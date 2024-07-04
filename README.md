@@ -12,6 +12,7 @@ Python library for generating Brazilian auxiliary fiscal documents in PDF from X
 
 - DANFE - Documento Auxiliar da Nota Fiscal Eletrônica (NF-e)
 - DACCe - Documento Auxiliar da Carta de Correção Eletrônica (CC-e )
+- DACTE - Documento Auxiliar do Conhecimento de Transporte Eletrônico (CT-e)
 
 ## Beta Stage Notice 🚧
 
@@ -22,11 +23,19 @@ This library is currently in the beta stage of development. While it has many of
 - [FPDF2](https://github.com/py-pdf/fpdf2) - PDF creation library for Python
 - phonenumbers
 - python-barcode
+- qrcode (only required for DACTE)
 
 ## To install 🔧
 
 ```bash
 pip install brazilfiscalreport
+```
+
+### Installing DACTE with Dependencies
+If you specifically need the DACTE functionality, you can install it along with its required dependencies using:
+
+```bash
+pip install brazilfiscalreport[dacte]
 ```
 
 ## Usage examples 🚀
@@ -65,6 +74,25 @@ cce = DaCCe(xml=xml_content)
 
 # Save the generated PDF to a file
 cce.output('cce.pdf')
+```
+
+### DACTE
+
+```python
+from brazilfiscalreport.dacte import Dacte
+
+# Path to the XML file
+xml_file_path = 'dacte.xml'
+
+# Load XML Content
+with open(xml_file_path, "r", encoding="utf8") as file:
+    xml_content = file.read()
+
+# Instantiate the DACTE object with the loaded XML content
+dacte = Dacte(xml=xml_content)
+
+# Save the generated PDF to a file
+dacte.output('dacte.pdf')
 ```
 
 ## Samples 📝
@@ -197,6 +225,75 @@ config = DanfeConfig(
 # Use this config when creating a Danfe instance
 danfe = Danfe(xml_content, config=config)
 danfe.output('output_danfe.pdf')
+```
+
+## Customizing DACTE
+
+This section describes how to customize the PDF output of the DACTE using the DacteConfig class. You can adjust various settings such as margins, fonts, and tax configurations according to your needs.
+
+###  Configuration Options
+
+Here is a breakdown of all the configuration options available in ``DanfeConfig``:
+
+1. **Logo**
+   - **Type**: ``str``, ``BytesIO``, or ``bytes``
+   - **Description**: Path to the logo file or binary image data to be included in the PDF. You can use a file path string or pass image data directly.
+   - **Example**:
+        ```python
+       config.logo = "path/to/logo.jpg"  # Using a file path
+      ```
+   - **Default**: No logo.
+
+
+2. **Margins**
+   - **Type**: ``Margins``
+   - **Fields**: ``top``, ``right``, ``bottom``, ``left`` (all of type ``Number``)
+   - **Description**: Sets the page margins for the PDF document.
+   - **Example**:
+        ```python
+        config.margins = Margins(top=5, right=5, bottom=5, left=5)
+        ```
+   - **Default**: top, right, bottom and left is 2 mm.
+
+3. **Font Type**
+   - **Type**: ``FontType`` (Enum)
+   - **Values**: ``COURIER``, ``TIMES``
+   - **Description**: Font style used throughout the PDF document.
+   - **Example**::
+        ```python
+       config.font_type = FontType.COURIER
+        ```
+   - **Default**: ``TIMES``
+
+### Usage Example with Customization
+
+Here’s how to set up a DacteConfig object with a full set of customizations:
+
+```python
+from brazilfiscalreport.dacte import (
+    Dacte,
+    DacteConfig,
+    FontType,
+    Margins,
+)
+
+# Path to the XML file
+xml_file_path = 'cte.xml'
+
+# Load XML Content
+with open(xml_file_path, "r", encoding="utf8") as file:
+    xml_content = file.read()
+
+# Create a configuration instance
+config = DacteConfig(
+    logo='path/to/logo.png',
+    margins=Margins(top=10, right=10, bottom=10, left=10),
+    font_type=FontType.TIMES
+)
+
+# Use this config when creating a Dacte instance
+dacte = Dacte(xml_content, config=config)
+dacte.output('output_dacte.pdf')
 ```
 
 ## Credits 🙌

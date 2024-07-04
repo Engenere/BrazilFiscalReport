@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cteProc versao="4.00" xmlns="http://www.portalfiscal.inf.br/cte">
+    <CTe xmlns="http://www.portalfiscal.inf.br/cte">
+        <infCte versao="4.00" Id="CTe42240302484555000343570020003396861082134657">
+            <ide>
+                <cUF>01</cUF>
+                <cCT>0111111</cCT>
+                <CFOP>6353</CFOP>
+                <natOp>PRESTACAO DE SERVICO</natOp>
+                <mod>57</mod>
+                <serie>2</serie>
+                <nCT>99203223</nCT>
+                <dhEmi>2024-03-27T00:00:00-03:00</dhEmi>
+                <tpImp>1</tpImp>
+                <tpEmis>1</tpEmis>
+                <cDV>3</cDV>
+                <tpAmb>2</tpAmb>
+                <tpCTe>0</tpCTe>
+                <procEmi>0</procEmi>
+                <verProc>4.0</verProc>
+                <cMunEnv>4216305</cMunEnv>
+                <xMunEnv>SAO JOAO BATISTA</xMunEnv>
+                <UFEnv>SC</UFEnv>
+                <modal>01</modal>
+                <tpServ>0</tpServ>
+                <cMunIni>4216305</cMunIni>
+                <xMunIni>SAO JOAO BATISTA</xMunIni>
+                <UFIni>SC</UFIni>
+                <cMunFim>3556453</cMunFim>
+                <xMunFim>VARGEM GRANDE PAULISTA</xMunFim>
+                <UFFim>SP</UFFim>
+                <retira>1</retira>
+                <indIEToma>1</indIEToma>
+                <toma3>
+                    <toma>0</toma>
+                </toma3>
+            </ide>
+            <compl>
+                <Entrega>
+                    <semData>
+                        <tpPer>0</tpPer>
+                    </semData>
+                    <semHora>
+                        <tpHor>0</tpHor>
+                    </semHora>
+                </Entrega>
+                <ObsCont xCampo="Lei da Transparencia">
+                    <xTexto>O valor aproximado de tributos incidentes sobre o preco deste servico e de R$ 56,40</xTexto>
+                </ObsCont>
+            </compl>
+            <emit>
+                <CNPJ>92382301841312</CNPJ>
+                <IE>232412442</IE>
+                <xNome>FANTASMA TRANSPORTES LTDA</xNome>
+                <xFant>FANTASMA TRANSPORTES LTDA</xFant>
+                <enderEmit>
+                    <xLgr>RUA TESTE FANTASMA</xLgr>
+                    <nro>0099</nro>
+                    <xBairro>FANTASMA</xBairro>
+                    <cMun>4216305</cMun>
+                    <xMun>SAO JOAO BATISTA</xMun>
+                    <CEP>88240000</CEP>
+                    <UF>SC</UF>
+                    <fone>489999009</fone>
+                </enderEmit>
+                <CRT>1</CRT>
+            </emit>
+            <rem>
+                <CNPJ>23924902942209</CNPJ>
+                <IE>224242421</IE>
+                <xNome>INDUSTRIA FANTASMA DE TESTE</xNome>
+                <xFant>INDUSTRIA FANTASMA DE TESTE</xFant>
+                <fone>47232332239</fone>
+                <enderReme>
+                    <xLgr>RODOVIA SC FANTASMA</xLgr>
+                    <nro>122</nro>
+                    <xBairro>TESTE</xBairro>
+                    <cMun>4216305</cMun>
+                    <xMun>SAO JOAO BATISTA</xMun>
+                    <CEP>88240000</CEP>
+                    <UF>SC</UF>
+                    <cPais>1058</cPais>
+                    <xPais>BRASIL</xPais>
+                </enderReme>
+            </rem>
+            <dest>
+                <CNPJ>02394820392092</CNPJ>
+                <IE>224242421</IE>
+                <xNome>EMPRESA DE TESTE</xNome>
+                <fone>23424242442</fone>
+                <enderDest>
+                    <xLgr>TESTE L.A</xLgr>
+                    <nro>21</nro>
+                    <xCpl>AO LADO DE EMPRESA FANTASMA</xCpl>
+                    <xBairro>TESTE</xBairro>
+                    <cMun>3556453</cMun>
+                    <xMun>VARGEM GRANDE PAULISTA</xMun>
+                    <CEP>06730000</CEP>
+                    <UF>SP</UF>
+                    <cPais>1058</cPais>
+                    <xPais>BRASIL</xPais>
+                </enderDest>
+            </dest>
+            <vPrest>
+                <vTPrest>221.19</vTPrest>
+                <vRec>221.19</vRec>
+                <Comp>
+                    <xNome>FPESO</xNome>
+                    <vComp>117.78</vComp>
+                </Comp>
+                <Comp>
+                    <xNome>FVALOR</xNome>
+                    <vComp>4.24</vComp>
+                </Comp>
+                <Comp>
+                    <xNome>PEDAGIO</xNome>
+                    <vComp>13.11</vComp>
+                </Comp>
+                <Comp>
+                    <xNome>TAXAS</xNome>
+                    <vComp>79.64</vComp>
+                </Comp>
+                <Comp>
+                    <xNome>GRIS</xNome>
+                    <vComp>3.15</vComp>
+                </Comp>
+                <Comp>
+                    <xNome>TAS</xNome>
+                    <vComp>3.27</vComp>
+                </Comp>
+            </vPrest>
+            <imp>
+                <ICMS>
+                    <ICMS00>
+                        <CST>00</CST>
+                        <vBC>221.19</vBC>
+                        <pICMS>12.00</pICMS>
+                        <vICMS>26.54</vICMS>
+                    </ICMS00>
+                </ICMS>
+                <vTotTrib>56.40</vTotTrib>
+            </imp>
+            <infCTeNorm>
+                <infCarga>
+                    <vCarga>3016.92</vCarga>
+                    <proPred>FITA GOMADA SEMI-KRAFT 80MM C/REFORCO CADEADO</proPred>
+                    <infQ>
+                        <cUnid>03</cUnid>
+                        <tpMed>UNIDADE</tpMed>
+                        <qCarga>14</qCarga>
+                    </infQ>
+                    <infQ>
+                        <cUnid>03</cUnid>
+                        <tpMed>PARES</tpMed>
+                        <qCarga>0</qCarga>
+                    </infQ>
+                    <infQ>
+                        <cUnid>00</cUnid>
+                        <tpMed>M3</tpMed>
+                        <qCarga>0.0000</qCarga>
+                    </infQ>
+                    <infQ>
+                        <cUnid>01</cUnid>
+                        <tpMed>PESO REAL</tpMed>
+                        <qCarga>209.8000</qCarga>
+                    </infQ>
+                    <infQ>
+                        <cUnid>01</cUnid>
+                        <tpMed>PESO BASE DE CALCULO</tpMed>
+                        <qCarga>209.8000</qCarga>
+                    </infQ>
+                    <vCargaAverb>3016.92</vCargaAverb>
+                </infCarga>
+                <infDoc>
+                    <infNFe>
+                        <chave>02394910232349239234934138491040891884149930</chave>
+                    </infNFe>
+                </infDoc>
+                <infModal versaoModal="4.00">
+                    <rodo>
+                        <RNTRC>23920392</RNTRC>
+                    </rodo>
+                </infModal>
+            </infCTeNorm>
+        </infCte>
+        <infCTeSupl>
+            <qrCodCTe>
+                https://dfe-portal.svrs.rs.gov.br/cte/qrCode?chCTe=42240302484555000343570020003396861081562222&amp;tpAmb=1
+            </qrCodCTe>
+        </infCTeSupl>
+    </CTe>
+    <protCTe versao="4.00" xmlns="http://www.portalfiscal.inf.br/cte">
+        <infProt Id="CTe342240111248006">
+            <tpAmb>1</tpAmb>
+            <verAplic>RS20240222155212</verAplic>
+            <chCTe>4224030248244242523254224232424242</chCTe>
+            <dhRecbto>2024-03-27T20:17:16-03:00</dhRecbto>
+            <nProt>2324240111249023</nProt>
+            <digVal>UCtDCEsja/Ljq5GjpftJHAK3oHI=</digVal>
+            <cStat>100</cStat>
+            <xMotivo>Autorizado o uso do CT-e</xMotivo>
+        </infProt>
+    </protCTe>
+</cteProc>

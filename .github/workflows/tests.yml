@@ -28,7 +28,7 @@ jobs:
         run: sudo apt-get update --allow-releaseinfo-change && sudo apt-get install qpdf
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip setuptools fpdf2 phonenumbers python-barcode pytest  pytest-cov
+          python -m pip install --upgrade pip setuptools fpdf2 phonenumbers python-barcode pytest qrcode  pytest-cov
       - name: Test
         run: |
           pytest --cov=./brazilfiscalreport --cov-report=xml --cov-branch --doctest-glob="docs/*.md"

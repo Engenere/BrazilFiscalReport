@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mdfeProc xmlns="http://www.portalfiscal.inf.br/mdfe" versao="3.00">
+    <MDFe xmlns="http://www.portalfiscal.inf.br/mdfe">
+        <infMDFe Id="MDFe42240802582975000109580010000000151986453241" versao="3.00">
+            <ide>
+                <cUF>42</cUF>
+                <tpAmb>2</tpAmb>
+                <tpEmit>2</tpEmit>
+                <mod>90</mod>
+                <serie>1</serie>
+                <nMDF>15</nMDF>
+                <cMDF>00000000</cMDF>
+                <cDV>8</cDV>
+                <modal>1</modal>
+                <dhEmi>2024-08-09T13:38:07-03:00</dhEmi>
+                <tpEmis>1</tpEmis>
+                <procEmi>0</procEmi>
+                <UFIni>SC</UFIni>
+                <UFFim>SC</UFFim>
+                <infMunCarrega>
+                    <cMunCarrega>0090001</cMunCarrega>
+                    <xMunCarrega>SÃO JOÃO BATISTA</xMunCarrega>
+                </infMunCarrega>
+                <infPercurso>
+                    <UFPer>SC</UFPer>
+                </infPercurso>
+                <infPercurso>
+                    <UFPer>SC</UFPer>
+                </infPercurso>
+                <dhIniViagem>2024-08-11T13:38:07-03:00</dhIniViagem>
+            </ide>
+            <emit>
+                <CNPJ>00112233445566</CNPJ>
+                <IE>9922334455</IE>
+                <xNome>EMPRESA FANTASMA</xNome>
+                <xFant>EMPRESA FANTASMA</xFant>
+                <enderEmit>
+                    <xLgr>RUA TESTE 0011</xLgr>
+                    <nro>0022</nro>
+                    <xCpl>KM 00</xCpl>
+                    <xBairro>COBRE</xBairro>
+                    <cMun>0099223</cMun>
+                    <xMun>CANELINHA</xMun>
+                    <CEP>88230000</CEP>
+                    <UF>SC</UF>
+                    <fone>48999999999</fone>
+                    <email>teste@gmail.com</email>
+                </enderEmit>
+            </emit>
+            <infSeg>
+                <nfSeg>
+                    <xSeg>SEGURADO TESTE</xSeg>
+                    <CNPJ>12345678000199</CNPJ>
+                    <nApol>12345678901234567890</nApol>
+                    <nAver>1234567890123456789012345678901234567890</nAver>
+                </nfSeg>
+            </infSeg>
+            <infModal versaoModal="3.00">
+                <rodo>
+                    <infANTT>
+                        <RNTRC>00000000</RNTRC>
+                    </infANTT>
+                    <veicTracao>
+                        <placa>RB09832</placa>
+                        <RENAVAM>09022129834</RENAVAM>
+                        <tara>2100</tara>
+                        <capKG>16000</capKG>
+                        <capM3>37</capM3>
+                        <condutor>
+                            <xNome>CONDUTOR TESTE</xNome>
+                            <CPF>92309230203</CPF>
+                        </condutor>
+                        <tpRod>02</tpRod>
+                        <tpCar>02</tpCar>
+                        <UF>SC</UF>
+                    </veicTracao>
+                </rodo>
+            </infModal>
+            <infDoc>
+                <infMunDescarga>
+                    <cMunDescarga>0909233</cMunDescarga>
+                    <xMunDescarga>BRUSQUE</xMunDescarga>
+                    <infNFe>
+                        <chNFe>09429847849344792357634954023782021734928955</chNFe>
+                    </infNFe>
+                    <infNFe>
+                        <chNFe>08429847849344792357634954023782021734928955</chNFe>
+                    </infNFe>
+                    <infNFe>
+                        <chNFe>09429847849344792357634954023782021734928955</chNFe>
+                    </infNFe>
+                    <infNFe>
+                        <chNFe>08429847849344792357634954023782021734928955</chNFe>
+                    </infNFe>
+                </infMunDescarga>
+            </infDoc>
+            <tot>
+                <qNFe>2</qNFe>
+                <vCarga>41873.80</vCarga>
+                <cUnid>01</cUnid>
+                <qCarga>7033.1300</qCarga>
+            </tot>
+            <autXML>
+                <CNPJ>90329384788454</CNPJ>
+            </autXML>
+            <infAdic />
+        </infMDFe>
+        <infMDFeSupl>
+            <qrCodMDFe>
+                https://dfe-portal.svrs.rs.gov.br/mdfe/QRCode?chMDFe=42240802582975000109580010000000151908765432&amp;tpAmb=1
+            </qrCodMDFe>
+        </infMDFeSupl>
+    </MDFe>
+    <protMDFe versao="3.00" xmlns="http://www.portalfiscal.inf.br/mdfe">
+        <infProt Id="MDFe942240018699639">
+            <tpAmb>1</tpAmb>
+            <chMDFe>42240802582975000109580010000000151908765432</chMDFe>
+            <dhRecbto>2024-08-09T13:43:42-03:00</dhRecbto>
+            <nProt>942240018699639</nProt>
+            <digVal>KGdmh/XYMKRySFCfXZat4VFHo7g=</digVal>
+            <cStat>100</cStat>
+            <xMotivo>Autorizado o uso do MDF-e</xMotivo>
+        </infProt>
+    </protMDFe>
+</mdfeProc>

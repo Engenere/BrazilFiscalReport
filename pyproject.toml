@@ -37,6 +37,13 @@ dependencies = [
     "python-barcode"
 ]
 
+# DACTE specific dependencies
+[project.optional-dependencies]
+dacte = [
+    "qrcode",
+]
+
+
 [project.readme]
 file = "README.md"
 content-type = "text/markdown"

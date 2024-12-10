@@ -56,6 +56,15 @@ def test_dacte_default_logo(tmp_path, load_dacte, logo_path):
     assert_pdf_equal(dacte, pdf_path, tmp_path)
 
 
+def test_dacte_default_aquaviario(tmp_path, load_dacte, logo_path):
+    dacte_config = DacteConfig(
+        logo=logo_path,
+    )
+    dacte = load_dacte("dacte_aquaviario_test.xml", config=dacte_config)
+    pdf_path = get_pdf_output_path("dacte", "dacte_default_aquaviario")
+    assert_pdf_equal(dacte, pdf_path, tmp_path)
+
+
 def test_dacte_default_aereo(tmp_path, load_dacte, logo_path):
     dacte_config = DacteConfig(
         logo=logo_path,

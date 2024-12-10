@@ -1,7 +1,7 @@
 import warnings
 from io import BytesIO
 
-from barcode import Code128
+from barcode.codex import Code128
 from barcode.writer import SVGWriter
 
 from brazilfiscalreport.pdf_element import Element

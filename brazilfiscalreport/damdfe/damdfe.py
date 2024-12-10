@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from io import BytesIO
 from xml.etree.ElementTree import Element
 
-from barcode import Code128
+from barcode.codex import Code128
 from barcode.writer import SVGWriter
 
 from ..dacte.generate_qrcode import draw_qr_code

@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 from io import BytesIO
 from xml.etree.ElementTree import Element
 
-from barcode import Code128
+from barcode.codex import Code128
 from barcode.writer import SVGWriter
 
 from ..utils import (

@@ -68,6 +68,7 @@ class Dacte(xFPDF):
         self.inf_modal = root.find(f"{URL}infModal")
         self.imp = root.find(f"{URL}imp")
         self.compl = root.find(f"{URL}compl")
+        self.aquav = root.find(f"{URL}aquav")
 
         self.obs_dacte_list = []
         for obs in self.compl:
@@ -1560,6 +1561,142 @@ class Dacte(xFPDF):
             style="",
         )
 
+    def draw_aquaviario_info(self, config):
+        x_margin = self.l_margin
+        page_width = self.epw
+        self.nLacre = extract_text(self.inf_modal, "nLacre")
+        self.nCont = extract_text(self.inf_modal, "nCont")
+        self.xNavio = extract_text(self.inf_modal, "xNavio")
+        self.vAFRMM = format_number(extract_text(self.inf_modal, "vAFRMM"), precision=2)
+
+        self.balsas = []
+        for balsa in self.aquav:
+            xBalsa = extract_text(balsa, "xBalsa")
+            if xBalsa:
+                self.balsas.append(xBalsa)
+
+        section_start_y = self.get_y() + 7
+        section_start_y = self.draw_section(
+            section_start_y,
+            13,
+            "INFORMAÇÕES ESPECÍFICAS DO MODAL AQUAVIÁRIO",
+        )
+        self.rect(
+            x=x_margin,
+            y=section_start_y - 10,
+            w=page_width - 0.1 * x_margin,
+            h=6,
+            style="",
+        )
+
+        col_width = (page_width - 2 * x_margin) / 2
+        for i in range(1, 2):
+            x_line = x_margin + i * col_width
+            self.line(
+                x1=x_line,
+                x2=x_line,
+                y1=section_start_y - 10,
+                y2=section_start_y - 4,
+            )
+
+        self.set_font(self.default_font, "", 6)
+        road_titles = [
+            "LACRE",
+            "IDENTIFICAÇÃO DO CONTAINER",
+        ]
+
+        road_values = [
+            f"{self.nLacre}",
+            f"{self.nCont}",
+        ]
+
+        for i, (title, value) in enumerate(zip(road_titles, road_values)):
+            self.set_xy(x_margin + i * col_width, section_start_y - 10)
+            self.multi_cell(w=col_width, h=3, text=title, align="L")
+            self.set_font(self.default_font, "B", 7)
+            self.set_xy(x_margin + i * col_width, section_start_y - 7)
+            self.multi_cell(w=col_width, h=3, text=value, align="L")
+            self.set_font(self.default_font, "", 6)
+
+        section_start_y = self.get_y()
+        section_start_y = self.draw_section(
+            section_start_y,
+            13,
+            "INFORMAÇÕES ESPECÍFICAS DO MODAL AQUAVIÁRIO",
+        )
+        self.rect(
+            x=x_margin,
+            y=section_start_y - 10,
+            w=page_width - 0.1 * x_margin,
+            h=6,
+            style="",
+        )
+
+        col_width = (page_width - 2 * x_margin) / 3
+        for i in range(1, 3):
+            x_line = x_margin + i * col_width
+            self.line(
+                x1=x_line,
+                x2=x_line,
+                y1=section_start_y - 10,
+                y2=section_start_y - 4,
+            )
+
+        self.set_font(self.default_font, "", 6)
+        road_titles = [
+            "IDENTIFICAÇÃO DO NAVIO / REBOCADOR",
+            "IDENTIFICAÇÃO DA BALSA",
+            "VLR DO AFRMM",
+        ]
+
+        road_values = [
+            f"{self.xNavio}",
+            f"{' '.join(self.balsas)}",
+            f"R$ {self.vAFRMM}",
+        ]
+
+        for i, (title, value) in enumerate(zip(road_titles, road_values)):
+            self.set_xy(x_margin + i * col_width, section_start_y - 10)
+            self.multi_cell(w=col_width, h=3, text=title, align="L")
+            if i == 3:
+                self.set_font(self.default_font, "B", 6)
+            else:
+                self.set_font(self.default_font, "B", 7)
+            self.set_xy(x_margin + i * col_width, section_start_y - 7)
+            self.multi_cell(w=col_width, h=3, text=value, align="L")
+            self.set_font(self.default_font, "", 6)
+
+        self.set_font(self.default_font, "", 7)
+        section_start_y = self.get_y()
+        section_start_y = self.draw_section(
+            section_start_y, 3, "USO EXCLUSIVO DO EMISSOR DO CT-E"
+        )
+        self.set_margins(
+            left=config.margins.left,
+            top=config.margins.top,
+            right=config.margins.right,
+        )
+        margins_to_height = {
+            2: 18,
+            3: 17,
+            4: 15,
+            5: 14,
+            6: 12,
+            7: 11,
+            8: 10,
+            9: 9,
+            10: 9,
+        }
+        rect_height = margins_to_height[config.margins.left]
+
+        self.rect(
+            x=x_margin,
+            y=section_start_y,
+            w=page_width - 0.1 * x_margin,
+            h=rect_height,
+            style="",
+        )
+
     def _draw_specific_data(self, config):
         x_margin = self.l_margin
         page_width = self.epw
@@ -1641,6 +1778,8 @@ class Dacte(xFPDF):
             )
         if self.tp_modal == ModalType.AEREO:
             self.draw_aereo_info(config)
+        if self.tp_modal == ModalType.AQUAVIARIO:
+            self.draw_aquaviario_info(config)
 
     # Adicionando outra página
     def _add_new_page(self, config):

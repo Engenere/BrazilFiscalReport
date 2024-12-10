@@ -291,7 +291,15 @@ class Damdfe(xFPDF):
         self.draw_vertical_lines_left(
             start_y=y_margin + 26, end_y=y_margin + 43, num_lines=4
         )
-
+        position_dict = {
+            5: 25,
+            6: 25,
+            7: 24,
+            8: 24,
+            9: 24,
+            10: 23,
+        }
+        position = position_dict.get(self.config.margins.left)
         self.set_xy(x=x_margin, y=y_middle)
         self.multi_cell(
             w=100,
@@ -311,7 +319,7 @@ class Damdfe(xFPDF):
         )
 
         self.set_font(self.default_font, "B", 7)
-        self.set_xy(x=x_margin + 25, y=y_middle)
+        self.set_xy(x=x_margin + position, y=y_middle)
         self.multi_cell(
             w=100,
             h=3,
@@ -321,7 +329,7 @@ class Damdfe(xFPDF):
         )
 
         self.set_font(self.default_font, "", 7)
-        self.set_xy(x=x_margin + 25, y=y_middle + 4)
+        self.set_xy(x=x_margin + position, y=y_middle + 4)
         self.multi_cell(
             w=100,
             h=3,
@@ -331,7 +339,7 @@ class Damdfe(xFPDF):
         )
 
         self.set_font(self.default_font, "B", 7)
-        self.set_xy(x=x_margin + 50, y=y_middle)
+        self.set_xy(x=x_margin + 25 + position, y=y_middle)
         self.multi_cell(
             w=100,
             h=3,
@@ -341,7 +349,7 @@ class Damdfe(xFPDF):
         )
 
         self.set_font(self.default_font, "", 7)
-        self.set_xy(x=x_margin + 50, y=y_middle + 4)
+        self.set_xy(x=x_margin + 25 + position, y=y_middle + 4)
         self.multi_cell(
             w=100,
             h=3,
@@ -351,7 +359,7 @@ class Damdfe(xFPDF):
         )
 
         self.set_font(self.default_font, "B", 7)
-        self.set_xy(x=x_margin + 75, y=y_middle)
+        self.set_xy(x=x_margin + 50 + position, y=y_middle)
         self.multi_cell(
             w=100,
             h=3,
@@ -361,7 +369,7 @@ class Damdfe(xFPDF):
         )
 
         self.set_font(self.default_font, "", 7)
-        self.set_xy(x=x_margin + 75, y=y_middle + 4)
+        self.set_xy(x=x_margin + 50 + position, y=y_middle + 4)
         self.multi_cell(
             w=100,
             h=3,
@@ -378,7 +386,18 @@ class Damdfe(xFPDF):
             start_y=y_margin + 26, end_y=y_margin + 43, num_lines=2
         )
 
-        self.set_xy(x=y_middle + 26, y=y_middle - 2.8)
+        position_middle_dict = {
+            5: 26,
+            6: 25,
+            7: 24,
+            8: 23,
+            9: 22,
+            10: 21,
+        }
+        position_middle = position_middle_dict.get(self.config.margins.left)
+
+        self.set_font(self.default_font, "B", 7)
+        self.set_xy(x=y_middle + position_middle, y=y_middle - 2.8)
         self.multi_cell(
             w=100,
             h=3,
@@ -387,7 +406,8 @@ class Damdfe(xFPDF):
             align="L",
         )
 
-        self.set_xy(x=y_middle + 26, y=y_middle + 0.5)
+        self.set_font(self.default_font, "", 7)
+        self.set_xy(x=y_middle + position_middle, y=y_middle + 0.5)
         self.multi_cell(
             w=100,
             h=3,
@@ -396,7 +416,18 @@ class Damdfe(xFPDF):
             align="L",
         )
 
-        self.set_xy(x=y_middle + 76, y=y_middle - 2.8)
+        position_condutores_dict = {
+            5: 76,
+            6: 74,
+            7: 72,
+            8: 71,
+            9: 69,
+            10: 68,
+        }
+        position_condutores = position_condutores_dict.get(self.config.margins.left)
+
+        self.set_font(self.default_font, "B", 7)
+        self.set_xy(x=y_middle + position_condutores, y=y_middle - 2.8)
         self.multi_cell(
             w=100,
             h=3,
@@ -405,7 +436,8 @@ class Damdfe(xFPDF):
             align="L",
         )
 
-        self.set_xy(x=y_middle + 76, y=y_middle + 0.5)
+        self.set_font(self.default_font, "", 7)
+        self.set_xy(x=y_middle + position_condutores, y=y_middle + 0.5)
         self.multi_cell(
             w=100,
             h=3,
@@ -1111,10 +1143,12 @@ class Damdfe(xFPDF):
         page_width = self.epw
 
         self.mun_descarregamento = extract_text(self.inf_doc, "xMunDescarga")
-        self.cnpj_forn = extract_text(self.disp, "CNPJForn")
-        self.cnpj_pag = extract_text(self.disp, "CNPJPg")
-        self.num_comra = extract_text(self.disp, "nCompra")
-        self.valor_pedagio = extract_text(self.disp, "vValePed")
+        self.cnpj_forn = extract_text(self.inf_modal, "CNPJForn")
+        self.cnpj_pag = extract_text(self.inf_modal, "CNPJPg")
+        self.num_comra = extract_text(self.inf_modal, "nCompra")
+        self.valor_pedagio = format_number(
+            extract_text(self.inf_modal, "vValePed"), precision=2
+        )
 
         if self.tp_modal == ModalType.RODOVIARIO:
             self.rect(x=x_margin, y=y_margin + 10.5, w=page_width - 0.5, h=30, style="")
@@ -1132,9 +1166,19 @@ class Damdfe(xFPDF):
                 start_y=y_margin + 14.5, end_y=y_margin + 18.5, num_lines=2
             )
 
+            position_rodoviario_dict = {
+                5: 59,
+                6: 58,
+                7: 57,
+                8: 57,
+                9: 55,
+                10: 55,
+            }
+            position_rodoviario = position_rodoviario_dict.get(self.config.margins.left)
+
             # Informações de Vale Pedágio
             # CPF
-            self.set_font(self.default_font, "B", 6)
+            self.set_font(self.default_font, "B", 6.5)
             self.set_xy(x=x_margin + 12, y=y_middle + 1)
             self.multi_cell(
                 w=100,
@@ -1143,9 +1187,19 @@ class Damdfe(xFPDF):
                 border=0,
                 align="L",
             )
+            self.set_font(self.default_font, "", 6.5)
+            self.set_xy(x=x_margin + 17, y=y_middle + 5)
+            self.multi_cell(
+                w=100,
+                h=3,
+                text=self.cnpj_forn,
+                border=0,
+                align="L",
+            )
 
             # CPF/CNPJ DO RESPONSÁVEL
-            self.set_xy(x=x_margin + 59, y=y_middle + 1)
+            self.set_font(self.default_font, "B", 6.5)
+            self.set_xy(x=x_margin + position_rodoviario, y=y_middle + 1)
             self.multi_cell(
                 w=100,
                 h=3,
@@ -1153,9 +1207,31 @@ class Damdfe(xFPDF):
                 border=0,
                 align="L",
             )
+            self.set_font(self.default_font, "", 6.5)
+            self.set_xy(x=x_margin + position_rodoviario + 7, y=y_middle + 5)
+            self.multi_cell(
+                w=100,
+                h=3,
+                text=self.cnpj_pag,
+                border=0,
+                align="L",
+            )
+
+            position_rodoviario_middle_dict = {
+                5: 15,
+                6: 15,
+                7: 14,
+                8: 14,
+                9: 11,
+                10: 11,
+            }
+            position__middle_rodoviario = position_rodoviario_middle_dict.get(
+                self.config.margins.left
+            )
 
             # NÚMERO DO COMPROVANTE
-            self.set_xy(x=y_middle + 15, y=y_middle + 1)
+            self.set_font(self.default_font, "B", 6.5)
+            self.set_xy(x=y_middle + position__middle_rodoviario, y=y_middle + 1)
             self.multi_cell(
                 w=100,
                 h=3,
@@ -1164,8 +1240,31 @@ class Damdfe(xFPDF):
                 align="L",
             )
 
+            self.set_font(self.default_font, "", 6.5)
+            self.set_xy(x=y_middle + position__middle_rodoviario + 6, y=y_middle + 5)
+            self.multi_cell(
+                w=100,
+                h=3,
+                text=self.num_comra,
+                border=0,
+                align="L",
+            )
+
+            position_vale_pedagio_middle_dict = {
+                5: 67,
+                6: 67,
+                7: 65,
+                8: 65,
+                9: 60,
+                10: 58,
+            }
+            position__vale_pedagio_rodoviario = position_vale_pedagio_middle_dict.get(
+                self.config.margins.left
+            )
+
             # VALOR DO VALE-PEDÁGIO
-            self.set_xy(x=y_middle + 67, y=y_middle + 1)
+            self.set_font(self.default_font, "B", 6.5)
+            self.set_xy(x=y_middle + position__vale_pedagio_rodoviario, y=y_middle + 1)
             self.multi_cell(
                 w=100,
                 h=3,
@@ -1173,6 +1272,19 @@ class Damdfe(xFPDF):
                 border=0,
                 align="L",
             )
+
+            self.set_font(self.default_font, "", 6.5)
+            self.set_xy(
+                x=y_middle + position__vale_pedagio_rodoviario + 8, y=y_middle + 5
+            )
+            if self.valor_pedagio >= "1":
+                self.multi_cell(
+                    w=100,
+                    h=3,
+                    text=f"R$ {self.valor_pedagio}",
+                    border=0,
+                    align="L",
+                )
 
             y_middle = y_margin + 18.5
             self.line(x_margin, y_middle, x_margin + page_width - 0.5, y_middle)

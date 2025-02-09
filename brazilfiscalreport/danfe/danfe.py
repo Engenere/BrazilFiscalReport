@@ -46,6 +46,7 @@ def extract_text(node: Element, tag: str) -> str:
 class Danfe(xFPDF):
     def __init__(self, xml, config: DanfeConfig = None):
         super().__init__(unit="mm", format="A4")
+
         config = config if config is not None else DanfeConfig()
         self.set_margins(
             left=config.margins.left, top=config.margins.top, right=config.margins.right
@@ -114,6 +115,9 @@ class Danfe(xFPDF):
         self.products = self._get_products_info()
 
         self.add_page(orientation=self.orientation)
+
+        self._size_definitions()
+        self._size_computations()
 
         # simulate render for get block sizes.
         addit_data = self._get_additional_data_content()
@@ -372,8 +376,8 @@ class Danfe(xFPDF):
     def _get_additional_data_content(self):
         fisco = extract_text(self.inf_adic, "infAdFisco")
         obs = extract_text(self.inf_adic, "infCpl")
-        dest_end, cpl, cpl_truncado = self._get_dest_end_text(self.dest)
-        if cpl_truncado:
+        dest_end, cpl, dest_end_truncado = self._get_dest_end_text(self.dest)
+        if dest_end_truncado:
             obs += "Complemento do destinatário: " + cpl + "."
         if fisco:
             obs = f"{obs} {fisco}\n"
@@ -821,31 +825,27 @@ class Danfe(xFPDF):
             )
         )
 
-        # pre-definitions line 2
-        w_dest_bairro = 50
-        w_data_cep = 25
-        w_data_ent_sai = 30
-        w_dest_end = block_dest.w - w_dest_bairro - w_data_cep - w_data_ent_sai
-
         block_dest.add_field(
             DanfeBasicField(
-                w=w_dest_end, description="ENDEREÇO", content=dest_end, pdf=self
+                w=self.w_dest_end, description="ENDEREÇO", content=dest_end, pdf=self
             )
         )
         block_dest.add_field(
             DanfeBasicField(
-                w=w_dest_bairro,
+                w=self.w_dest_bairro,
                 description="BAIRRO / DISTRITO",
                 content=dest_bairro,
                 pdf=self,
             )
         )
         block_dest.add_field(
-            DanfeBasicField(w=w_data_cep, description="CEP", content=dest_cep, pdf=self)
+            DanfeBasicField(
+                w=self.w_data_cep, description="CEP", content=dest_cep, pdf=self
+            )
         )
         block_dest.add_field(
             DanfeBasicField(
-                w=w_data_ent_sai,
+                w=self.w_data_ent_sai,
                 description="DATA DA ENTRADA / SAÍDA",
                 content=date_sai_ent,
                 new_x="L_BLOCK",
@@ -1420,8 +1420,36 @@ class Danfe(xFPDF):
         if complemento:
             partes.append(complemento)
         dest_end = ", ".join(partes)
-        cpl_truncado = False
-        if len(dest_end) > 85:
-            dest_end = dest_end[:85]
-            cpl_truncado = True
-        return dest_end, complemento, cpl_truncado
+        dest_end_truncado = False
+
+        font_atual = self.font_face()
+        self.set_font(self.default_font, "", 8)
+        w_text_dest_end = self.get_string_width(dest_end)
+
+        if w_text_dest_end > self.w_dest_end:
+            qtd_caracteres = 50
+            w_new_dest_end = 0
+            while w_new_dest_end < self.w_dest_end:
+                new_dest_end = dest_end[:qtd_caracteres]
+                w_new_dest_end = self.get_string_width(new_dest_end)
+                qtd_caracteres += 1
+            dest_end = new_dest_end
+            dest_end_truncado = True
+
+        self.set_font(font_atual.family, "", font_atual.size_pt)
+        return dest_end, complemento, dest_end_truncado
+
+    def _size_definitions(self):
+        # pre-definitions line 2
+        self.w_dest_bairro = 50
+        self.w_data_cep = 25
+        self.w_data_ent_sai = 30
+
+    def _size_computations(self):
+        any_block = DanfeBlock(
+            description="",
+            pdf=self,
+        )
+        self.w_dest_end = (
+            any_block.w - self.w_dest_bairro - self.w_data_cep - self.w_data_ent_sai
+        )

@@ -74,6 +74,7 @@ class Danfe(xFPDF):
         self.cobr = root.find(f"{URL}cobr")
         self.det = root.findall(f"{URL}det")
         self.inf_adic = root.find(f"{URL}infAdic")
+        self.nf_ref = root.find(f"{URL}NFref")
         self.issqn_tot = root.find(f"{URL}ISSQNtot")
         self.crt = extract_text(self.emit, "CRT")
 
@@ -373,15 +374,66 @@ class Danfe(xFPDF):
             products.append(product)
         return products
 
+    def _is_valid_cpf(self, cpf):
+        """Valida um CPF usando os dígitos verificadores."""
+        cpf = re.sub(r"\\\\\\\\D", "", cpf)  #
+
+        if len(cpf) != 11 or cpf in (c * 11 for c in "0123456789"):
+            return False  
+
+        
+        soma = sum(int(cpf[i]) * (10 - i) for i in range(9))
+        resto = soma % 11
+        dv1 = 0 if resto < 2 else 11 - resto
+
+        
+        soma = sum(int(cpf[i]) * (11 - i) for i in range(10))
+        resto = soma % 11
+        dv2 = 0 if resto < 2 else 11 - resto
+
+        return cpf[-2:] == f"{dv1}{dv2}"
+
+
+    def _extract_cnp_emitente(self, ref_nfe):
+        """Extrai e valida se o identificador do emitente é um CPF ou CNPJ."""
+        cpf_candidato = ref_nfe[9:20]
+
+
+        if self._is_valid_cpf(cpf_candidato):
+            return cpf_candidato
+
+        return ref_nfe[6:20]  
+
+
     def _get_additional_data_content(self):
-        fisco = extract_text(self.inf_adic, "infAdFisco")
-        obs = extract_text(self.inf_adic, "infCpl")
-        dest_end, cpl, cpl_truncado = self._get_dest_end_text(self.dest)
-        if cpl_truncado:
-            obs += "Complemento do destinatário: " + cpl + "."
+        fisco = ""
+        obs = ""
+
+        if hasattr(self, 'inf_adic') and self.inf_adic:
+            fisco = extract_text(self.inf_adic, "infAdFisco")
+            obs = extract_text(self.inf_adic, "infCpl") or ""
+
+        if not fisco and hasattr(self, 'nf_ref') and self.nf_ref:
+            ref_nfe = extract_text(self.nf_ref, "refNFe")
+
+            cnp_emitente = self._extract_cnp_emitente(ref_nfe)
+            modelo = ref_nfe[20:22]
+            serie = ref_nfe[22:25]
+            numero = ref_nfe[25:34]
+            data = ref_nfe[2:6]
+
+            fisco = (
+                f"Dados da nota de referência:\\\\\\\\n"
+                f"Modelo: {modelo}\\\\\\\\nSérie: {serie}\\\\\\\\nNúmero: {numero}\\\\\\\\n"
+                f"{'CPF' if len(cnp_emitente) == 11 else 'CNPJ'} do Emitente: {cnp_emitente}\\\\\\\\n"
+                f"Data de Emissão: {data[2:4]}/20{data[0:2]}\\\\\\\\n"
+                f"Chave de Acesso: {ref_nfe}"
+            )
+
         if fisco:
-            obs = f"{obs} {fisco}\n"
-        obs = " ".join(re.split(r"\s+", obs.strip(), flags=re.UNICODE))
+            obs = f"{obs} {fisco}".strip()
+
+        obs = " ".join(re.split(r"\\\\\\\\s+", obs.strip(), flags=re.UNICODE))
         return obs
 
     def _calculate_product_splits(self, products, height_product_table):

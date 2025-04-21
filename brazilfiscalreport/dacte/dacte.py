@@ -99,7 +99,7 @@ class Dacte(xFPDF):
             self.inf_doc_list.append(self.chave)
 
         self.comp_list = []
-        for comp in self.v_prest:
+        for comp in self.v_prest.findall(f"{URL}Comp"):
             self.xNome = extract_text(comp, "xNome")
             self.vComp = extract_text(comp, "vComp")
             self.comp_list.append((self.xNome, self.vComp))
@@ -1208,27 +1208,41 @@ class Dacte(xFPDF):
             self.line(x1=x_line, x2=x_line, y1=section_start_y, y2=section_start_y + 18)
 
         self.set_font(self.default_font, "", 8)
-        titles = ["NOME", "VALOR"]
-        for col in range(
-            2
-        ):  # TODO Arrumar a sopreposição do title: NOME E VALOR SOBRE o FPESO
-            self.set_xy(x_margin + col * col_width, section_start_y - 6)
-            self.multi_cell(w=col_width / 2, h=16, text=titles[0], align="L")
-            self.set_xy(x_margin + col * col_width + col_width / 2, section_start_y - 6)
-            self.multi_cell(w=col_width / 2, h=16, text=titles[1], align="L")
 
-        for row, (xNome, vComp) in enumerate(self.comp_list):
-            col = row % 3
-            actual_row = row // 3
-            self.set_xy(x_margin + col * col_width, section_start_y + (actual_row * 6))
-            self.multi_cell(w=col_width / 2, h=4, text=xNome, align="L")
-            self.set_xy(
-                x_margin + col * col_width + col_width / 2,
-                section_start_y + (actual_row * 6),
-            )
-            self.set_font(self.default_font, "B", 8)
-            self.multi_cell(w=col_width / 2, h=4, text=vComp, align="L")
-            self.set_font(self.default_font, "", 8)
+        # Desenha os títulos "NOME" e "VALOR" para as 3 colunas
+        titles = ["NOME", "VALOR"]
+        for col in range(3):
+            nome_x = x_margin + col * col_width
+            valor_x = nome_x + col_width / 2
+
+            # Imprime os títulos
+            self.set_xy(nome_x, section_start_y + 2)
+            self.cell(w=col_width / 2, h=4, text=titles[0], align="L")
+            self.set_xy(valor_x, section_start_y + 2)
+            self.cell(w=col_width / 2, h=4, text=titles[1], align="L")
+
+        # Distribuir os componentes em 3 colunas com 3 linhas cada
+        col1 = self.comp_list[:3]  # Primeiros 3 componentes
+        col2 = self.comp_list[3:6]  # Próximos 3 componentes
+        col3 = self.comp_list[6:9]  # Últimos 3 componentes
+
+        # Altura inicial para começo dos dados
+        data_y = section_start_y + 6
+
+        # Função auxiliar para imprimir uma coluna de componentes
+        def print_column(components, x_start):
+            current_y = data_y
+            for comp in components:
+                self.set_xy(x_start, current_y)
+                self.cell(w=col_width / 2, h=4, text=comp[0], align="L")
+                self.set_xy(x_start + col_width / 2, current_y)
+                self.cell(w=col_width / 2, h=4, text=comp[1], align="L")
+                current_y += 4  # Incrementa a posição Y para o próximo item
+
+        # Imprime cada coluna
+        print_column(col1, x_margin)  # Primeira coluna
+        print_column(col2, x_margin + col_width)  # Segunda coluna
+        print_column(col3, x_margin + 2 * col_width)  # Terceira coluna
 
         self.set_font(self.default_font, "", 8)
         self.set_xy(x_margin + 3 * col_width, section_start_y)

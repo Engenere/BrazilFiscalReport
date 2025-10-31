@@ -65,11 +65,14 @@ def assert_pdf_equal(
         actual_pdf = actual
     if at_epoch:
         actual_pdf.creation_date = EPOCH
+    # Allow regeneration via env var without changing tests
+    generate = generate or os.environ.get("BFR_GENERATE_EXPECTED") == "1"
     if generate:
         assert isinstance(expected, pathlib.Path), (
             "When passing `True` to `generate`"
             "a pathlib.Path must be provided as the `expected` parameter"
         )
+        expected.parent.mkdir(parents=True, exist_ok=True)
         with expected.open("wb") as output_file:
             actual_pdf.output(output_file, linearize=linearize)
         return

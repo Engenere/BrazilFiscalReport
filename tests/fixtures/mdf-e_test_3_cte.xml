@@ -49,6 +49,25 @@
             <rodo>
                 <infANTT>
                     <RNTRC>12345678</RNTRC>
+                    <infPag>
+                        <xNome>EMPRESA FANTASMA</xNome>
+                        <CNPJ>00112233445566</CNPJ>
+                        <Comp>
+                            <tpComp>99</tpComp>
+                            <vComp>1000.00</vComp>
+                            <xComp>FRETE E OUTROS</xComp>
+                        </Comp>
+                        <vContrato>1000.00</vContrato>
+                        <indPag>1</indPag>
+                        <infPrazo>
+                            <nParcela>001</nParcela>
+                            <dVenc>2025-11-11</dVenc>
+                            <vParcela>1000.00</vParcela>
+                        </infPrazo>
+                        <infBanc>
+                            <PIX>00112233445566</PIX>
+                        </infBanc>
+                    </infPag>
                 </infANTT>
                 <veicTracao>
                     <cInt>1</cInt>

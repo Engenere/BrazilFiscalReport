@@ -1,6 +1,7 @@
 from .config import (
     DanfeConfig,
     DecimalConfig,
+    FontSize,
     FontType,
     InvoiceDisplay,
     Margins,
@@ -15,6 +16,7 @@ __all__ = [
     "DanfeConfig",
     "DecimalConfig",
     "FontType",
+    "FontSize",
     "InvoiceDisplay",
     "Margins",
     "ProductDescriptionConfig",

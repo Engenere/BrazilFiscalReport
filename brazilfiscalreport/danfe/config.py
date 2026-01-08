@@ -21,6 +21,11 @@ class FontType(Enum):
     TIMES = "Times"
 
 
+class FontSize(Enum):
+    SMALL = 1.0
+    BIG = 1.35
+
+
 @dataclass
 class Margins:
     top: Number = 5
@@ -59,6 +64,7 @@ class DanfeConfig:
     tax_configuration: TaxConfiguration = TaxConfiguration.STANDARD_ICMS_IPI
     invoice_display: InvoiceDisplay = InvoiceDisplay.FULL_DETAILS
     font_type: FontType = FontType.TIMES
+    font_size: FontSize = FontSize.SMALL
     display_pis_cofins: bool = False
     watermark_cancelled: bool = False
     product_description_config: ProductDescriptionConfig = field(

@@ -10,10 +10,6 @@ from .danfe_conf import (
     DEFAULT_HEIGHT_FONT_CONTENT,
 )
 
-FONT_SIZE_DESC = 5
-H_FONT_DESC = 2.8
-FONT_SIZE_CONT = 7
-
 
 class DanfeBasicField(Element):
     def __init__(
@@ -52,11 +48,15 @@ class DanfeBasicField(Element):
 
         pdf.set_xy(x=self.x, y=self.y)
 
+        font_size_desc = pdf.get_font_size("FONT_SIZE_DESC")
+        h_font_desc = pdf.get_font_size("H_FONT_DESC")
+        font_size_cont = pdf.get_font_size("FONT_SIZE_CONT", True)
+
         # Description Cell
-        pdf.set_font(pdf.default_font, "", FONT_SIZE_DESC)
+        pdf.set_font(pdf.default_font, "", font_size_desc)
         pdf.cell(
             w=self.w,
-            h=H_FONT_DESC,
+            h=h_font_desc,
             text=self.description,
             new_x="LEFT",
             new_y="NEXT",
@@ -64,10 +64,13 @@ class DanfeBasicField(Element):
         )
 
         if self.type in ["protocolo", "chave_acesso"]:
-            pdf.set_font(pdf.default_font, "B", FONT_SIZE_CONT)
+            pdf.set_font(pdf.default_font, "B", font_size_cont)
             align = "C"
+        elif self.type in ["info_complementares"]:
+            pdf.set_font(pdf.default_font, "", pdf.get_font_size("FONT_SIZE_CONT"))
+            align = "R" if self.type == "number" else "L"
         else:
-            pdf.set_font(pdf.default_font, "", FONT_SIZE_CONT)
+            pdf.set_font(pdf.default_font, "", font_size_cont)
             align = "R" if self.type == "number" else "L"
         self._content_lines = pdf.multi_cell(
             w=self.w,
@@ -76,5 +79,5 @@ class DanfeBasicField(Element):
             align=align,
             output=MethodReturnValue.LINES,
         )
-        content_height = self.h - H_FONT_DESC
+        content_height = self.h - h_font_desc
         self._max_content_lines = int(content_height // DEFAULT_HEIGHT_FONT_CONTENT)

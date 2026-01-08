@@ -23,7 +23,12 @@ from .config import DanfeConfig, InvoiceDisplay, ReceiptPosition
 from .danfe_basic_field import DanfeBasicField
 from .danfe_block import DanfeBlock
 from .danfe_code import DanfeCode
-from .danfe_conf import DEFAULT_FIELD_HEIGHT, HEIGHT_FONT_BLOCK_DESC, URL
+from .danfe_conf import (
+    BASE_FONT_SIZES,
+    DEFAULT_FIELD_HEIGHT,
+    HEIGHT_FONT_BLOCK_DESC,
+    URL,
+)
 from .danfe_emit_info import DanfeEmitInfo
 from .danfe_ident_info import DanfeIdentInfo
 from .danfe_verification_msg import DanfeVerificationMsg
@@ -55,6 +60,7 @@ class Danfe(xFPDF):
         self.logo_image = config.logo
         self.receipt_pos = config.receipt_pos
         self.default_font = config.font_type.value
+        self.default_font_factor = config.font_size.value
         self.price_precision = config.decimal_config.price_precision
         self.quantity_precision = config.decimal_config.quantity_precision
         self.invoice_display = config.invoice_display
@@ -637,7 +643,8 @@ class Danfe(xFPDF):
         line_y = self.l_margin + w_date_field
         self.line(line_y, lin + h_recibo / 2, line_y, lin + h_recibo)
 
-        self.set_font(self.default_font, "", 5)
+        self.set_font(self.default_font, "", self.get_font_size("RECEIPT_FONT", True))
+
         self.set_xy(x=self.l_margin, y=lin + 1)
         self.multi_cell(
             w=w_desc_field, h=None, text=self.recibo_text, border=0, align="L"
@@ -1110,7 +1117,9 @@ class Danfe(xFPDF):
             # Skip
             return
 
-        self.set_font(self.default_font, "", 7)
+        self.set_font(
+            self.default_font, "", self.get_font_size("FONT_DUPLICATES", True)
+        )
         dups_text = []
         max_width = 0.0
 
@@ -1338,13 +1347,19 @@ class Danfe(xFPDF):
             "%IPI",
         ]
         monetary_fields_index = [6, 7, 8, 9, 10, 11, 12, 13]
-        col_widths = (15, None, 11, cst_width, 7, 6, 12, 13, 13, 13, 10, 10, 9, 8)
+        if self.default_font_factor == 1.0:
+            col_widths = (15, None, 11, cst_width, 7, 6, 12, 13, 13, 13, 10, 10, 9, 8)
+        else:
+            col_widths = (15, None, 14, 7, 8, 8, 12, 13, 13, 14, 13, 10, 9, 8)
+
         defined_width = sum(filter(None, col_widths))
         none_width = self.edw - defined_width
         fixed_col_widths = tuple(w if w is not None else none_width for w in col_widths)
         y_before = self.get_y()
         x_before = self.get_x()
-        self.set_font(self.default_font, "", 6)
+        self.set_font(
+            self.default_font, "", self.get_font_size("PRODUCT_DESCRIPTION", True)
+        )
         title_style = FontFace(emphasis="BOLD", size_pt=5)
         with self.table(
             col_widths=fixed_col_widths, line_height=3, width=self.edw, align="R"
@@ -1425,6 +1440,7 @@ class Danfe(xFPDF):
                     w=0,
                     description="INFORMAÇÕES COMPLEMENTARES",
                     content=additional_data,
+                    type="info_complementares",
                 ),
                 BaseFieldInfo(w=70, description="RESERVADO AO FISCO", content=""),
             ]
@@ -1457,3 +1473,14 @@ class Danfe(xFPDF):
             dest_end = dest_end[:85]
             cpl_truncado = True
         return dest_end, complemento, cpl_truncado
+
+    def get_font_size(self, element_type: str, multiplier=False):
+        """Retorna o tamanho da fonte escalado para o tipo de elemento."""
+        base_size = BASE_FONT_SIZES.get(element_type)
+        if multiplier:
+            return base_size * self.default_font_factor
+        else:
+            return base_size
+
+
+# inicialize

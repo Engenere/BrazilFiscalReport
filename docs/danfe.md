@@ -70,6 +70,18 @@ Here is a breakdown of all the configuration options available in `DanfeConfig`:
 - **Default**: `TIMES`
 
 ---
+**Font Size**
+
+- **Type**: `FontSize` (Enum)
+- **Values**: `BIG`, `SMALL`
+- **Description**: Font size used throughout the PDF document.
+- **Example**:
+    ```python
+    config.font_size = FontSize.BIG
+    ```
+- **Default**: `SMALL`
+
+---
 
 **Receipt Position**
 

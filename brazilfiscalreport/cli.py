@@ -187,5 +187,49 @@ def generate_damdfe(xml):
     click.echo(f"DAMDFE generated successfully: {output_path}")
 
 
+@cli.command("danfce")
+@click.argument("xml", type=click.Path(exists=True))
+def generate_danfce(xml):
+    """
+    Gera o DANFCe (DANFE NFC-e em formato de cupom) a partir de um XML de NFC-e.
+    """
+    try:
+        from brazilfiscalreport import danfce
+    except ImportError:
+        click.echo(
+            "Error: The brazilfiscalreport package"
+            " or its danfce module is not installed."
+        )
+        return
+
+    config_data = load_config()
+    logo = config_data.get("LOGO")
+    top = config_data.get("TOP_MARGIN", danfce.Margins.top)
+    right = config_data.get("RIGHT_MARGIN", danfce.Margins.right)
+    bottom = config_data.get("BOTTOM_MARGIN", danfce.Margins.bottom)
+    left = config_data.get("LEFT_MARGIN", danfce.Margins.left)
+
+    xml_path = Path(xml).resolve()
+    output_path = Path.cwd() / xml_path.stem
+    output_path = output_path.with_suffix(".pdf")
+    logo_path = Path(logo).resolve() if logo else None
+
+    if logo_path and not logo_path.exists():
+        click.echo("Logo file not found, proceeding without logo.")
+        logo_path = None
+
+    with open(xml_path, encoding="utf-8") as xml_file:
+        xml_content = xml_file.read()
+
+    config = danfce.DanfceConfig(
+        margins=danfce.Margins(top=top, right=right, bottom=bottom, left=left),
+        logo=logo_path,
+    )
+
+    danfce_instance = danfce.Danfce(xml=xml_content, config=config)
+    danfce_instance.output(output_path)
+    click.echo(f"DANFCe generated successfully: {output_path}")
+
+
 if __name__ == "__main__":
     cli()

@@ -922,7 +922,7 @@ class Dacte(xFPDF):
         self.set_xy(x_line_middle, section_start_y + 0.5)
         self.multi_cell(w=0, h=32, text="PAÍS", align="L")
         self.set_font(self.default_font, "B", 7)
-        self.set_xy(x_line_middle + 20, section_start_y + 0.5)
+        self.set_xy(x_line_middle + 20, section_start_y)
         self.multi_cell(w=0, h=33.4, text=f"{self.receb_pais}", align="L")
 
         self.set_font(self.default_font, "", 7)
@@ -989,7 +989,7 @@ class Dacte(xFPDF):
         self.set_xy(x=self.l_margin, y=section_start_y + 0.5)
         self.multi_cell(w=0, h=32, text="PAÍS", align="L")
         self.set_font(self.default_font, "B", 7)
-        self.set_xy(x=self.l_margin + 16, y=section_start_y + 0.5)
+        self.set_xy(x=self.l_margin + 16, y=section_start_y)
         self.multi_cell(w=0, h=33.4, text=f"{self.exped_pais}", align="L")
 
         self.set_font(self.default_font, "", 7)

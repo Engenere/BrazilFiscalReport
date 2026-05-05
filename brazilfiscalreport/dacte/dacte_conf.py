@@ -28,6 +28,7 @@ TP_SERVICO = {
     "1": "SUBCONTRATAÇÃO",
     "2": "REDESPACHO",
     "3": "REDESPACHO INTERMEDIÁRIO",
+    "4": "MULTIMODAL",
 }
 
 TP_CODIGO_MEDIDA = {

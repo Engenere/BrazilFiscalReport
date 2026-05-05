@@ -11,7 +11,7 @@ from tests.conftest import assert_pdf_equal, get_pdf_output_path
 @pytest.fixture
 def load_danfse(load_xml):
     def _load_danfse(filename, config=None):
-        xml_content = load_xml(filename)
+        xml_content = load_xml(f"danfse/{filename}")
         return Danfse(xml=xml_content, config=config)
 
     return _load_danfse

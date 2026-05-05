@@ -88,7 +88,8 @@ class Danfse(xFPDF):
             "2": "Optante - Microempreendedor Individual (MEI)",
             "3": "Optante - Microempresa ou Empresa de Pequeno Porte (ME/EPP)",
         }
-        simples = simples_op[extract_text(regTrib, "opSimpNac")]
+        opSimpNac = extract_text(regTrib, "opSimpNac")
+        simples = simples_op.get(opSimpNac, "Não Optante")
 
         tax_regim_op = {
             "1": (
@@ -105,7 +106,8 @@ class Danfse(xFPDF):
                 "de cada tributo"
             ),
         }
-        tax_regim = tax_regim_op[extract_text(regTrib, "regApTribSN")]
+        reg_ap_trib = extract_text(regTrib, "regApTribSN")
+        tax_regim = tax_regim_op.get(reg_ap_trib, "")
 
         special_tax_type = {
             "0": "Nenhum",
@@ -117,7 +119,8 @@ class Danfse(xFPDF):
             "6": "Sociedade de Profissionais",
             "9": "Outros",
         }
-        special_tax_regim = special_tax_type[extract_text(regTrib, "regEspTrib")]
+        reg_esp_trib = extract_text(regTrib, "regEspTrib")
+        special_tax_regim = special_tax_type.get(reg_esp_trib, "Nenhum")
 
         description = extract_text(serv, "xDescServ") or ""
 
@@ -128,8 +131,14 @@ class Danfse(xFPDF):
             format_description = description.strip()
 
         national_tax = extract_text(serv, "cTribNac")
-        national_tax = f"{national_tax[:2]}.{national_tax[2:4]}.{national_tax[4:]}"  # noqa
-        national_tax_code = f"{national_tax} - {format_description}"
+        if len(national_tax) >= 6:
+            national_tax_formated = (
+                f"{national_tax[:2]}.{national_tax[2:4]}.{national_tax[4:]}"
+            )
+        else:
+            national_tax_formated = national_tax
+
+        national_tax_code = f"{national_tax_formated} - {format_description}"
 
         issqn_tax = {
             "1": "Operação Tributável",
@@ -137,7 +146,8 @@ class Danfse(xFPDF):
             "3": "Exportação de serviço",
             "4": "Não Incidência",
         }
-        issqn = issqn_tax[extract_text(dps, "tribISSQN")]
+        trib_issqn = extract_text(dps, "tribISSQN")
+        issqn = issqn_tax.get(trib_issqn, "Operação Tributável")
 
         issqn_retention_type = {
             "1": "Não Retido",
@@ -145,13 +155,13 @@ class Danfse(xFPDF):
             "3": "Retido pelo Intermediario",
         }
         issqn_type = extract_text(dps, "tpRetISSQN")
-        issqn_value = extract_text(valores, "vISSQN")
+        issqn_type_val = issqn_retention_type.get(issqn_type)
 
-        issqn_retained = issqn_value if issqn_type in ["2", "3"] else 0
-        total_retentions = extract_text(valores, "vTotalRet")
+        issqn_value = extract_text(valores, "vISSQN")
+        issqn_retained = issqn_value if issqn_type_val in ["2", "3"] else 0
 
         total_federal_retentions = 0
-
+        total_retentions = extract_text(valores, "vTotalRet")
         if total_retentions:
             total_federal_retentions = float(total_retentions) - float(
                 issqn_retained or 0
@@ -838,7 +848,10 @@ class Danfse(xFPDF):
         self.multi_cell(
             w=col_width,
             h=2.5,
-            text=self.data["service"]["national_tax_code"],
+            text=self.long_field(
+                text=self.data["service"]["national_tax_code"],
+                limit=col_width,
+            ),
             align="L",
         )
 
@@ -884,7 +897,15 @@ class Danfse(xFPDF):
         # Descrição do Serviço - Valor
         self.set_font(self.default_font, "", 8)
         self.set_xy(x=x_margin + 3, y=section_start_y + 14)
-        self.cell(w=col_width, h=8, text=self.data["service"]["description"], align="L")
+        self.cell(
+            w=col_width,
+            h=8,
+            text=self.long_field(
+                text=self.data["service"]["description"],
+                limit=page_width,
+            ),
+            align="L",
+        )
 
         self.set_font(self.default_font, "B", 7)
         self.set_dash_pattern(dash=0, gap=0)

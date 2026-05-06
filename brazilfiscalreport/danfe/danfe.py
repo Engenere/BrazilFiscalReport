@@ -345,7 +345,7 @@ class Danfe(xFPDF):
         if ccredpresumido:
             add_infos.append(f"cCredPresumido: {ccredpresumido}")
 
-        xped = extract_text(prod, "xPed")            
+        xped = extract_text(prod, "xPed")
         if xped:
             add_infos.append(f"Pedido: {xped}")
 

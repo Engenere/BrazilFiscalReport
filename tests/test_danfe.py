@@ -358,3 +358,16 @@ def test_danfe_default_footer_stamp_emits_no_warning():
     with warnings.catch_warnings():
         warnings.simplefilter("error")
         Danfe(xml=xml, config=config)
+
+
+def test_danfe_product_description_with_xped(tmp_path, load_danfe):
+    config = DanfeConfig(
+        margins=Margins(top=2, right=2, bottom=2, left=2),
+        product_description_config=ProductDescriptionConfig(
+            display_anp=True,
+            display_additional_info=False,
+        ),
+    )
+    danfe = load_danfe("nfe_test_xped.xml", config=config)
+    pdf_path = get_pdf_output_path("danfe", "danfe_xped")
+    assert_pdf_equal(danfe, pdf_path, tmp_path)

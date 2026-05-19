@@ -9,7 +9,7 @@ from xml.etree.ElementTree import Element
 from barcode.codex import Code128
 from barcode.writer import SVGWriter
 
-from ..dacte.generate_qrcode import draw_qr_code
+from ..generate_qrcode import draw_qr_code
 from ..utils import (
     format_cep,
     format_cpf_cnpj,

@@ -5,6 +5,9 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools.packages.find]
 include = ["brazilfiscalreport*"]
 
+[tool.setuptools.package-data]
+"brazilfiscalreport.danfse" = ["*.png"]
+
 [project]
 name = "BrazilFiscalReport"
 dynamic = ["version"]
@@ -47,6 +50,10 @@ dacte = [
 ]
 # DAMDFE specific dependencies
 damdfe = [
+    "qrcode",
+]
+# DANFSE specific dependencies
+danfse = [
     "qrcode",
 ]
 # Dependencies CLI

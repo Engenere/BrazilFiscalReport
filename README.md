@@ -37,8 +37,9 @@ This installs the core library with support for **DANFE** and **DACCe**. For add
 ```bash
 pip install 'brazilfiscalreport[dacte]'   # DACTE support (requires qrcode)
 pip install 'brazilfiscalreport[damdfe]'  # DAMDFE support (requires qrcode)
+pip install 'brazilfiscalreport[danfse]'  # DANFSE support (requires qrcode)
 pip install 'brazilfiscalreport[cli]'     # CLI tool
-pip install 'brazilfiscalreport[dacte,damdfe,cli]'  # All extras
+pip install 'brazilfiscalreport[dacte,damdfe,danfse,cli]'  # All extras
 ```
 
 ## Quick Start
@@ -89,7 +90,7 @@ See the [CLI documentation](https://engenere.github.io/BrazilFiscalReport/cli/) 
 - [FPDF2](https://github.com/py-pdf/fpdf2) - PDF creation library for Python
 - [phonenumbers](https://github.com/daviddrysdale/python-phonenumbers) - Phone number formatting
 - [python-barcode](https://github.com/WhyNotHugo/python-barcode) - Barcode generation
-- [qrcode](https://github.com/lincolnloop/python-qrcode) - QR code generation (required for DACTE and DAMDFE)
+- [qrcode](https://github.com/lincolnloop/python-qrcode) - QR code generation (required for DACTE, DAMDFE and DANFSE)
 
 ## Credits
 

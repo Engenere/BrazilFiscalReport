@@ -10,6 +10,7 @@ from xml.etree.ElementTree import Element
 from barcode.codex import Code128
 from barcode.writer import SVGWriter
 
+from ..generate_qrcode import draw_qr_code
 from ..utils import (
     format_cep,
     format_cpf_cnpj,
@@ -36,7 +37,6 @@ from .dacte_conf import (
     TP_TRAFICO,
     URL,
 )
-from .generate_qrcode import draw_qr_code
 
 
 def extract_text(node: Element, tag: str) -> str:

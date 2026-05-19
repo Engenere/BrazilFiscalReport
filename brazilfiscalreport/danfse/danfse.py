@@ -2,7 +2,7 @@ import os
 import xml.etree.ElementTree as ET
 from xml.etree.ElementTree import Element
 
-from ..dacte.generate_qrcode import draw_qr_code
+from ..generate_qrcode import draw_qr_code
 from ..utils import (
     format_cep,
     format_cpf_cnpj,

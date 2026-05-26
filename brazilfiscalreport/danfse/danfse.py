@@ -176,9 +176,7 @@ class Danfse(xFPDF):
         total_federal_retentions = 0
         total_retentions = extract_text(valores, "vTotalRet")
         if total_retentions:
-            total_federal_retentions = to_float(
-                total_retentions
-            ) - to_float(
+            total_federal_retentions = to_float(total_retentions) - to_float(
                 issqn_retained or 0
             )
             total_federal_retentions = (

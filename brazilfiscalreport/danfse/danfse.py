@@ -57,6 +57,19 @@ class Danfse(xFPDF):
         def get_val(node, tag):
             return extract_text(node, tag) if node is not None else ""
 
+        def to_float(value):
+            if value is None:
+                return 0.0
+
+            text_value = str(value).strip()
+            if not text_value:
+                return 0.0
+
+            try:
+                return float(text_value)
+            except ValueError:
+                raise
+
         def format_address(tag):
             address_fields = [
                 extract_text(tag, "xLgr"),
@@ -163,7 +176,9 @@ class Danfse(xFPDF):
         total_federal_retentions = 0
         total_retentions = extract_text(valores, "vTotalRet")
         if total_retentions:
-            total_federal_retentions = float(total_retentions) - float(
+            total_federal_retentions = to_float(
+                total_retentions
+            ) - to_float(
                 issqn_retained or 0
             )
             total_federal_retentions = (
@@ -374,7 +389,7 @@ class Danfse(xFPDF):
             if piscofins is not None:
                 pis = extract_text(piscofins, "vPis")
                 cofins = extract_text(piscofins, "vCofins")
-                pis_cofins_debit = float(pis) + float(cofins)
+                pis_cofins_debit = to_float(pis) + to_float(cofins)
                 data["federal_taxes"]["pis_debit"] = (
                     f"R$ {format_number(pis, self.price_precision)}"
                 )

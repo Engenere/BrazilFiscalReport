@@ -94,6 +94,9 @@
                             <vRetIRRF>150.00</vRetIRRF>
                             <vRetCSLL>465.00</vRetCSLL>
                             <tpRetPisCofins>3</tpRetPisCofins>
+                            <piscofins>
+                                <CST>00</CST>
+                            </piscofins>
                         </tribFed>
                     </trib>
                 </valores>

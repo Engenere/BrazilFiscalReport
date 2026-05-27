@@ -374,7 +374,7 @@ class Danfse(xFPDF):
             if piscofins is not None:
                 pis = extract_text(piscofins, "vPis")
                 cofins = extract_text(piscofins, "vCofins")
-                pis_cofins_debit = float(pis) + float(cofins)
+                pis_cofins_debit = float(pis or 0) + float(cofins or 0)
                 data["federal_taxes"]["pis_debit"] = (
                     f"R$ {format_number(pis, self.price_precision)}"
                 )

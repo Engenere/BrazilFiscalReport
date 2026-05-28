@@ -218,7 +218,10 @@ class Danfse(xFPDF):
             "service": {
                 "national_tax_code": national_tax_code,
                 "municipal_tax_code": extract_text(serv, "cTribMun") or "-",
-                "place_of_provision": extract_text(serv, "cLocPrestacao") or "-",
+                "place_of_provision": (
+                    f"{extract_text(inf_nfse, 'xLocPrestacao')} - "
+                    f"{extract_text(emit, 'UF')}"
+                ),
                 "country": extract_text(serv, "cPaisPrestacao") or "-",
                 "description": description,
             },
@@ -226,7 +229,7 @@ class Danfse(xFPDF):
                 "issqn_tax": issqn,
                 "country": extract_text(dps, "cPaisResult") or "-",
                 "city": (
-                    f"{extract_text(inf_nfse, 'cLocIncid')} - "
+                    f"{extract_text(inf_nfse, 'xLocIncid')} - "
                     f"{extract_text(emit, 'UF')}"
                     or "Nenhum"
                 ),

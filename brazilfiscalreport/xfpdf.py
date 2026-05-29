@@ -2,6 +2,10 @@ from fpdf import FPDF
 
 
 class xFPDF(FPDF):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.core_fonts_encoding = "cp1252"
+
     def long_field(self, text="", limit=0, font_size=None, font_style=""):
         if not text or limit <= 0:
             return ""

@@ -123,6 +123,33 @@ class Damdfe(xFPDF):
             )
         return self.inf_seg_str
 
+    def _build_ciot_str(self):
+        self.inf_ciot_str = []
+        if not self.inf_modal:
+            return self.inf_ciot_str
+
+        for ciot_node in self.inf_modal.findall(f"{URL}rodo/{URL}infANTT/{URL}infCIOT"):
+            ciot = extract_text(ciot_node, "CIOT")
+            cnpj = extract_text(ciot_node, "CNPJ")
+            cpf = extract_text(ciot_node, "CPF")
+
+            doc = cnpj or cpf
+            if not doc and not ciot:
+                continue
+
+            self.inf_ciot_str.append(
+                {
+                    "responsavel_tipo": "CNPJ" if cnpj else "CPF",
+                    "responsavel_doc": format_cpf_cnpj(doc) if doc else "",
+                    "ciot": ciot or "",
+                }
+            )
+
+            if len(self.inf_ciot_str) >= 3:
+                break
+
+        return self.inf_ciot_str
+
     def _build_chnfe_str(self):
         self.chNFe_str = []
         # Itera sobre todos os infMunDescarga no infDoc
@@ -1818,6 +1845,7 @@ class Damdfe(xFPDF):
             self.fisco = self.fisco.replace(";", "\n")
         self.obs = extract_text(self.inf_adic, "infCpl")
         self._build_seg_str()
+        self._build_ciot_str()
 
         self.rect(
             x=x_margin,
@@ -1880,14 +1908,56 @@ class Damdfe(xFPDF):
                 )
                 y_position += 4
 
+        current_block_y = y_margin + 40
+
+        if self.inf_ciot_str:
+            self.rect(
+                x=x_margin,
+                y=current_block_y,
+                w=page_width - 0.5,
+                h=16,
+                style="",
+            )
+            self.line(
+                x_margin,
+                current_block_y + 4,
+                x_margin + page_width - 0.5,
+                current_block_y + 4,
+            )
+            self.set_xy(x=(page_width - 30) / 2, y=current_block_y + 2)
+            self.set_font(self.default_font, "B", 7)
+            self.multi_cell(
+                w=100,
+                h=0,
+                text="INFORMAÇÕES DO CIOT",
+                border=0,
+                align="L",
+            )
+            self.set_font(self.default_font, "", 6)
+            ciot_y = current_block_y + 5
+            for ciot_data in self.inf_ciot_str:
+                self.set_xy(x=x_margin, y=ciot_y)
+                self.multi_cell(
+                    w=190,
+                    h=3,
+                    text=(
+                        f"RESPONSÁVEL {ciot_data['responsavel_tipo']}: "
+                        f"{ciot_data['responsavel_doc']} e Nº CIOT: {ciot_data['ciot']}"
+                    ),
+                    border=0,
+                    align="L",
+                )
+                ciot_y += 3
+            current_block_y += 16
+
         self.rect(
             x=x_margin,
-            y=y_margin + 40,
+            y=current_block_y,
             w=page_width - 0.5,
             h=45,
             style="",
         )
-        y_middle = y_margin + 44
+        y_middle = current_block_y + 4
         self.line(x_margin, y_middle, x_margin + page_width - 0.5, y_middle)
         self.set_xy(x=(page_width - 80) / 2, y=y_middle - 2)
         self.set_font(self.default_font, "B", 7)
@@ -1908,13 +1978,14 @@ class Damdfe(xFPDF):
             align="L",
         )
 
+        fisco_start_y = current_block_y + 45
         self._draw_dynamic_text_block(
             title="INFORMAÇÕES ADICIONAIS DE INTERESSE DO FISCO",
             text=self.fisco,
-            y_start=y_margin + 85,
+            y_start=fisco_start_y,
             line_height=3,
             min_content_height=41,
-            max_content_height=(self.h - self.b_margin) - (y_margin + 85) - 4,
+            max_content_height=(self.h - self.b_margin) - fisco_start_y - 4,
             allow_page_break=False,
             overflow_suffix="",
         )

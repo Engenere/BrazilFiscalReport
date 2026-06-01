@@ -122,8 +122,7 @@ class Danfse(xFPDF):
         reg_esp_trib = extract_text(regTrib, "regEspTrib")
         special_tax_regim = special_tax_type.get(reg_esp_trib, "Nenhum")
 
-        raw_description = extract_text(serv, "xDescServ") or ""
-        description = raw_description.replace("–", "-") if raw_description else ""
+        description = extract_text(serv, "xDescServ") or ""
 
         if " - " in description:
             parts = description.split(" - ", 1)

@@ -43,6 +43,10 @@
             <rodo>
                 <infANTT>
                     <RNTRC>12345678</RNTRC>
+                    <infCIOT>
+                        <CIOT>520005530382</CIOT>
+                        <CNPJ>81583054000129</CNPJ>
+                    </infCIOT>
                     <infPag>
                         <xNome>EMPRESA FANTASMA</xNome>
                         <CNPJ>00112233445566</CNPJ>

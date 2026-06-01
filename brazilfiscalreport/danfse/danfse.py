@@ -628,7 +628,15 @@ class Danfse(xFPDF):
         # Nome / Nome Empresarial - Valor
         self.set_font(self.default_font, "", 8)
         self.set_xy(x=x_margin + 3, y=section_start_y + 7)
-        self.cell(w=col_width, h=7, text=self.data["issuer"]["name"], align="L")
+        self.cell(
+            w=col_width,
+            h=7,
+            text=self.long_field(
+                text=self.data["issuer"]["name"],
+                limit=col_width * 2,
+            ),
+            align="L",
+        )
 
         # E-mail
         self.set_font(self.default_font, "B", 7)
@@ -638,7 +646,15 @@ class Danfse(xFPDF):
         # E-mail - Valor
         self.set_font(self.default_font, "", 8)
         self.set_xy(x=x_margin + (col_width * 2), y=section_start_y + 7)
-        self.cell(w=col_width, h=7, text=self.data["issuer"]["email"], align="L")
+        self.cell(
+            w=col_width,
+            h=7,
+            text=self.long_field(
+                text=self.data["issuer"]["email"],
+                limit=col_width * 2,
+            ),
+            align="L",
+        )
 
         # Endereço
         self.set_font(self.default_font, "B", 7)
@@ -648,7 +664,15 @@ class Danfse(xFPDF):
         # Endereço - Valor
         self.set_font(self.default_font, "", 8)
         self.set_xy(x=x_margin + 3, y=section_start_y + 14)
-        self.cell(w=col_width, h=7, text=self.data["issuer"]["address"], align="L")
+        self.cell(
+            w=col_width,
+            h=7,
+            text=self.long_field(
+                text=self.data["issuer"]["address"],
+                limit=col_width * 2,
+            ),
+            align="L",
+        )
 
         # Município
         self.set_font(self.default_font, "B", 7)
@@ -759,7 +783,15 @@ class Danfse(xFPDF):
         # Nome / Nome Empresarial - Valor
         self.set_font(self.default_font, "", 8)
         self.set_xy(x=x_margin + 3, y=section_start_y + 6)
-        self.cell(w=col_width, h=7, text=self.data["taker"]["name"], align="L")
+        self.cell(
+            w=col_width,
+            h=7,
+            text=self.long_field(
+                text=self.data["taker"]["name"],
+                limit=col_width * 2,
+            ),
+            align="L",
+        )
 
         # E-mail
         self.set_font(self.default_font, "B", 7)
@@ -769,7 +801,15 @@ class Danfse(xFPDF):
         # E-mail - Valor
         self.set_font(self.default_font, "", 8)
         self.set_xy(x=x_margin + (col_width * 2), y=section_start_y + 6)
-        self.cell(w=col_width, h=7, text=self.data["taker"]["email"], align="L")
+        self.cell(
+            w=col_width,
+            h=7,
+            text=self.long_field(
+                text=self.data["taker"]["email"],
+                limit=col_width * 2,
+            ),
+            align="L",
+        )
 
         # Endereço
         self.set_font(self.default_font, "B", 7)
@@ -779,7 +819,15 @@ class Danfse(xFPDF):
         # Endereço - Valor
         self.set_font(self.default_font, "", 8)
         self.set_xy(x=x_margin + 3, y=section_start_y + 13)
-        self.cell(w=col_width, h=7, text=self.data["taker"]["address"], align="L")
+        self.cell(
+            w=col_width,
+            h=7,
+            text=self.long_field(
+                text=self.data["taker"]["address"],
+                limit=col_width * 2,
+            ),
+            align="L",
+        )
 
         # Município
         self.set_font(self.default_font, "B", 7)
@@ -905,7 +953,7 @@ class Danfse(xFPDF):
             h=8,
             text=self.long_field(
                 text=self.data["service"]["description"],
-                limit=page_width,
+                limit=page_width - 1,
             ),
             align="L",
         )

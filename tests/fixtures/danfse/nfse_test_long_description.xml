@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NFSe versao="1.01" xmlns="http://www.sped.fazenda.gov.br/nfse">
+	<infNFSe Id="NFS3505708120011111111000111000000011111111111111111111">
+		<xLocEmi>BARUERI</xLocEmi>
+		<xLocPrestacao>BARUERI</xLocPrestacao>
+		<nNFSe>908845</nNFSe>
+		<cLocIncid>3505708</cLocIncid>
+		<xLocIncid>BARUERI</xLocIncid>
+		<xTribNac>Processamento de dados, textos, imagens, vídeos, páginas ele</xTribNac>
+		<xTribMun>Processamento de dados, textos, imagens, vídeos, páginas ele</xTribMun>
+		<xNBS>Serviços de processamento de dados</xNBS>
+		<verAplic>Sistema NFS-e</verAplic>
+		<ambGer>1</ambGer>
+		<tpEmis>2</tpEmis>
+		<cStat>100</cStat>
+		<dhProc>2026-06-04T19:21:51-03:00</dhProc>
+		<nDFSe>15665050</nDFSe>
+		<emit>
+			<CNPJ>11111111000111</CNPJ>
+			<IM>1234567</IM>
+			<xNome>EMPRESA EMISSORA EXEMPLO LTDA</xNome>
+			<xFant>EMISSORA EXEMPLO</xFant>
+			<enderNac>
+				<xLgr>RUA EXEMPLO EMISSOR</xLgr>
+				<nro>100</nro>
+				<xCpl>COMPLEMENTO EXEMPLO</xCpl>
+				<xBairro>BAIRRO EXEMPLO</xBairro>
+				<cMun>3505708</cMun>
+				<UF>SP</UF>
+				<CEP>00000000</CEP>
+			</enderNac>
+		</emit>
+		<valores>
+			<vBC>1305.32</vBC>
+			<pAliqAplic>2.00</pAliqAplic>
+			<vISSQN>26.11</vISSQN>
+			<vLiq>1305.32</vLiq>
+		</valores>
+		<IBSCBS>
+			<cLocalidadeIncid>3505708</cLocalidadeIncid>
+			<xLocalidadeIncid>BARUERI</xLocalidadeIncid>
+			<valores>
+				<vBC>1279.21</vBC>
+				<uf>
+					<pIBSUF>0.10</pIBSUF>
+					<pRedAliqUF>0.00</pRedAliqUF>
+					<pAliqEfetUF>0.00</pAliqEfetUF>
+				</uf>
+				<mun>
+					<pIBSMun>0.00</pIBSMun>
+					<pRedAliqMun>0.00</pRedAliqMun>
+					<pAliqEfetMun>0.00</pAliqEfetMun>
+				</mun>
+				<fed>
+					<pCBS>0.90</pCBS>
+					<pRedAliqCBS>0.00</pRedAliqCBS>
+					<pAliqEfetCBS>0.00</pAliqEfetCBS>
+				</fed>
+			</valores>
+			<totCIBS>
+				<vTotNF>1305.32</vTotNF>
+				<gIBS>
+					<vIBSTot>1.28</vIBSTot>
+					<gIBSUFTot>
+						<vIBSUF>1.28</vIBSUF>
+					</gIBSUFTot>
+					<gIBSMunTot>
+						<vIBSMun>0.00</vIBSMun>
+					</gIBSMunTot>
+				</gIBS>
+				<gCBS>
+					<vCBS>11.51</vCBS>
+				</gCBS>
+			</totCIBS>
+		</IBSCBS>
+		<DPS versao="1.01">
+			<infDPS Id="DPS350570821111111100011100017000020261111111">
+				<tpAmb>1</tpAmb>
+				<dhEmi>2026-06-04T19:21:51-03:00</dhEmi>
+				<verAplic>Sistema NFS-e</verAplic>
+				<serie>17</serie>
+				<nDPS>20268179683</nDPS>
+				<dCompet>2026-06-03</dCompet>
+				<tpEmit>1</tpEmit>
+				<cLocEmi>3505708</cLocEmi>
+				<prest>
+					<CNPJ>11111111000111</CNPJ>
+					<IM>1234567</IM>
+					<regTrib>
+						<opSimpNac>1</opSimpNac>
+						<regEspTrib>0</regEspTrib>
+					</regTrib>
+				</prest>
+				<toma>
+					<CNPJ>22222222000122</CNPJ>
+					<xNome>EMPRESA TOMADORA EXEMPLO LTDA</xNome>
+					<end>
+						<endNac>
+							<cMun>5108402</cMun>
+							<CEP>99999999</CEP>
+						</endNac>
+						<xLgr>RUA EXEMPLO TOMADOR</xLgr>
+						<nro>2</nro>
+						<xCpl>COMPLEMENTO TOMADOR</xCpl>
+						<xBairro>BAIRRO TOMADOR</xBairro>
+					</end>
+					<email>contato@empresa-exemplo.com</email>
+				</toma>
+				<serv>
+					<locPrest>
+						<cLocPrestacao>3505708</cLocPrestacao>
+					</locPrest>
+					<cServ>
+						<cTribNac>010301</cTribNac>
+						<cTribMun>220</cTribMun>
+						<xDescServ>Num. Ref.: 8012947 LOCACAO R$ 2.305,73 TRATAMENTO DE INFORMACOES R$ 1.000,00 N o Reter ISS, INSS, IRRF e CSRF conf Art 3 ,LC 116 Art. 714 do RIR 9580/2018 Art 30-Lei 10.833/03 Art 1 -IN SRF n 459/2004 Para mais informa es, acesse o portal atrav s do link: https://www.service.com.br</xDescServ>
+						<cNBS>115090000</cNBS>
+						<cIntContrib>72895</cIntContrib>
+					</cServ>
+					<infoCompl>
+						<xInfComp>Cálculo IBS/CBS: - Vl. Base Calc.: 1279.21 - IBS UF %: 0.10 - IBS UF v: 1.28 - IBS Município %: 0.00 - IBS Município v: 0.00 - CBS Federal %: 0.90 - CBS Federal v.: 11.51</xInfComp>
+					</infoCompl>
+				</serv>
+				<valores>
+					<vServPrest>
+						<vServ>1305.32</vServ>
+					</vServPrest>
+					<trib>
+						<tribMun>
+							<tribISSQN>1</tribISSQN>
+							<tpRetISSQN>1</tpRetISSQN>
+						</tribMun>
+						<totTrib>
+							<indTotTrib>0</indTotTrib>
+						</totTrib>
+					</trib>
+				</valores>
+				<IBSCBS>
+					<finNFSe>0</finNFSe>
+					<cIndOp>100301</cIndOp>
+					<indDest>0</indDest>
+					<valores>
+						<trib>
+							<gIBSCBS>
+								<CST>000</CST>
+								<cClassTrib>000001</cClassTrib>
+							</gIBSCBS>
+						</trib>
+					</valores>
+				</IBSCBS>
+			</infDPS>
+		</DPS>
+	</infNFSe>
+	<Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+		<SignedInfo>
+			<CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+			<SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+			<Reference URI="#NFS3505708120011111111000111000000011111111111111111111">
+				<Transforms>
+					<Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+					<Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+				</Transforms>
+				<DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+				<DigestValue>y+6mz0UVa1nY2CBcsdepBIHgwbs=</DigestValue>
+			</Reference>
+		</SignedInfo>
+		<SignatureValue>UBfWjm7EKPk0AwPEsWKP9nzLQh54Kh+EkpZLSo1izdwWoRT51Q+eEs552pv2lgxJ/vrTs+1ZhjqbU0jX/NV3XGZb9bBg+M7jC/zsBjz6b3PvySmqVV9rWis7urK1hg8uGKvdbWHNCXNlIe/SsgZ8M+ABciB+LhkrguAt7/XYKeTXH046UB5LFqTNYK5Za/WcqikqwXR2DLUD5zc+tosplDKT9Qt8hgUC37HYfeeo+zEtjpYycJ3PxnsgwCwz/cnYYDhhHWx+DV8s4D6oO237OqkH9Gn+5nLetKRPT0mmCe0lN7VRbXy9y+C39x59OvPairTJvC2WtV/e9hEf0lAJnw==</SignatureValue>
+		<KeyInfo>
+			<X509Data>
+				<X509Certificate>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</X509Certificate>
+			</X509Data>
+		</KeyInfo>
+	</Signature>
+</NFSe>

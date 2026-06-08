@@ -3,6 +3,7 @@ import pytest
 from brazilfiscalreport.danfse import (
     Danfse,
     DanfseConfig,
+    DecimalConfig,
     Margins,
 )
 from tests.conftest import assert_pdf_equal, get_pdf_output_path
@@ -50,4 +51,17 @@ def test_danfse_cancelled_hom(tmp_path, load_danfse):
     )
     danfse = load_danfse("nfse_test_hom.xml", config=config)
     pdf_path = get_pdf_output_path("danfse", "danfse_cancelled_hom")
+    assert_pdf_equal(danfse, pdf_path, tmp_path)
+
+
+def test_danfse_default_long_description(tmp_path, load_danfse):
+    config = DanfseConfig(
+        margins=Margins(top=2, right=2, bottom=2, left=2),
+        decimal_config=DecimalConfig(
+            price_precision=2,
+            quantity_precision=2,
+        ),
+    )
+    danfse = load_danfse("nfse_test_long_description.xml", config=config)
+    pdf_path = get_pdf_output_path("danfse", "danfse_default_prod_long_description")
     assert_pdf_equal(danfse, pdf_path, tmp_path)

@@ -21,6 +21,14 @@ def extract_text(node: Element, tag: str) -> str:
 
 
 class Danfse(xFPDF):
+    @staticmethod
+    def _truncate_text(text: str, max_length: int) -> str:
+        if not text:
+            return ""
+        if len(text) <= max_length:
+            return text
+        return text[: max_length - 3] + "..."
+
     def __init__(self, xml, config: DanfseConfig = None):
         super().__init__(unit="mm", format="A4")
         config = config if config is not None else DanfseConfig()
@@ -123,6 +131,7 @@ class Danfse(xFPDF):
         special_tax_regim = special_tax_type.get(reg_esp_trib, "Nenhum")
 
         description = extract_text(serv, "xDescServ") or ""
+        description = self._truncate_text(description, max_length=1300)
 
         if " - " in description:
             parts = description.split(" - ", 1)
@@ -131,6 +140,7 @@ class Danfse(xFPDF):
             format_description = description.strip()
 
         national_tax = extract_text(serv, "cTribNac")
+        national_tax_description = extract_text(inf_nfse, "xTribNac") or ""
         if len(national_tax) >= 6:
             national_tax_formated = (
                 f"{national_tax[:2]}.{national_tax[2:4]}.{national_tax[4:]}"
@@ -138,7 +148,22 @@ class Danfse(xFPDF):
         else:
             national_tax_formated = national_tax
 
-        national_tax_code = f"{national_tax_formated} - {format_description}"
+        # Use the dedicated national taxation description when available.
+        # Keep the previous behavior as a fallback for XMLs without xTribNac.
+        if not national_tax_description:
+            national_tax_description = format_description
+
+        if national_tax_formated and national_tax_description:
+            national_tax_code = f"{national_tax_formated} - {national_tax_description}"
+        else:
+            national_tax_code = national_tax_formated or national_tax_description
+
+        municipal_tax = extract_text(serv, "cTribMun")
+        municipal_tax_description = extract_text(inf_nfse, "xTribMun") or ""
+        if municipal_tax and municipal_tax_description:
+            municipal_tax_code = f"{municipal_tax} - {municipal_tax_description}"
+        else:
+            municipal_tax_code = municipal_tax or municipal_tax_description or "-"
 
         issqn_tax = {
             "1": "Operação Tributável",
@@ -217,7 +242,7 @@ class Danfse(xFPDF):
             },
             "service": {
                 "national_tax_code": national_tax_code,
-                "municipal_tax_code": extract_text(serv, "cTribMun") or "-",
+                "municipal_tax_code": municipal_tax_code,
                 "place_of_provision": (
                     f"{extract_text(inf_nfse, 'xLocPrestacao')} - "
                     f"{extract_text(emit, 'UF')}"
@@ -913,9 +938,15 @@ class Danfse(xFPDF):
 
         # Código de Tributação Municipal - Valor
         self.set_font(self.default_font, "", 8)
-        self.set_xy(x=x_margin + col_width, y=section_start_y + 4)
-        self.cell(
-            w=col_width, h=8, text=self.data["service"]["municipal_tax_code"], align="L"
+        self.set_xy(x=x_margin + col_width, y=section_start_y + 7)
+        self.multi_cell(
+            w=col_width,
+            h=2.5,
+            text=self.long_field(
+                text=self.data["service"]["municipal_tax_code"],
+                limit=col_width,
+            ),
+            align="L",
         )
 
         # Local da Prestação
@@ -947,25 +978,25 @@ class Danfse(xFPDF):
 
         # Descrição do Serviço - Valor
         self.set_font(self.default_font, "", 8)
-        self.set_xy(x=x_margin + 3, y=section_start_y + 14)
-        self.cell(
-            w=col_width,
-            h=8,
-            text=self.long_field(
-                text=self.data["service"]["description"],
-                limit=page_width - 1,
-            ),
+        description_start_y = section_start_y + 17
+        self.set_xy(x=x_margin + 3, y=description_start_y)
+        self.multi_cell(
+            w=page_width - 4,
+            h=3,
+            text=self.data["service"]["description"],
             align="L",
         )
 
         self.set_font(self.default_font, "B", 7)
         self.set_dash_pattern(dash=0, gap=0)
+        section_end_y = max(y_margin + 25, self.y + 2)
         self.line(
             x1=x_margin + 2,
-            y1=y_margin + 25,
+            y1=section_end_y,
             x2=x_margin + page_width - 2,
-            y2=y_margin + 25,
+            y2=section_end_y,
         )
+        self.set_y(section_end_y)
 
     def _draw_taxes(self):
         x_margin = self.l_margin

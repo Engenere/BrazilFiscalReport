@@ -155,10 +155,9 @@ class Danfse(xFPDF):
             "3": "Retido pelo Intermediario",
         }
         issqn_type = extract_text(dps, "tpRetISSQN")
-        issqn_type_val = issqn_retention_type.get(issqn_type)
 
         issqn_value = extract_text(valores, "vISSQN")
-        issqn_retained = issqn_value if issqn_type_val in ["2", "3"] else 0
+        issqn_retained = issqn_value if issqn_type in ["2", "3"] else 0
 
         total_federal_retentions = 0
         total_retentions = extract_text(valores, "vTotalRet")

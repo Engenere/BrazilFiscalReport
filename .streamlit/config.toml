@@ -1,5 +1,13 @@
 [theme]
+base = "light"
 primaryColor = "#7C3AED"
 backgroundColor = "#FFFFFF"
 secondaryBackgroundColor = "#F3F0FF"
 textColor = "#1E1B4B"
+
+[server]
+# XMLs fiscais são pequenos; limite baixo evita abuso do uploader.
+maxUploadSize = 25
+
+[browser]
+gatherUsageStats = false

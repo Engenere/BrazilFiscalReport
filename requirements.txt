@@ -1,2 +1,2 @@
-streamlit
-brazilfiscalreport[dacte,damdfe]
+streamlit[pdf]>=1.50
+.[dacte,damdfe,danfse]

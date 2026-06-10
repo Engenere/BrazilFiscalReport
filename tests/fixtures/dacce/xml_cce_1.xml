@@ -7,7 +7,7 @@
             <CNPJ>01234567890123</CNPJ>
             <chNFe>99999999999999999999999999999999999999999999</chNFe>
             <dhEvento>2024-03-08T12:00:00-03:00</dhEvento>
-            <tpEvento>999999</tpEvento>
+            <tpEvento>110110</tpEvento>
             <nSeqEvento>99</nSeqEvento>
             <verEvento>9.99</verEvento>
             <detEvento versao="1.00">
@@ -49,7 +49,7 @@
             <cStat>999</cStat>
             <xMotivo>Evento fictício registrado e vinculado a NF-e de teste</xMotivo>
             <chNFe>99999999999999999999999999999999999999999999</chNFe>
-            <tpEvento>999999</tpEvento>
+            <tpEvento>110110</tpEvento>
             <nSeqEvento>99</nSeqEvento>
             <dhRegEvento>2024-03-08T12:00:00-03:00</dhRegEvento>
             <nProt>999999999999999</nProt>

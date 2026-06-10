@@ -975,15 +975,12 @@ class Danfe(xFPDF):
         block_dest.render()
 
     def _draw_delivery_location(self):
+        if self.retirada is not None and len(self.retirada):
+            self._draw_location_block(self.retirada, "INFORMAÇÕES DO LOCAL DE RETIRADA")
         if self.entrega is not None and len(self.entrega):
-            elem = self.entrega
-            description = "INFORMAÇÕES DO LOCAL DE ENTREGA"
-        elif self.retirada is not None and len(self.retirada):
-            elem = self.retirada
-            description = "INFORMAÇÕES DO LOCAL DE RETIRADA"
-        else:
-            return
+            self._draw_location_block(self.entrega, "INFORMAÇÕES DO LOCAL DE ENTREGA")
 
+    def _draw_location_block(self, elem, description):
         # Get Content Data
         name = extract_text(elem, "xNome")
         cnpj_cpf = extract_text(elem, "CNPJ")

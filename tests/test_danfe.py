@@ -358,3 +358,25 @@ def test_danfe_default_footer_stamp_emits_no_warning():
     with warnings.catch_warnings():
         warnings.simplefilter("error")
         Danfe(xml=xml, config=config)
+
+
+def test_danfe_retirada(tmp_path, load_danfe):
+    """
+    Tests the creation of a DANFE for an NF-e that has only the pickup
+    location group (retirada), without the delivery location group (entrega).
+    """
+    danfe = load_danfe("nfe_retirada.xml")
+    pdf_path = get_pdf_output_path("danfe", "danfe_retirada")
+    assert_pdf_equal(danfe, pdf_path, tmp_path)
+
+
+def test_danfe_retirada_entrega(tmp_path, load_danfe):
+    """
+    Tests the creation of a DANFE for an NF-e that has both the pickup
+    location group (retirada) and the delivery location group (entrega).
+    Both blocks must be rendered in the document. Regression test for
+    issue #169.
+    """
+    danfe = load_danfe("nfe_retirada_entrega.xml")
+    pdf_path = get_pdf_output_path("danfe", "danfe_retirada_entrega")
+    assert_pdf_equal(danfe, pdf_path, tmp_path)

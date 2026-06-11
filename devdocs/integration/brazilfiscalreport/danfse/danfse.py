@@ -27,28 +27,11 @@ import qrcode
 from ..xfpdf import xFPDF
 from .config import DanfseConfig
 from .fonts import COLOR_SHADING, NT008Fonts
-from .nt009_utils import parse_event_xml
 from .parser import DanfseParser
 
 
 class Danfse(xFPDF):
-    def __init__(
-        self,
-        xml: str | bytes,
-        config: DanfseConfig | None = None,
-        event_xml: str | bytes | None = None,
-    ):
-        """Gera o DANFSe.
-
-        Args:
-            xml: XML da NFS-e (elemento NFSe/infNFSe).
-            config: configuração opcional do documento.
-            event_xml: XML de um evento (cancelamento/substituição) associado.
-                A NFS-e é imutável; quando há cancelamento/substituição, a
-                situação vem deste evento, que referencia a nota pela chave.
-                Permite gerar o DANFSe com a marca d'água correta a partir
-                dos dois documentos (NFS-e + evento).
-        """
+    def __init__(self, xml: str | bytes, config: DanfseConfig | None = None):
         super().__init__(unit="mm", format="A4")
         self.config = config or DanfseConfig()
 
@@ -73,8 +56,7 @@ class Danfse(xFPDF):
 
         # Parse.
         self.root = ET.fromstring(xml)
-        event = parse_event_xml(event_xml) if event_xml else None
-        self.data = DanfseParser(xml, self.config, event=event).parse()
+        self.data = DanfseParser(xml, self.config).parse()
 
         # Render pipeline.
         self.add_page("P")
@@ -182,29 +164,21 @@ class Danfse(xFPDF):
     # ======================================================================
 
     def _draw_void_watermark(self):
-        """Marca d'água de situação (NT 008).
+        is_prod = self.data["environment"] == "1"
+        text = None
+        size = 60
+        if self.watermark_cancelled:
+            if is_prod:
+                text = "CANCELADA"
+            else:
+                text, size = "CANCELADA - SEM VALOR FISCAL", 45
+        elif not is_prod:
+            text = "SEM VALOR FISCAL"
 
-        A NT 008 exige, para NFS-e cancelada ou substituída, marca d'água
-        DIAGONAL com o texto "CANCELADA" / "SUBSTITUÍDA", fonte Arial,
-        tamanho MÍNIMO 50pt e cor CINZA.
-
-        A situação é detectada pelo cStat do XML (101=Cancelada,
-        102=Substituída); ``config.watermark_cancelled`` força "CANCELADA".
-
-        Obs.: o aviso de homologação ("NFS-e SEM VALIDADE JURÍDICA") é
-        tratado no cabeçalho (texto vermelho), não como marca d'água.
-        """
-        if self.data.get("is_replaced"):
-            text = "SUBSTITUÍDA"
-        elif self.data.get("is_cancelled") or self.watermark_cancelled:
-            text = "CANCELADA"
-        else:
+        if not text:
             return
-
-        # NT 008: Arial, mínimo 50pt, cinza, diagonal.
-        size = 60  # >= 50pt
-        self.set_font("helvetica", "B", size)  # Arial == Helvetica (FPDF2)
-        self.set_text_color(166, 166, 166)  # cinza K35 (NT 008 item 2.5.1/2.5.2)
+        self.set_font("helvetica", "B", size)
+        self.set_text_color(220, 150, 150)
         width = self.get_string_width(text)
         height = size * 0.25
         x_center = (self.w - width) / 2
@@ -389,7 +363,7 @@ class Danfse(xFPDF):
             self.cell(
                 w=pw - 6,
                 h=4,
-                text="TOMADOR/ADQUIRENTE DA OPERAÇÃO NÃO IDENTIFICADO NA NFS-e",
+                text="TOMADOR / ADQUIRENTE NÃO IDENTIFICADO NA NFS-e",
                 align="C",
             )
             self.divider(x + 2, y + 16, x + pw - 2)
@@ -426,41 +400,9 @@ class Danfse(xFPDF):
         )
 
         self.y = y + 23
-        self._draw_recipient_notice()
         self._draw_intermediary_notice()
         self.divider(x + 2, self.y + 1, x + pw - 2)
         self.y += 1
-
-    def _draw_recipient_notice(self):
-        """Bloco Destinatário da Operação (NT 008).
-
-        No caso usual (destinatário = tomador) a NT permite suprimir o bloco
-        e imprimir a frase padrão. Quando há destinatário distinto, exibe a
-        identificação resumida.
-        """
-        x = self.l_margin
-        rec = self.data.get("recipient", {})
-        if rec.get("is_taker") or not rec.get("present"):
-            self._nt_fonts.apply(self._nt_fonts.value())
-            self.set_xy(x=x + 3, y=self.y + 1)
-            self.cell(
-                w=0,
-                h=3,
-                text=("O DESTINATÁRIO É O PRÓPRIO TOMADOR/ADQUIRENTE DA OPERAÇÃO"),
-                align="C",
-            )
-            self.y += 5
-        else:
-            self._nt_fonts.apply(self._nt_fonts.label())
-            self.set_xy(x=x + 3, y=self.y + 1)
-            self.cell(w=0, h=3, text="DESTINATÁRIO DA OPERAÇÃO", align="L")
-            self._nt_fonts.apply(self._nt_fonts.value())
-            self.set_xy(x=x + 3, y=self.y + 4)
-            info = " - ".join(
-                p for p in (rec.get("id"), rec.get("name")) if p and p != "-"
-            )
-            self.cell(w=0, h=3, text=info or "-", align="L")
-            self.y += 8
 
     def _draw_intermediary_notice(self):
         """Aviso/grid do intermediário (port: original só imprimia aviso)."""
@@ -472,7 +414,7 @@ class Danfse(xFPDF):
             self.cell(
                 w=0,
                 h=3,
-                text="INTERMEDIÁRIO DA OPERAÇÃO NÃO IDENTIFICADO NA NFS-e",
+                text="INTERMEDIÁRIO DO SERVIÇO NÃO IDENTIFICADO NA NFS-e",
                 align="C",
             )
             self.y += 5
@@ -778,7 +720,7 @@ class Danfse(xFPDF):
         x = self.l_margin
         y = self.y
         sy = y + 2
-        self._block_title(x + 3, sy, "INFORMAÇÕES COMPLEMENTARES")
+        self._block_title(x + 3, sy, "INFORMAÇÕES COMPLEMENTARES", shaded=False)
         self._nt_fonts.apply(self._nt_fonts.value(7))
         self.set_xy(x=x + 3, y=sy + 4)
         self.multi_cell(
@@ -821,16 +763,9 @@ class Danfse(xFPDF):
 
 
 def generate_danfse(
-    xml: str | bytes,
-    output_path: str,
-    config: DanfseConfig | None = None,
-    event_xml: str | bytes | None = None,
+    xml: str | bytes, output_path: str, config: DanfseConfig | None = None
 ) -> str:
-    """Atalho: gera o PDF do DANFSe e salva em output_path.
-
-    event_xml: XML de evento (cancelamento/substituição) opcional, associado
-    à NFS-e pela chave de acesso.
-    """
-    doc = Danfse(xml, config, event_xml=event_xml)
+    """Atalho: gera o PDF do DANFSe e salva em output_path."""
+    doc = Danfse(xml, config)
     doc.output(output_path)
     return output_path

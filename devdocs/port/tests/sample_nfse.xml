@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NFSe xmlns="http://www.sped.fazenda.gov.br/nfse">
+  <infNFSe Id="NFS31062001234567890123456789012345678901234567890">
+    <nNFSe>123456</nNFSe>
+    <cStat>100</cStat>
+    <ambGer>2</ambGer>
+    <dhProc>2026-05-10T14:30:00-03:00</dhProc>
+    <cLocEmi>3106200</cLocEmi>
+    <xLocEmi>Belo Horizonte</xLocEmi>
+    <cLocPrestacao>3106200</cLocPrestacao>
+    <xLocPrestacao>Belo Horizonte</xLocPrestacao>
+    <cLocIncid>3106200</cLocIncid>
+    <xLocIncid>Belo Horizonte</xLocIncid>
+    <emit>
+      <CNPJ>12ABC34501DE35</CNPJ>
+      <IM>987654</IM>
+      <xNome>Empresa Prestadora de Servicos Tecnologicos LTDA</xNome>
+      <fone>31987654321</fone>
+      <email>contato@prestadora.com.br</email>
+      <enderNac>
+        <xLgr>Avenida Afonso Pena</xLgr>
+        <nro>1000</nro>
+        <xCpl>Sala 501</xCpl>
+        <xBairro>Centro</xBairro>
+        <cMun>3106200</cMun>
+        <CEP>30130003</CEP>
+        <UF>MG</UF>
+      </enderNac>
+    </emit>
+  </infNFSe>
+  <DPS>
+    <tpAmb>2</tpAmb>
+    <tpEmit>1</tpEmit>
+    <finNFSe>0</finNFSe>
+    <nDPS>555</nDPS>
+    <serie>1</serie>
+    <dhEmi>2026-05-10T14:00:00-03:00</dhEmi>
+    <dCompet>2026-05-01</dCompet>
+    <vServ>10000.00</vServ>
+    <vDescIncond>500.00</vDescIncond>
+    <vDescCond>200.00</vDescCond>
+    <tribISSQN>1</tribISSQN>
+    <tpRetISSQN>1</tpRetISSQN>
+    <vAjusteBCISSQN>100.00</vAjusteBCISSQN>
+    <vCalcAjusteBCISSQN>50.00</vCalcAjusteBCISSQN>
+    <vTotTribFed>800.00</vTotTribFed>
+    <vTotTribEst>0.00</vTotTribEst>
+    <vTotTribMun>300.00</vTotTribMun>
+    <prest>
+      <regTrib>
+        <opSimpNac>3</opSimpNac>
+        <regApTribSN>1</regApTribSN>
+        <regEspTrib>0</regEspTrib>
+      </regTrib>
+    </prest>
+    <serv>
+      <cTribNac>010701</cTribNac>
+      <cTribMun>0107</cTribMun>
+      <cNBS>123456789</cNBS>
+      <cPaisPrestacao>1058</cPaisPrestacao>
+      <xDescServ>Desenvolvimento de software sob encomenda e licenciamento de programas de computador.</xDescServ>
+      <xTribNac>Servicos de informatica e congeneres</xTribNac>
+      <infoCompl>
+        <xInfComp>Pedido aprovado conforme contrato 2026/001.</xInfComp>
+      </infoCompl>
+    </serv>
+    <toma>
+      <CNPJ>11222333000181</CNPJ>
+      <IM>123456</IM>
+      <xNome>Cliente Tomador de Servicos SA</xNome>
+      <fone>1133224455</fone>
+      <email>financeiro@tomador.com.br</email>
+      <end>
+        <xLgr>Rua das Flores</xLgr>
+        <nro>250</nro>
+        <xBairro>Jardins</xBairro>
+        <endNac>
+          <cMun>3550308</cMun>
+          <CEP>01410000</CEP>
+        </endNac>
+      </end>
+    </toma>
+    <tribFed>
+      <vRetIRRF>150.00</vRetIRRF>
+      <vRetCP>200.00</vRetCP>
+      <vRetCSLL>100.00</vRetCSLL>
+      <piscofins>
+        <vPis>65.00</vPis>
+        <vCofins>300.00</vCofins>
+      </piscofins>
+    </tribFed>
+  </DPS>
+  <valores>
+    <vBC>9350.00</vBC>
+    <pAliqAplic>5.00</pAliqAplic>
+    <vISSQN>467.50</vISSQN>
+    <vLiq>9050.00</vLiq>
+    <vTotalRet>450.00</vTotalRet>
+  </valores>
+</NFSe>

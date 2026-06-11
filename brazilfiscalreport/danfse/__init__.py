@@ -1,10 +1,5 @@
-from .config import (
-    DanfseConfig,
-    DecimalConfig,
-    FontType,
-    Margins,
-)
-from .danfse import Danfse
+from .config import DanfseConfig, DecimalConfig, FontType, Margins
+from .danfse import Danfse, generate_danfse
 
 __all__ = [
     "Danfse",
@@ -12,4 +7,5 @@ __all__ = [
     "DecimalConfig",
     "FontType",
     "Margins",
+    "generate_danfse",
 ]

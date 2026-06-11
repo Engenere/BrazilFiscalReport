@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 include = ["brazilfiscalreport*"]
 
 [tool.setuptools.package-data]
-"brazilfiscalreport.danfse" = ["*.png"]
+"brazilfiscalreport.danfse" = ["*.png", "*.ttf", "*.json"]
 
 [project]
 name = "BrazilFiscalReport"

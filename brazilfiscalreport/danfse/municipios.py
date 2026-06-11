@@ -26,7 +26,7 @@ def load_municipios(path: str | None = None) -> dict[str, str]:
 
     municipios: dict[str, str] = {}
     try:
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             for m in json.load(f):
                 uf = _extract_uf(m)
                 nome = m.get("nome", "")

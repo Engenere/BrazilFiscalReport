@@ -1,7 +1,8 @@
-import os
 import pytest
+
 from brazilfiscalreport.danfse import Danfse, DanfseConfig
 from tests.conftest import assert_pdf_equal, get_pdf_output_path
+
 
 @pytest.fixture
 def load_danfse_custom(load_xml):
@@ -11,11 +12,13 @@ def load_danfse_custom(load_xml):
 
     return _load_danfse
 
+
 def test_danfse_user_fixture_6187(tmp_path, load_danfse_custom):
     """Teste com XML original de Suporte Técnico (Rogerio)."""
     danfse = load_danfse_custom("6187ae43-fd6b-4819-8e9e-9a0911eceec3.xml")
     expected_path = get_pdf_output_path("danfse", "danfse_user_6187")
     assert_pdf_equal(danfse, expected_path, tmp_path)
+
 
 def test_danfse_user_fixture_661a(tmp_path, load_danfse_custom):
     """Teste com XML original de Clínica Médica (Belo Horizonte)."""
@@ -23,19 +26,23 @@ def test_danfse_user_fixture_661a(tmp_path, load_danfse_custom):
     expected_path = get_pdf_output_path("danfse", "danfse_user_661a")
     assert_pdf_equal(danfse, expected_path, tmp_path)
 
+
 def test_danfse_cancellation_watermark_with_real_xml(tmp_path, load_danfse_custom):
     """Teste de marca d'água de cancelamento com XML real."""
     config = DanfseConfig(watermark_cancelled=True)
-    danfse = load_danfse_custom("6187ae43-fd6b-4819-8e9e-9a0911eceec3.xml", config=config)
+    danfse = load_danfse_custom(
+        "6187ae43-fd6b-4819-8e9e-9a0911eceec3.xml", config=config
+    )
     expected_path = get_pdf_output_path("danfse", "danfse_cancelled_real")
     assert_pdf_equal(danfse, expected_path, tmp_path)
 
-def test_danfse_event_xml_fails(tmp_path, load_danfse_custom):
-    """Teste para verificar comportamento com XML de evento (cancelamento)."""
-    # Este teste deve falhar ou gerar um PDF vazio/incompleto se o parser não suportar <evento>
-    try:
-        danfse = load_danfse_custom("5e6ca60e-7148-4d44-8bd8-d3aff2a6c16f_cancel.xml")
-        output_path = str(tmp_path / "event_fail.pdf")
-        danfse.output(output_path)
-    except Exception as e:
-        pytest.fail(f"O parser falhou ao processar XML de evento: {e}")
+
+def test_danfse_event_xml_rejected(load_danfse_custom):
+    """XML de evento (cancelamento) deve ser rejeitado com erro claro.
+
+    O arquivo *_cancel.xml tem raiz <evento> (e101101 - Cancelamento de
+    NFS-e), não é uma NFS-e. O DANFSe não deve ser gerado a partir dele;
+    em vez de produzir um documento vazio, o parser levanta ValueError.
+    """
+    with pytest.raises(ValueError, match="evento"):
+        load_danfse_custom("5e6ca60e-7148-4d44-8bd8-d3aff2a6c16f_cancel.xml")

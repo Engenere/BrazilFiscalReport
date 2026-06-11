@@ -104,6 +104,22 @@ class DanfseParser:
     def parse(self) -> dict:
         root = self.root
         inf_nfse = self._find(root, "infNFSe")
+
+        # Validação: o XML precisa ser uma NFS-e (conter infNFSe).
+        # Arquivos de EVENTO (cancelamento/substituição), cuja raiz é
+        # <evento>, NÃO são DANFSe e devem ser rejeitados com mensagem clara
+        # em vez de gerar um documento vazio.
+        if inf_nfse is None:
+            root_tag = root.tag.split("}")[-1]
+            if root_tag == "evento" or self._find(root, "infEvento") is not None:
+                raise ValueError(
+                    "O XML informado é um evento da NFS-e (ex.: cancelamento), "
+                    "não uma NFS-e. O DANFSe só pode ser gerado a partir do "
+                    "XML da NFS-e (elemento infNFSe)."
+                )
+            raise ValueError(
+                "XML inválido para DANFSe: elemento 'infNFSe' não encontrado."
+            )
         dps = self._find(root, "DPS")
         emit = self._find(root, "emit")
         if emit is None:

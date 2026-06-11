@@ -60,6 +60,7 @@ The same pattern applies to all document types:
 from brazilfiscalreport.dacte import Dacte
 from brazilfiscalreport.damdfe import Damdfe
 from brazilfiscalreport.dacce import DaCCe
+from brazilfiscalreport.danfse import Danfse
 
 dacte = Dacte(xml=cte_xml)
 dacte.output("dacte.pdf")
@@ -69,7 +70,23 @@ damdfe.output("damdfe.pdf")
 
 dacce = DaCCe(xml=cce_xml)
 dacce.output("dacce.pdf")
+
+danfse = Danfse(xml=nfse_xml)
+danfse.output("danfse.pdf")
 ```
+
+The **DANFSE** generator follows the **NT 008** layout and **NT 009**
+(Tax Reform) rules — IBS/CBS, alphanumeric CNPJ, QR Code, watermarks and more.
+Because an authorized NFS-e XML is immutable, cancellation/replacement come from
+a **separate event document**, which can be associated when rendering:
+
+```python
+danfse = Danfse(xml=nfse_xml, event_xml=cancellation_event_xml)
+danfse.output("danfse_cancelled.pdf")  # adds the "CANCELADA" watermark
+```
+
+See the [DANFSE documentation](https://engenere.github.io/BrazilFiscalReport/danfse/)
+for NT 008/009 details, event association, custom fonts and more.
 
 ## CLI
 

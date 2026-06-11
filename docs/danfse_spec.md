@@ -8,8 +8,8 @@
 
 ## Índice
 1. [Helpers arquiteturais](#0-helpers-arquiteturais)
-2. [Índice central de NTs](#índice-central-de-notas-técnicas)
-3. [Domínios de tradução](#domínios-de-tradução)
+2. [Índice central de NTs](#indice-central-de-notas-tecnicas)
+3. [Domínios de tradução](#dominios-de-traducao)
 4. [Blocos de desenho](#blocos-de-desenho)
 
 ---

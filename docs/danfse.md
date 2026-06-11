@@ -56,3 +56,35 @@ config = DanfseConfig(watermark_cancelled=True)
 danfse = Danfse(xml=xml_content, config=config)
 danfse.output('output_danfse.pdf')
 ```
+
+### NT 008/009 Support
+
+The library supports the **NT 008** and **NT 009** standards, which include new tax groups like **IBS/CBS**, alphanumeric CNPJ, and updated typography.
+
+### Receipt (Canhoto)
+
+To display the optional receipt block (Canhoto) at the bottom:
+
+```python
+from brazilfiscalreport.danfse import Danfse, DanfseConfig
+
+config = DanfseConfig(show_receipt=True)
+
+danfse = Danfse(xml=xml_content, config=config)
+danfse.output('output_danfse.pdf')
+```
+
+### Custom Fonts
+
+NT 008 requires specific fonts (Arial for labels, Microsoft Sans Serif for values). You can provide the path to the MS Sans Serif TTF file if it's not installed in the system:
+
+```python
+from brazilfiscalreport.danfse import Danfse, DanfseConfig
+
+config = DanfseConfig(
+    custom_font_path='/path/to/micross.ttf'
+)
+
+danfse = Danfse(xml=xml_content, config=config)
+danfse.output('output_danfse.pdf')
+```

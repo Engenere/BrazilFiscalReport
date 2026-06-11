@@ -1,0 +1,352 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "meta": {
+    "name": "DANFSe v2.0 Layout Spec",
+    "description": "Mapeamento estruturado dos blocos, campos, regras e formulas do Documento Auxiliar da NFS-e (DANFSe) para geracao via FPDF2 / BrazilFiscalReport.",
+    "version": "2.0",
+    "engine": "FPDF2",
+    "unit": "cm",
+    "norms": ["NT 008", "NT 009"],
+    "generated_for": "IA programadora (codegen)"
+  },
+
+  "constants": {
+    "shading": {
+      "description": "Fundo cinza 5% exigido pela NT 008.",
+      "rgb": [242, 242, 242],
+      "norm": "NT 008",
+      "fpdf_call": "pdf.set_fill_color(242,242,242) ; usar fill=True na cell"
+    },
+    "fonts": {
+      "label": { "family": "Arial", "size_pt": 7, "transform": "uppercase" },
+      "value": { "family": "MS Sans Serif", "size_pt": 7 },
+      "title_block": { "family": "Arial", "size_pt": 9, "style": "bold" },
+      "header_right_municipio": { "size_pt": 8 },
+      "header_right_ambiente": { "size_pt": 6 },
+      "qr_caption": { "family": "MS Sans Serif", "size_pt": 6 },
+      "homolog_warning": { "family": "Arial", "size_pt": 9, "color_cmyk": "M100/Y100", "color_rgb": [255, 0, 0] }
+    },
+    "truncation_rule": {
+      "description": "Regra rigida de reticencias exigida pela NT 008.",
+      "norm": "NT 008",
+      "behavior": "se len(text) > max_length: text[:max_length-3] + '...'; vazio -> '-'"
+    }
+  },
+
+  "helpers": [
+    {
+      "name": "truncate_text",
+      "signature": "truncate_text(text: str, max_length: int) -> str",
+      "norm": "NT 008",
+      "purpose": "Aplica reticencias (...) e devolve '-' para valores vazios.",
+      "logic": "if text and len(text) > max_length: return text[:max_length-3] + '...'  ; return text or '-'"
+    },
+    {
+      "name": "apply_shading",
+      "signature": "apply_shading(pdf) -> bool",
+      "norm": "NT 008",
+      "purpose": "Ativa fundo cinza 5% (RGB 242,242,242).",
+      "logic": "pdf.set_fill_color(242,242,242); return True  # usar como fill=True em pdf.cell"
+    }
+  ],
+
+  "domains": {
+    "tpAmb": { "description": "Tipo de Ambiente", "values": { "1": "Producao", "2": "Homologacao" }, "rule": "Se 2 -> exibir 'NFS-e SEM VALIDADE JURIDICA' em vermelho." },
+    "tpEmit": { "description": "Emitente da NFS-e", "values": { "1": "Prestador", "2": "Tomador", "3": "Intermediario" } },
+    "finNFSe": { "description": "Finalidade da NFS-e", "norm": "NT 009", "values": { "0": "Regular", "1": "Credito", "2": "Debito" }, "note": "Dominios 1 e 2 sao novos (notas de ajuste) introduzidos pela NT 009." },
+    "cStat": { "description": "Situacao da NFS-e", "values_source": "Tabela oficial de status SEFIN Nacional", "truncate": 37 },
+    "opSimpNac": { "description": "Optante Simples Nacional", "norm": "NT 009", "values": { "1": "Nao Optante", "2": "Optante - MEI", "3": "Optante - ME/EPP", "4": "Optante Pendente" }, "note": "Dominio 4 incluido pela NT 009." },
+    "cIndOp": { "description": "Indicador de Operacao IBS/CBS", "norm": "NT 009", "values_source": "Nova tabela LC 214/2025" }
+  },
+
+  "norm_notes": {
+    "NT008": {
+      "id": "NT008",
+      "ref": "NT 008",
+      "topics": [
+        "Regra rigida de reticencias (truncate_text).",
+        "Fundo cinza 5% (RGB 242,242,242) em titulos/blocos.",
+        "Posicionamento exato de logomarca e QR Code.",
+        "Hierarquia de fontes (Arial labels / MS Sans Serif valores)."
+      ]
+    },
+    "NT009": {
+      "id": "NT009",
+      "ref": "NT 009",
+      "ref_legal": "LC 214/2025",
+      "topics": [
+        "CNPJ agora alfanumerico (Tipo C) - NAO tratar como inteiro no parser.",
+        "finNFSe ganhou dominios 1 (Credito) e 2 (Debito) para notas de ajuste.",
+        "opSimpNac ganhou dominio 4 (Optante Pendente) e campo cAtvSN.",
+        "vDedRed/vDR descontinuado -> vAjusteBC (ISSQN: vAjusteBCISSQN + vCalcAjusteBCISSQN).",
+        "Novos grupos IBS/CBS: vCalcAjusteBCIBSCBS, vCalcAjusteBCLocImoveis.",
+        "Simples Nacional: valores IBS/CBS vem do grupo gTribSN (pIBSSN, vIBSSN, pCBSSN, vCBSSN).",
+        "Locacao de imovel: valores multiplicados por pCopropriedade.",
+        "Indicador de operacao IBS/CBS baseado na tabela LC 214/2025.",
+        "Informacoes de pagamento no grupo gPgtoVinc.",
+        "PIS/COFINS apenas para competencia ate dez/2026."
+      ]
+    }
+  },
+
+  "blocks": [
+    {
+      "order": 1,
+      "fn": "draw_header",
+      "title": "Cabecalho e Identificacao",
+      "field_count": 20,
+      "fonts": { "labels": "Arial 7pt UPPER", "values": "MS Sans Serif 7pt" },
+      "sub_sections": [
+        {
+          "name": "Cabecalho Superior",
+          "fill": "cinza",
+          "fixed_visuals": [
+            { "id": "logo", "label": "Logomarca Nacional", "pos": { "x_cm": 0.49, "y_cm": 0.44 } },
+            { "id": "versao", "label": "DANFSe v2.0", "text2": "Documento Auxiliar da NFS-e", "font": "Arial 9pt Bold" },
+            { "id": "aviso_homolog", "label": "NFS-e SEM VALIDADE JURIDICA", "condition": "tpAmb == 2", "font": "Arial 9pt", "color": "Vermelho M100/Y100" }
+          ]
+        }
+      ],
+      "fields": [
+        { "label": "Municipio", "tag": "xLocEmi", "concat": ["xLocEmi", "UF"], "max_length": 37, "rule": "Ocultar se codigo tributacao nacional == 99.", "align": "right", "font_pt": 8 },
+        { "label": "Ambiente Gerador", "tag": "ambGer", "font_pt": 6 },
+        { "label": "Tipo de Ambiente", "tag": "tpAmb", "domain": "tpAmb", "font_pt": 6 },
+        { "label": "Chave de Acesso", "tag": "id", "length": 50, "transform": "remover prefixo 'NFS'", "fill": "branco" },
+        { "label": "Numero da NFS-e", "tag": "nNFSe" },
+        { "label": "Competencia", "tag": "dCompet", "format": "DD/MM/AAAA" },
+        { "label": "Data/Hora Emissao", "tag": "dhProc", "format": "DD/MM/AAAA hh:mm:ss" },
+        { "label": "Numero da DPS", "tag": "nDPS" },
+        { "label": "Serie da DPS", "tag": "serie" },
+        { "label": "Data/Hora Emissao DPS", "tag": "dhEmi", "format": "DD/MM/AAAA hh:mm:ss" },
+        { "label": "Emitente da NFS-e", "tag": "tpEmit", "domain": "tpEmit" },
+        { "label": "Situacao da NFS-e", "tag": "cStat", "domain": "cStat", "max_length": 37 },
+        { "label": "Finalidade", "tag": "finNFSe", "domain": "finNFSe", "max_length": 37, "norm": "NT 009" }
+      ]
+    },
+
+    {
+      "order": 2,
+      "fn": "draw_qr_code",
+      "title": "QR Code",
+      "fields": [
+        { "id": "qr", "label": "QR Code", "size_cm": [1.52, 1.52], "pos": { "x_cm": 17.48, "y_cm": 1.67 }, "norm": "NT 008" },
+        { "id": "qr_caption", "label": "Descricao QR Code", "lines": 3, "font": "MS Sans Serif 6pt", "text": "Texto fixo da norma logo abaixo do QR." }
+      ]
+    },
+
+    {
+      "order": 3,
+      "fn": "draw_entities",
+      "title": "Os Envolvidos (Prestador, Tomador, Destinatario, Intermediario)",
+      "null_behavior": "Se nulos: aplicar fundo cinza no bloco inteiro e imprimir 'NAO IDENTIFICADO'.",
+      "entities": [
+        {
+          "name": "prestador",
+          "label": "Prestador / Fornecedor",
+          "field_count": 10,
+          "fields": [
+            { "label": "CNPJ/CPF/NIF", "tags": ["CNPJ", "CPF", "NIF"], "norm": "NT 009", "note": "CNPJ alfanumerico (Tipo C) - parser como string." },
+            { "label": "Indicador Municipal", "tag": "IM" },
+            { "label": "Telefone", "tag": "fone", "max_length": 20 },
+            { "label": "Nome/Nome Empresarial", "tag": "xNome", "max_length": 77 },
+            { "label": "Municipio/UF", "tags": ["cMun", "xCidade"], "transform": "De-Para IBGE 7 digitos + UF" },
+            { "label": "Codigo IBGE/CEP", "concat": ["cMun", "cEndPost"], "format": "cMun / CEP (ex: 3106200 / 35494-000)" },
+            { "label": "Endereco", "concat": ["xLgr", "nro", "xCpl", "xBairro"], "max_length": 77 },
+            { "label": "Email", "tag": "email" },
+            { "label": "Simples Nacional", "tag": "opSimpNac", "domain": "opSimpNac", "max_length": 37, "norm": "NT 009", "note": "Incluir dominio 4 e cAtvSN se necessario." },
+            { "label": "Regime Apuracao SN", "tag": "regApTribSN", "max_length": 77 }
+          ]
+        },
+        {
+          "name": "tomador",
+          "label": "Tomador / Adquirente",
+          "field_count": 8,
+          "null_behavior": "Se vazio: suprimir e imprimir frase fixa com fundo cinza.",
+          "fields": [
+            { "label": "CNPJ/CPF/NIF", "tags": ["CNPJ", "CPF", "NIF"], "norm": "NT 009" },
+            { "label": "Indicador Municipal", "tag": "IM" },
+            { "label": "Telefone", "tag": "fone", "max_length": 20 },
+            { "label": "Nome/Nome Empresarial", "tag": "xNome", "max_length": 77 },
+            { "label": "Municipio/UF", "tags": ["cMun", "xCidade"], "transform": "De-Para IBGE 7 digitos + UF" },
+            { "label": "Codigo IBGE/CEP", "concat": ["cMun", "cEndPost"] },
+            { "label": "Endereco", "concat": ["xLgr", "nro", "xCpl", "xBairro"], "max_length": 77 },
+            { "label": "Email", "tag": "email" }
+          ]
+        },
+        {
+          "name": "destinatario",
+          "label": "Destinatario",
+          "field_count": 7,
+          "null_behavior": "Se for o proprio tomador: suprimir e imprimir 'O DESTINATARIO E O PROPRIO TOMADOR/ADQUIRENTE...'.",
+          "note": "Mesmos campos do Tomador, SEM Inscricao Municipal.",
+          "fields": [
+            { "label": "CNPJ/CPF/NIF", "tags": ["CNPJ", "CPF", "NIF"] },
+            { "label": "Telefone", "tag": "fone" },
+            { "label": "Nome/Nome Empresarial", "tag": "xNome", "max_length": 77 },
+            { "label": "Municipio/UF", "tags": ["cMun", "xCidade"] },
+            { "label": "Codigo IBGE/CEP", "concat": ["cMun", "cEndPost"] },
+            { "label": "Endereco", "concat": ["xLgr", "nro", "xCpl", "xBairro"], "max_length": 77 },
+            { "label": "Email", "tag": "email" }
+          ]
+        },
+        {
+          "name": "intermediario",
+          "label": "Intermediario",
+          "field_count": 8,
+          "note": "Mesmos campos do Tomador.",
+          "fields": [
+            { "label": "CNPJ/CPF/NIF", "tags": ["CNPJ", "CPF", "NIF"] },
+            { "label": "Indicador Municipal", "tag": "IM" },
+            { "label": "Telefone", "tag": "fone" },
+            { "label": "Nome/Nome Empresarial", "tag": "xNome", "max_length": 77 },
+            { "label": "Municipio/UF", "tags": ["cMun", "xCidade"] },
+            { "label": "Codigo IBGE/CEP", "concat": ["cMun", "cEndPost"] },
+            { "label": "Endereco", "concat": ["xLgr", "nro", "xCpl", "xBairro"], "max_length": 77 },
+            { "label": "Email", "tag": "email" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "order": 4,
+      "fn": "draw_service_details",
+      "title": "Servico Prestado",
+      "field_count": 5,
+      "fields": [
+        { "label": "Codigo Trib Nac/Mun", "concat": ["cTribNac", "cTribMun"] },
+        { "label": "Codigo NBS", "tag": "cNBS" },
+        { "label": "Local Prestacao", "concat": ["xLocPrestacao", "cPaisPrestacao"], "transform": "Pais em ISO-2 (ex: BR)", "note": "Concatenar local/UF/Pais." },
+        { "label": "Descricao Tributacao", "tag": "xTribMun", "fallback": "xTribNac", "max_length": 167, "rule": "Se xTribMun vazio usar xTribNac." },
+        { "label": "Descricao do Servico", "tag": "xDescServ", "max_length": 1297, "render": "multi_cell" }
+      ]
+    },
+
+    {
+      "order": 5,
+      "fn": "draw_taxes",
+      "title": "Tributacao Municipal (ISSQN) e Federal",
+      "sub_sections": [
+        {
+          "name": "issqn",
+          "label": "Tributacao Municipal (ISSQN)",
+          "title_fill": "cinza",
+          "field_count": 14,
+          "no_incidence_rule": "Se cTribNac nao incidir: imprimir 'OPERACAO NAO SUJEITA AO ISSQN'.",
+          "fields": [
+            { "label": "Tipo Tributacao", "tag": "tribISSQN", "max_length": 21 },
+            { "label": "Municipio Incidencia", "concat": ["xLocIncid", "cPaisResult"] },
+            { "label": "Regime Especial", "tag": "regEspTrib", "max_length": 27 },
+            { "label": "Imunidade", "tag": "tpImunidade", "max_length": 37 },
+            { "label": "Suspensao", "tag": "tpSusp", "max_length": 37 },
+            { "label": "Nº Processo", "tag": "nProcesso", "max_length": 37 },
+            { "label": "Beneficio Municipal", "tag": "tpBM" },
+            { "label": "Calculo BM", "tag": "vCalcBM", "fallback": "vRedBCBM" },
+            { "label": "Total Deducoes/Reducoes", "formula": "vAjusteBCISSQN + vCalcAjusteBCISSQN", "norm": "NT 009", "note": "Substituiu vDedRed/vDR." },
+            { "label": "Desconto Incondicionado", "tag": "vDescIncond" },
+            { "label": "BC ISSQN", "tag": "vBC", "formula": "vServ - vDescIncond - (vAjusteBCISSQN + vCalcAjusteBCISSQN) - Beneficio Municipal", "norm": "NT 009" },
+            { "label": "Aliquota", "tag": "pAliqAplic" },
+            { "label": "Retencao", "tag": "tpRetISSQN", "render": "Sim/Nao" },
+            { "label": "ISSQN Apurado", "tag": "vISSQN" }
+          ]
+        },
+        {
+          "name": "federal",
+          "label": "Tributacao Federal (Exceto CBS)",
+          "field_count": 6,
+          "fields": [
+            { "label": "IRRF", "tag": "vRetIRRF" },
+            { "label": "CP Retida", "tag": "vRetCP" },
+            { "label": "CSLL Retida", "tag": "vRetCSLL" },
+            { "label": "PIS", "tag": "vPis", "condition": "competencia <= dez/2026" },
+            { "label": "COFINS", "tag": "vCofins", "condition": "competencia <= dez/2026" },
+            { "label": "Descricao Contribuicoes", "tag": "tpRetPisCofins", "max_length": 35 }
+          ]
+        }
+      ]
+    },
+
+    {
+      "order": 6,
+      "fn": "draw_ibs_cbs",
+      "title": "Tributacao IBS / CBS (Reforma Tributaria)",
+      "norm": "NT 009",
+      "field_count": 14,
+      "simples_nacional_rule": "Se a nota for do Simples Nacional, puxar valores de apuracao do grupo gTribSN (pIBSSN, vIBSSN, pCBSSN, vCBSSN).",
+      "fields": [
+        { "label": "CST/cClassTrib", "concat": ["CST", "cClassTrib"], "format": "nnn / nnnnnn" },
+        { "label": "Ind/IBGE/Mun/UF", "concat": ["cIndOp", "cLocalidadeIncid", "xLocalidadeIncid", "UF"], "domain": "cIndOp", "note": "IndOp baseado na tabela LC 214/2025." },
+        { "label": "Exclusoes/Reducoes", "formula": "vCalcAjusteBCIBSCBS + vCalcAjusteBCLocImoveis", "norm": "NT 009" },
+        { "label": "BC Apos Exclusoes", "tag": "vBC", "formula": "vServ - vDescIncond - vCalcAjusteBCIBSCBS - vCalcAjusteBCLocImoveis - vISSQN - vPIS - vCOFINS", "norm": "NT 009" },
+        { "label": "Red. Aliquotas (IBS/CBS)", "concat": ["pRedAliqUF", "pRedAliqMun", "pRedAliqCBS"], "format": "% / % / %" },
+        { "label": "Aliquota IBS UF/Mun", "concat": ["pIBSUF", "pIBSMun"] },
+        { "label": "Aliq Efetiva Mun", "tag": "pAliqEfetMun" },
+        { "label": "Valor Apurado Mun", "tag": "vIBSMun" },
+        { "label": "Aliq Efetiva Est", "tag": "pAliqEfetUF" },
+        { "label": "Valor Apurado Est", "tag": "vIBSUF" },
+        { "label": "Valor Total IBS", "tag": "vIBSTot", "simples_source": "gTribSN.vIBSSN" },
+        { "label": "Aliquota CBS", "tag": "pCBS", "simples_source": "gTribSN.pCBSSN" },
+        { "label": "Aliq Efetiva CBS", "tag": "pAliqEfetCBS" },
+        { "label": "Valor Total CBS", "tag": "vCBS", "simples_source": "gTribSN.vCBSSN" }
+      ]
+    },
+
+    {
+      "order": 7,
+      "fn": "draw_totals",
+      "title": "Totais (Consolidado)",
+      "field_count": 7,
+      "fields": [
+        { "label": "Valor Operacao/Servico", "tag": "vServ", "norm": "NT 009", "note": "Locacao Imovel: multiplicar por pCopropriedade." },
+        { "label": "Desc Incondicionado", "tag": "vDescIncond", "norm": "NT 009", "note": "Locacao Imovel: multiplicar por pCopropriedade." },
+        { "label": "Desc Condicionado", "tag": "vDescCond", "norm": "NT 009", "note": "Locacao Imovel: multiplicar por pCopropriedade." },
+        { "label": "Total Retencoes", "tag": "vTotalRet", "note": "ISSQN + Federais." },
+        { "label": "Valor Liquido", "tag": "vLiq" },
+        { "label": "Total IBS/CBS", "formula": "vIBSTot + vCBS" },
+        { "label": "Valor Liquido + IBS/CBS", "tag": "vTotNF", "fill": "cinza", "note": "Fundo cinza 5% no label e na celula." }
+      ]
+    },
+
+    {
+      "order": 8,
+      "fn": "draw_additional_info",
+      "title": "Informacoes Complementares (Rodape)",
+      "field_count": 1,
+      "render": "pdf.multi_cell() dinamico",
+      "separator": "|",
+      "concat_template": [
+        "Inf. Cont.: {xInfComp}",
+        "NFS-e Subst.: {chSubstda}",
+        "Doc. Ref.: {docRef}",
+        "Cod. Obra: {cObra}",
+        "Insc. Imob.: {inscImobFisc}",
+        "Cod. Evt.: {idAtvEvt}",
+        "Doc. Tec.: {idDocTec}",
+        "Num. Ped.: {xPed}",
+        "Item Ped.: {xItemPed}",
+        "Out. Inf.: {xOutInf}"
+      ],
+      "nt009_extra": "Incluir informacoes de pagamento do grupo gPgtoVinc se a transacao for disponibilizada na emissao.",
+      "truncate": { "max_length": 1997, "rule": "Truncar a string resultante SEM apagar a frase fixa final." },
+      "fixed_last_line": {
+        "norm": "Lei 12.741/2012 (Lei da Transparencia)",
+        "ignore_truncate": true,
+        "text": "Totais Aproximados dos Tributos cfe. Lei nº 12.741/2012: Federais: R$ ...; Estaduais: R$ ...; Municipais: R$ ..."
+      }
+    },
+
+    {
+      "order": 9,
+      "fn": "draw_canhoto",
+      "title": "Canhoto (Opcional)",
+      "field_count": 4,
+      "condition": "config.show_receipt == True",
+      "fields": [
+        { "label": "Data Cientificacao" },
+        { "label": "Identificacao/Assinatura" },
+        { "label": "Nº NFS-e", "tag": "nNFSe" },
+        { "label": "Chave NFS-e", "tag": "id", "concat": ["nNFSe", "id"] }
+      ]
+    }
+  ]
+}

@@ -186,7 +186,7 @@ class Danfse(xFPDF):
         # NT 008: Arial, mínimo 50pt, cinza, diagonal.
         size = 60  # >= 50pt
         self.set_font("helvetica", "B", size)  # Arial == Helvetica (FPDF2)
-        self.set_text_color(180, 180, 180)  # cinza
+        self.set_text_color(166, 166, 166)  # cinza K35 (NT 008 item 2.5.1/2.5.2)
         width = self.get_string_width(text)
         height = size * 0.25
         x_center = (self.w - width) / 2
@@ -371,7 +371,7 @@ class Danfse(xFPDF):
             self.cell(
                 w=pw - 6,
                 h=4,
-                text="TOMADOR / ADQUIRENTE NÃO IDENTIFICADO NA NFS-e",
+                text="TOMADOR/ADQUIRENTE DA OPERAÇÃO NÃO IDENTIFICADO NA NFS-e",
                 align="C",
             )
             self.divider(x + 2, y + 16, x + pw - 2)
@@ -428,7 +428,7 @@ class Danfse(xFPDF):
             self.cell(
                 w=0,
                 h=3,
-                text=("O DESTINATÁRIO É O PRÓPRIO TOMADOR/ADQUIRENTE DO SERVIÇO"),
+                text=("O DESTINATÁRIO É O PRÓPRIO TOMADOR/ADQUIRENTE DA OPERAÇÃO"),
                 align="C",
             )
             self.y += 5
@@ -454,7 +454,7 @@ class Danfse(xFPDF):
             self.cell(
                 w=0,
                 h=3,
-                text="INTERMEDIÁRIO DO SERVIÇO NÃO IDENTIFICADO NA NFS-e",
+                text="INTERMEDIÁRIO DA OPERAÇÃO NÃO IDENTIFICADO NA NFS-e",
                 align="C",
             )
             self.y += 5

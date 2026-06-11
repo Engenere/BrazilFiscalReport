@@ -10,7 +10,86 @@ Compatível com Python 3.8+ (sem unions ``X | Y``).
 """
 
 import re
+import xml.etree.ElementTree as ET
 from typing import Optional
+
+# Namespace da NFS-e (igual ao danfse_conf.URL, mas sem o prefixo de busca).
+_NS = "{http://www.sped.fazenda.gov.br/nfse}"
+
+# Tipos de evento que alteram a situação da NFS-e.
+# A parte específica do evento é uma tag eNNNNNN dentro de infPedReg.
+EVENT_CANCEL = "cancelamento"
+EVENT_REPLACE = "substituicao"
+
+
+def parse_event_xml(xml):
+    """Lê um XML de EVENTO da NFS-e e retorna um dicionário resumido.
+
+    Os eventos (cancelamento, substituição, etc.) são documentos separados
+    cuja raiz é <evento>. Eles referenciam a NFS-e pela chave (chNFSe) e
+    podem alterar a situação do documento.
+
+    Retorna None se o XML não for um evento reconhecível, ou um dict:
+        {
+            "ch_nfse": "...",        # chave da NFS-e referenciada
+            "kind": "cancelamento"|"substituicao"|"outro",
+            "tp_evento": "101101",   # código do tipo (eNNNNNN)
+            "x_desc": "Cancelamento de NFS-e",
+            "x_motivo": "Erro na emissão.",
+            "ch_subst": "...",       # chave substituta (só em substituição)
+        }
+    """
+    try:
+        root = ET.fromstring(xml)
+    except ET.ParseError:
+        return None
+
+    root_tag = root.tag.split("}")[-1]
+    inf_evento = root.find(f"{_NS}infEvento")
+    if root_tag != "evento" and inf_evento is None:
+        return None
+
+    ch_nfse = _deep_text(root, "chNFSe")
+    x_desc = _deep_text(root, "xDesc")
+    x_motivo = _deep_text(root, "xMotivo")
+    ch_subst = _deep_text(root, "chSubstda") or _deep_text(root, "chNFSeSubst")
+
+    # Identifica a tag específica do evento (eNNNNNN) dentro de infPedReg.
+    tp_evento = ""
+    inf_ped = root.find(f".//{_NS}infPedReg")
+    if inf_ped is not None:
+        for child in inf_ped:
+            local = child.tag.split("}")[-1]
+            if re.fullmatch(r"e\d{6}", local):
+                tp_evento = local[1:]
+                break
+
+    # Classifica o tipo. 101101 = Cancelamento; substituição traz chSubstda
+    # ou descrição/código próprios.
+    desc = (x_desc or "").lower()
+    if ch_subst or "substitu" in desc:
+        kind = EVENT_REPLACE
+    elif tp_evento.startswith("1011") or "cancel" in desc:
+        kind = EVENT_CANCEL
+    else:
+        kind = "outro"
+
+    return {
+        "ch_nfse": ch_nfse,
+        "kind": kind,
+        "tp_evento": tp_evento,
+        "x_desc": x_desc,
+        "x_motivo": x_motivo,
+        "ch_subst": ch_subst,
+    }
+
+
+def _deep_text(node, tag):
+    """Busca recursiva pelo primeiro texto da tag (com namespace)."""
+    found = node.find(f".//{_NS}{tag}")
+    if found is not None and found.text:
+        return found.text.strip()
+    return ""
 
 
 def truncate_text(text: Optional[str], max_length: int) -> str:

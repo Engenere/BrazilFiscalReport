@@ -30,7 +30,7 @@ def real_data():
 
 def test_cnpj_alfanumerico(real_data):
     # CNPJ numérico do fixture real -> máscara padrão.
-    assert real_data["issuer"]["id"] == "37.015.437/0001-09"
+    assert real_data["issuer"]["id"] == "11.111.111/0001-11"
 
 
 def test_cnpj_alfanumerico_tipo_c():

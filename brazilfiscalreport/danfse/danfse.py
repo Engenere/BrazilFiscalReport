@@ -27,11 +27,28 @@ import qrcode
 from ..xfpdf import xFPDF
 from .config import DanfseConfig
 from .fonts import COLOR_SHADING, NT008Fonts
+from .nt009_utils import parse_event_xml
 from .parser import DanfseParser
 
 
 class Danfse(xFPDF):
-    def __init__(self, xml: str | bytes, config: DanfseConfig | None = None):
+    def __init__(
+        self,
+        xml: str | bytes,
+        config: DanfseConfig | None = None,
+        event_xml: str | bytes | None = None,
+    ):
+        """Gera o DANFSe.
+
+        Args:
+            xml: XML da NFS-e (elemento NFSe/infNFSe).
+            config: configuração opcional do documento.
+            event_xml: XML de um evento (cancelamento/substituição) associado.
+                A NFS-e é imutável; quando há cancelamento/substituição, a
+                situação vem deste evento, que referencia a nota pela chave.
+                Permite gerar o DANFSe com a marca d'água correta a partir
+                dos dois documentos (NFS-e + evento).
+        """
         super().__init__(unit="mm", format="A4")
         self.config = config or DanfseConfig()
 
@@ -56,7 +73,8 @@ class Danfse(xFPDF):
 
         # Parse.
         self.root = ET.fromstring(xml)
-        self.data = DanfseParser(xml, self.config).parse()
+        event = parse_event_xml(event_xml) if event_xml else None
+        self.data = DanfseParser(xml, self.config, event=event).parse()
 
         # Render pipeline.
         self.add_page("P")
@@ -803,9 +821,16 @@ class Danfse(xFPDF):
 
 
 def generate_danfse(
-    xml: str | bytes, output_path: str, config: DanfseConfig | None = None
+    xml: str | bytes,
+    output_path: str,
+    config: DanfseConfig | None = None,
+    event_xml: str | bytes | None = None,
 ) -> str:
-    """Atalho: gera o PDF do DANFSe e salva em output_path."""
-    doc = Danfse(xml, config)
+    """Atalho: gera o PDF do DANFSe e salva em output_path.
+
+    event_xml: XML de evento (cancelamento/substituição) opcional, associado
+    à NFS-e pela chave de acesso.
+    """
+    doc = Danfse(xml, config, event_xml=event_xml)
     doc.output(output_path)
     return output_path

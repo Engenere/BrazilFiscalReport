@@ -53,11 +53,14 @@ from .nt009_utils import (
 
 
 class DanfseParser:
-    def __init__(self, xml, config=None):
+    def __init__(self, xml, config=None, event=None):
         self.config = config or DanfseConfig()
         self.price_precision = self.config.decimal_config.price_precision
         self.municipios = load_municipios()
         self.root = ET.fromstring(xml)
+        # Evento de cancelamento/substituição já parseado (dict de
+        # nt009_utils.parse_event_xml) ou None.
+        self.event = event
 
     # -- helpers internos ---------------------------------------------------
 
@@ -173,6 +176,22 @@ class DanfseParser:
         is_cancelled = c_stat == "101"
         is_replaced = c_stat == "102"
 
+        # Evento separado (cancelamento/substituição) associado a esta NFS-e.
+        # A NFS-e é imutável (continua cStat 100/107); a situação real vem do
+        # evento, que referencia a nota pela chave. Só aplica se a chave bater.
+        situacao_evento = ""
+        if self.event:
+            ev_ch = (self.event.get("ch_nfse") or "").strip()
+            if not ev_ch or ev_ch == key:
+                if self.event.get("kind") == "substituicao":
+                    is_replaced = True
+                    situacao_evento = "Cancelada por Substituição"
+                elif self.event.get("kind") == "cancelamento":
+                    is_cancelled = True
+                    situacao_evento = "Cancelada"
+
+        situacao = situacao_evento or K.C_STAT.get(c_stat, "Normal")
+
         return {
             "environment": tp_amb,
             "environment_str": K.TP_AMB.get(tp_amb, "Não Informado"),
@@ -180,6 +199,7 @@ class DanfseParser:
             "c_stat": c_stat,
             "is_cancelled": is_cancelled,
             "is_replaced": is_replaced,
+            "event": self.event,
             "ambiente_gerador": amb_ger or "Não Informado",
             "key_nfse": key,
             "nfse_number": self._t(inf_nfse, "nNFSe"),
@@ -192,9 +212,7 @@ class DanfseParser:
             "dps_number": self._t(dps, "nDPS"),
             "dps_serie": self._t(dps, "serie"),
             "emitente_nfse": K.TP_EMIT.get(tp_emit, "Prestador do Serviço"),
-            "situacao_nfse": truncate_text(
-                K.C_STAT.get(c_stat, "Normal"), K.Limits.CSTAT
-            ),
+            "situacao_nfse": truncate_text(situacao, K.Limits.CSTAT),
             "finalidade": truncate_text(
                 K.FIN_NFSE.get(fin, "Regular"), K.Limits.FIN_NFSE
             ),

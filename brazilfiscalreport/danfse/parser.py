@@ -123,7 +123,7 @@ class DanfseParser:
         data["service"] = self._parse_service(serv, inf_nfse)
         data["municipal_taxes"] = self._parse_municipal_taxes(dps, valores, serv)
         data["federal_taxes"] = self._parse_federal_taxes(dps, data)
-        data["ibs_cbs_taxes"] = self._parse_ibs_cbs(dps, valores, reg_trib)
+        data["ibs_cbs_taxes"] = self._parse_ibs_cbs(dps, valores, reg_trib, inf_nfse)
         data["total_value"] = self._parse_totals(dps, valores, data)
         data["taxes_amount"] = self._parse_approx_taxes(dps)
         data["complementary_info"] = self._parse_complementary_info(serv, dps, data)
@@ -486,10 +486,18 @@ class DanfseParser:
 
     # -- 9. IBS / CBS (NT 009) ---------------------------------------------
 
-    def _parse_ibs_cbs(self, dps, valores, reg_trib) -> dict:
-        ibs_cbs = self._find(dps, "IBSCBS")
-        if ibs_cbs is None:
-            ibs_cbs = self._find(valores, "IBSCBS")
+    def _parse_ibs_cbs(self, dps, valores, reg_trib, inf_nfse=None) -> dict:
+        # NT-004: há DOIS grupos IBSCBS.
+        #  - DPS  (infDPS/IBSCBS): declarado pelo emitente -> CST, cClassTrib,
+        #    cIndOp, dest, finNFSe.
+        #  - NFSe (infNFSe/IBSCBS): calculado pela plataforma -> valores
+        #    brutos e totalizadores (totCIBS).
+        ibs_dps = self._find(dps, "IBSCBS")
+        ibs_nfse = self._find(inf_nfse, "IBSCBS") if inf_nfse is not None else None
+        if ibs_nfse is None:
+            ibs_nfse = self._find(valores, "IBSCBS")
+        # Referência principal para identificação (DPS) e cálculos (NFSe).
+        ibs_cbs = ibs_dps if ibs_dps is not None else ibs_nfse
         pp = self.MONEY_PRECISION
 
         # Estrutura default (sem grupo IBS/CBS no XML).
@@ -514,48 +522,70 @@ class DanfseParser:
         }
         if ibs_cbs is None:
             return result
+        result["present"] = True
 
         # NT 009: Simples Nacional puxa valores de gTribSN.
         op_simp = self._t(reg_trib, "opSimpNac")
         is_simples = op_simp in K.OP_SIMP_NAC_OPTANTES
-        g_trib_sn = self._find(ibs_cbs, "gTribSN")
+        g_trib_sn = self._find(ibs_nfse, "gTribSN") or self._find(ibs_cbs, "gTribSN")
 
-        cst = self._t(ibs_cbs, "CST")
-        cclass = self._t(ibs_cbs, "cClassTrib")
+        # Estrutura oficial (NT-004 SE/CGNFS-e):
+        #   DPS:  infDPS/IBSCBS/{finNFSe,cIndOp,dest,...}
+        #         infDPS/IBSCBS/valores/trib/gIBSCBS/{CST,cClassTrib}
+        #   NFSe: infNFSe/IBSCBS/valores/{vBC, uf/, mun/, fed/}
+        #         infNFSe/IBSCBS/totCIBS/gIBS/{vIBSTot, gIBSUFTot/, gIBSMunTot/}
+        #         infNFSe/IBSCBS/totCIBS/gCBS/{vCBS}
+        g_ibscbs = self._find(ibs_dps, "gIBSCBS")  # CST/cClassTrib (DPS)
+        # Valores brutos e totalizadores vêm do grupo da NFSe (calculados).
+        nfse_grp = ibs_nfse if ibs_nfse is not None else ibs_cbs
+        vals = self._find(nfse_grp, "valores")
+        uf = self._find(vals, "uf")
+        mun = self._find(vals, "mun")
+        fed = self._find(vals, "fed")
+        totc = self._find(nfse_grp, "totCIBS")
+        g_ibs = self._find(totc, "gIBS")
+        g_ibs_uf = self._find(g_ibs, "gIBSUFTot")
+        g_ibs_mun = self._find(g_ibs, "gIBSMunTot")
+        g_cbs = self._find(totc, "gCBS")
+
+        cst_src = g_ibscbs if g_ibscbs is not None else ibs_dps
+        cst = self._t(cst_src, "CST")
+        cclass = self._t(cst_src, "cClassTrib")
         result["cst_cclass"] = f"{cst} / {cclass}".strip(" /") or K.EMPTY
 
-        ind_op = self._t(ibs_cbs, "cIndOp")
-        loc_code = self._t(ibs_cbs, "cLocalidadeIncid")
+        ind_op = self._t(ibs_dps, "cIndOp")
+        loc_code = self._t(ibs_cbs, "cLocalidadeIncid") or self._t(ibs_cbs, "cMunIncid")
         loc_name = self._t(ibs_cbs, "xLocalidadeIncid")
-        uf = self._t(ibs_cbs, "UF")
+        uf_sigla = self._t(ibs_cbs, "UF")
         result["ind_oper_ibge_mun_uf"] = (
-            " / ".join(p for p in (ind_op, loc_code, loc_name, uf) if p) or K.EMPTY
+            " / ".join(p for p in (ind_op, loc_code, loc_name, uf_sigla) if p)
+            or K.EMPTY
         )
 
-        # Exclusões/Reduções (NT 009).
-        excl = to_float(self._t(ibs_cbs, "vCalcAjusteBCIBSCBS")) + to_float(
+        # Exclusões/Reduções e BC após exclusões (grupo valores da NFSe).
+        excl = to_float(self._t(vals, "vCalcReeRepRes")) + to_float(
             self._t(ibs_cbs, "vCalcAjusteBCLocImoveis")
         )
         result["excl_red_bc"] = self._money(excl)
-        result["bc_apos_excl"] = self._money(self._t(ibs_cbs, "vBC"))
+        result["bc_apos_excl"] = self._money(self._t(vals, "vBC"))
 
         result["red_aliq_ibs_cbs"] = (
-            f"{format_number(self._t(ibs_cbs, 'pRedAliqUF'), pp)}% / "
-            f"{format_number(self._t(ibs_cbs, 'pRedAliqMun'), pp)}% / "
-            f"{format_number(self._t(ibs_cbs, 'pRedAliqCBS'), pp)}%"
+            f"{format_number(self._t(uf, 'pRedAliqUF'), pp)}% / "
+            f"{format_number(self._t(mun, 'pRedAliqMun'), pp)}% / "
+            f"{format_number(self._t(fed, 'pRedAliqCBS'), pp)}%"
         )
         result["aliq_ibs_uf_mun"] = (
-            f"{format_number(self._t(ibs_cbs, 'pIBSUF'), pp)}% / "
-            f"{format_number(self._t(ibs_cbs, 'pIBSMun'), pp)}%"
+            f"{format_number(self._t(uf, 'pIBSUF'), pp)}% / "
+            f"{format_number(self._t(mun, 'pIBSMun'), pp)}%"
         )
         result["aliq_efet_mun_ibs"] = (
-            f"{format_number(self._t(ibs_cbs, 'pAliqEfetMun'), pp)}%"
+            f"{format_number(self._t(mun, 'pAliqEfetMun'), pp)}%"
         )
-        result["valor_apurado_mun_ibs"] = self._money(self._t(ibs_cbs, "vIBSMun"))
+        result["valor_apurado_mun_ibs"] = self._money(self._t(g_ibs_mun, "vIBSMun"))
         result["aliq_efet_est_ibs"] = (
-            f"{format_number(self._t(ibs_cbs, 'pAliqEfetUF'), pp)}%"
+            f"{format_number(self._t(uf, 'pAliqEfetUF'), pp)}%"
         )
-        result["valor_apurado_est_ibs"] = self._money(self._t(ibs_cbs, "vIBSUF"))
+        result["valor_apurado_est_ibs"] = self._money(self._t(g_ibs_uf, "vIBSUF"))
 
         # Totais IBS/CBS — Simples Nacional usa gTribSN.
         if is_simples and g_trib_sn is not None:
@@ -563,15 +593,13 @@ class DanfseParser:
             p_cbs = self._t(g_trib_sn, "pCBSSN")
             v_cbs = to_float(self._t(g_trib_sn, "vCBSSN"))
         else:
-            v_ibs = to_float(self._t(ibs_cbs, "vIBSTot"))
-            p_cbs = self._t(ibs_cbs, "pCBS")
-            v_cbs = to_float(self._t(ibs_cbs, "vCBS"))
+            v_ibs = to_float(self._t(g_ibs, "vIBSTot"))
+            p_cbs = self._t(fed, "pCBS")
+            v_cbs = to_float(self._t(g_cbs, "vCBS"))
 
         result["valor_total_apurado_ibs"] = self._money(v_ibs)
         result["aliq_cbs"] = f"{format_number(p_cbs, pp)}%" if p_cbs else "%"
-        result["aliq_efet_cbs"] = (
-            f"{format_number(self._t(ibs_cbs, 'pAliqEfetCBS'), pp)}%"
-        )
+        result["aliq_efet_cbs"] = f"{format_number(self._t(fed, 'pAliqEfetCBS'), pp)}%"
         result["valor_total_apurado_cbs"] = self._money(v_cbs)
         result["_v_ibs_tot"] = v_ibs
         result["_v_cbs"] = v_cbs

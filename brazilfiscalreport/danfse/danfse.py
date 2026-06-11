@@ -164,21 +164,29 @@ class Danfse(xFPDF):
     # ======================================================================
 
     def _draw_void_watermark(self):
-        is_prod = self.data["environment"] == "1"
-        text = None
-        size = 60
-        if self.watermark_cancelled:
-            if is_prod:
-                text = "CANCELADA"
-            else:
-                text, size = "CANCELADA - SEM VALOR FISCAL", 45
-        elif not is_prod:
-            text = "SEM VALOR FISCAL"
+        """Marca d'água de situação (NT 008).
 
-        if not text:
+        A NT 008 exige, para NFS-e cancelada ou substituída, marca d'água
+        DIAGONAL com o texto "CANCELADA" / "SUBSTITUÍDA", fonte Arial,
+        tamanho MÍNIMO 50pt e cor CINZA.
+
+        A situação é detectada pelo cStat do XML (101=Cancelada,
+        102=Substituída); ``config.watermark_cancelled`` força "CANCELADA".
+
+        Obs.: o aviso de homologação ("NFS-e SEM VALIDADE JURÍDICA") é
+        tratado no cabeçalho (texto vermelho), não como marca d'água.
+        """
+        if self.data.get("is_replaced"):
+            text = "SUBSTITUÍDA"
+        elif self.data.get("is_cancelled") or self.watermark_cancelled:
+            text = "CANCELADA"
+        else:
             return
-        self.set_font("helvetica", "B", size)
-        self.set_text_color(220, 150, 150)
+
+        # NT 008: Arial, mínimo 50pt, cinza, diagonal.
+        size = 60  # >= 50pt
+        self.set_font("helvetica", "B", size)  # Arial == Helvetica (FPDF2)
+        self.set_text_color(180, 180, 180)  # cinza
         width = self.get_string_width(text)
         height = size * 0.25
         x_center = (self.w - width) / 2

@@ -153,10 +153,17 @@ class DanfseParser:
         c_stat = self._t(inf_nfse, "cStat")
         fin = self._t(dps, "finNFSe")
 
+        # cStat: 101 = Cancelada, 102 = Cancelada por Substituição.
+        is_cancelled = c_stat == "101"
+        is_replaced = c_stat == "102"
+
         return {
             "environment": tp_amb,
             "environment_str": K.TP_AMB.get(tp_amb, "Não Informado"),
             "is_homologation": tp_amb == "2",
+            "c_stat": c_stat,
+            "is_cancelled": is_cancelled,
+            "is_replaced": is_replaced,
             "ambiente_gerador": amb_ger or "Não Informado",
             "key_nfse": key,
             "nfse_number": self._t(inf_nfse, "nNFSe"),
@@ -591,11 +598,8 @@ class DanfseParser:
             issqn_value if muni.get("_ret_type") in K.TP_RET_ISSQN_RETIDO else 0.0
         )
         total_ret_raw = self._t(valores, "vTotalRet")
-        if total_ret_raw:
-            total_retentions = to_float(total_ret_raw)
-        else:
-            # soma defensiva: ISSQN retido + federais conhecidos
-            total_retentions = issqn_retained
+        # vTotalRet quando presente; senão, soma defensiva (ISSQN retido).
+        total_retentions = to_float(total_ret_raw) if total_ret_raw else issqn_retained
         federal_retentions = max(total_retentions - issqn_retained, 0.0)
 
         v_ibs_cbs = ibs.get("_v_ibs_tot", 0.0) + ibs.get("_v_cbs", 0.0)

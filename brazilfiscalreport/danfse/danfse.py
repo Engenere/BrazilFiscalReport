@@ -408,9 +408,41 @@ class Danfse(xFPDF):
         )
 
         self.y = y + 23
+        self._draw_recipient_notice()
         self._draw_intermediary_notice()
         self.divider(x + 2, self.y + 1, x + pw - 2)
         self.y += 1
+
+    def _draw_recipient_notice(self):
+        """Bloco Destinatário da Operação (NT 008).
+
+        No caso usual (destinatário = tomador) a NT permite suprimir o bloco
+        e imprimir a frase padrão. Quando há destinatário distinto, exibe a
+        identificação resumida.
+        """
+        x = self.l_margin
+        rec = self.data.get("recipient", {})
+        if rec.get("is_taker") or not rec.get("present"):
+            self._nt_fonts.apply(self._nt_fonts.value())
+            self.set_xy(x=x + 3, y=self.y + 1)
+            self.cell(
+                w=0,
+                h=3,
+                text=("O DESTINATÁRIO É O PRÓPRIO TOMADOR/ADQUIRENTE DO SERVIÇO"),
+                align="C",
+            )
+            self.y += 5
+        else:
+            self._nt_fonts.apply(self._nt_fonts.label())
+            self.set_xy(x=x + 3, y=self.y + 1)
+            self.cell(w=0, h=3, text="DESTINATÁRIO DA OPERAÇÃO", align="L")
+            self._nt_fonts.apply(self._nt_fonts.value())
+            self.set_xy(x=x + 3, y=self.y + 4)
+            info = " - ".join(
+                p for p in (rec.get("id"), rec.get("name")) if p and p != "-"
+            )
+            self.cell(w=0, h=3, text=info or "-", align="L")
+            self.y += 8
 
     def _draw_intermediary_notice(self):
         """Aviso/grid do intermediário (port: original só imprimia aviso)."""
@@ -728,7 +760,7 @@ class Danfse(xFPDF):
         x = self.l_margin
         y = self.y
         sy = y + 2
-        self._block_title(x + 3, sy, "INFORMAÇÕES COMPLEMENTARES", shaded=False)
+        self._block_title(x + 3, sy, "INFORMAÇÕES COMPLEMENTARES")
         self._nt_fonts.apply(self._nt_fonts.value(7))
         self.set_xy(x=x + 3, y=sy + 4)
         self.multi_cell(

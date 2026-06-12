@@ -808,9 +808,10 @@ class Danfse(xFPDF):
         self.cell(w=self.colw - 1.6, h=ROW_H, text=text, align="L")
 
     def _title_strip(self, text):
+        # Sem sombreamento: o modelo do Anexo I exibe o título de
+        # INFORMAÇÕES COMPLEMENTARES sem fundo.
         y = self.get_y()
         h = STRIP_H + 0.5
-        self._shade(self.bx, y, self.bw, h)
         self.set_font(self.default_font, "B", 7)
         self.set_xy(self.bx + 0.8, y)
         self.cell(w=self.bw - 1.6, h=h, text=text, align="L")

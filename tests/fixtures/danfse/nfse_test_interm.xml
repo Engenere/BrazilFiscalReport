@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NFSe xmlns="http://www.sped.fazenda.gov.br/nfse">
+    <infNFSe versao="1.01" Id="NFS42046082240248250000160000000000077777777777777777">
+        <xLocEmi>Porto Alegre</xLocEmi>
+        <xLocPrestacao>São Paulo</xLocPrestacao>
+        <nNFSe>777</nNFSe>
+        <cLocIncid>3550308</cLocIncid>
+        <xLocIncid>São Paulo</xLocIncid>
+        <xTribNac>Serviços de Publicidade</xTribNac>
+        <verAplic>SefinNacional_1.6.0</verAplic>
+        <ambGer>1</ambGer>
+        <tpEmis>1</tpEmis>
+        <procEmi>1</procEmi>
+        <cStat>100</cStat>
+        <dhProc>2026-05-10T10:00:00-03:00</dhProc>
+        <nDFSe>117999</nDFSe>
+        <emit>
+            <CNPJ>90449244000149</CNPJ>
+            <xNome>Renata e Leandro Publicidade e Propaganda ME</xNome>
+            <enderNac>
+                <xLgr>Avenida Ipiranga</xLgr>
+                <nro>500</nro>
+                <xBairro>Centro Histórico</xBairro>
+                <cMun>4314902</cMun>
+                <UF>RS</UF>
+                <CEP>90040000</CEP>
+            </enderNac>
+            <fone>5132023254</fone>
+            <email>contato@renataeleandropublicidade.com.br</email>
+        </emit>
+        <valores>
+            <vCalcDR>150.00</vCalcDR>
+            <tpBM>2</tpBM>
+            <vCalcBM>300.00</vCalcBM>
+            <vBC>7000.00</vBC>
+            <pAliqAplic>3.00</pAliqAplic>
+            <vISSQN>210.00</vISSQN>
+            <vTotalRet>510.00</vTotalRet>
+            <vLiq>6490.00</vLiq>
+        </valores>
+        <IBSCBS>
+            <valores>
+                <vCalcReeRepRes>50.00</vCalcReeRepRes>
+            </valores>
+        </IBSCBS>
+        <DPS versao="1.00">
+            <infDPS Id="DPS777">
+                <tpAmb>1</tpAmb>
+                <dhEmi>2026-05-10T09:00:00-03:00</dhEmi>
+                <nDPS>777</nDPS>
+                <serie>1</serie>
+                <dCompet>2026-05-10</dCompet>
+                <prest>
+                    <CNPJ>11222333000144</CNPJ>
+                    <IM>123456</IM>
+                    <regTrib>
+                        <opSimpNac>3</opSimpNac>
+                        <regApTribSN>2</regApTribSN>
+                        <regEspTrib>0</regEspTrib>
+                    </regTrib>
+                </prest>
+                <toma>
+                    <CNPJ>96572806000123</CNPJ>
+                    <xNome>Bento e Silvana Doces e Salgados Ltda</xNome>
+                    <end>
+                        <endNac>
+                            <cMun>3552205</cMun>
+                            <CEP>18047607</CEP>
+                        </endNac>
+                        <xLgr>Rua José Beraldo Rosa</xLgr>
+                        <nro>100</nro>
+                        <xBairro>Parque Campolim</xBairro>
+                    </end>
+                    <fone>15982295603</fone>
+                    <email>sistema@bentoesilvanadocessalgadosltda.com.br</email>
+                </toma>
+                <interm>
+                    <CNPJ>44555666000177</CNPJ>
+                    <IM>654321</IM>
+                    <xNome>Plataforma Intermediação Digital Ltda</xNome>
+                    <end>
+                        <endNac>
+                            <cMun>3550308</cMun>
+                            <CEP>01310100</CEP>
+                        </endNac>
+                        <xLgr>Avenida Paulista</xLgr>
+                        <nro>1000</nro>
+                        <xBairro>Bela Vista</xBairro>
+                        <xMun>São Paulo</xMun>
+                    </end>
+                    <fone>1133334444</fone>
+                    <email>contato@plataformaintermediacao.com.br</email>
+                </interm>
+                <serv>
+                    <locPrest>
+                        <cLocPrestacao>3550308</cLocPrestacao>
+                    </locPrest>
+                    <cServ>
+                        <cTribNac>010501</cTribNac>
+                        <xDescServ>0105 | 1.05 - Serviço de Publicidade e Propaganda</xDescServ>
+                    </cServ>
+                </serv>
+                <valores>
+                    <vServPrest>
+                        <vServ>7000.00</vServ>
+                    </vServPrest>
+                    <trib>
+                        <tribMun>
+                            <tribISSQN>2</tribISSQN>
+                            <exigSusp>
+                                <tpSusp>1</tpSusp>
+                                <nProcesso>123456789012345678901234567890</nProcesso>
+                            </exigSusp>
+                            <BM>
+                                <nBM>00000000012345</nBM>
+                                <pRedBCBM>20.00</pRedBCBM>
+                            </BM>
+                            <tpRetISSQN>3</tpRetISSQN>
+                        </tribMun>
+                        <tribFed>
+                            <piscofins>
+                                <CST>01</CST>
+                                <vPis>45.50</vPis>
+                                <vCofins>210.00</vCofins>
+                                <tpRetPisCofins>4</tpRetPisCofins>
+                            </piscofins>
+                            <vRetCP>100.00</vRetCP>
+                            <vRetIRRF>150.00</vRetIRRF>
+                            <vRetCSLL>50.00</vRetCSLL>
+                        </tribFed>
+                    </trib>
+                </valores>
+            </infDPS>
+        </DPS>
+    </infNFSe>
+</NFSe>

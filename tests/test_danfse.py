@@ -53,6 +53,26 @@ def test_danfse_minimal(tmp_path, load_danfse):
     assert_pdf_equal(danfse, pdf_path, tmp_path)
 
 
+def test_danfse_rtc(tmp_path, load_danfse):
+    config = DanfseConfig(
+        margins=Margins(top=2, right=2, bottom=2, left=2),
+        display_canhoto=True,
+    )
+    danfse = load_danfse("nfse_test_rtc.xml", config=config)
+    pdf_path = get_pdf_output_path("danfse", "danfse_rtc")
+    assert_pdf_equal(danfse, pdf_path, tmp_path)
+
+
+def test_danfse_replaced(tmp_path, load_danfse):
+    config = DanfseConfig(
+        margins=Margins(top=2, right=2, bottom=2, left=2),
+        watermark_replaced=True,
+    )
+    danfse = load_danfse("nfse_test_rtc.xml", config=config)
+    pdf_path = get_pdf_output_path("danfse", "danfse_replaced")
+    assert_pdf_equal(danfse, pdf_path, tmp_path)
+
+
 def test_danfse_cancelled(tmp_path, load_danfse):
     config = DanfseConfig(
         margins=Margins(top=2, right=2, bottom=2, left=2), watermark_cancelled=True

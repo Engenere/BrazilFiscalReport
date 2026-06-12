@@ -68,13 +68,19 @@ MARGIN_HELP = "Margens da página em milímetros."
 
 
 def margin_inputs(
-    prefix, left=(0, 50, 5), left_help=None, right=(0, 50, 5), right_help=None
+    prefix,
+    left=(0, 50, 5),
+    left_help=None,
+    right=(0, 50, 5),
+    right_help=None,
+    top=(0, 50, 5),
+    bottom=(0, 50, 5),
 ):
-    """Quatro campos de margem em mm; esquerda/direita podem ter limites próprios."""
+    """Quatro campos de margem em mm; cada lado pode ter limites próprios."""
     st.markdown("**Margens (mm)**", help=MARGIN_HELP)
     col1, col2 = st.columns(2)
-    top = col1.number_input("Superior", 0, 50, 5, key=f"{prefix}_margin_top")
-    bottom = col2.number_input("Inferior", 0, 50, 5, key=f"{prefix}_margin_bottom")
+    top_val = col1.number_input("Superior", *top, key=f"{prefix}_margin_top")
+    bottom = col2.number_input("Inferior", *bottom, key=f"{prefix}_margin_bottom")
     left_val = col1.number_input(
         "Esquerda", *left, key=f"{prefix}_margin_left", help=left_help
     )
@@ -82,7 +88,7 @@ def margin_inputs(
         "Direita", *right, key=f"{prefix}_margin_right", help=right_help
     )
     return {
-        "margin_top": top,
+        "margin_top": top_val,
         "margin_right": right_val,
         "margin_bottom": bottom,
         "margin_left": left_val,
@@ -329,28 +335,63 @@ def damdfe_options():
     return opts
 
 
+DANFSE_FONTS = {
+    "Helvetica (Arial)": "HELVETICA",
+    "Times": "TIMES",
+    "Courier": "COURIER",
+}
+
+
 def danfse_options():
     opts = {}
     st.caption(
         "O DANFSE usa o brasão oficial da NFS-e nacional; não há opção de logotipo."
     )
-    opts["font_type"] = font_input("danfse")
+    label = st.radio(
+        "Fonte",
+        list(DANFSE_FONTS),
+        horizontal=True,
+        key="danfse_font",
+        help="A NT 008/2026 exige Arial/Microsoft Sans Serif; a Helvetica é "
+        "o equivalente métrico disponível no PDF.",
+    )
+    opts["font_type"] = DANFSE_FONTS[label]
     opts["watermark_cancelled"] = st.toggle(
         "Marca d'água CANCELADA",
         key="danfse_cancelled",
         help="O XML da nota não indica o cancelamento; ative esta "
         "opção para NFS-es canceladas.",
     )
+    opts["watermark_replaced"] = st.toggle(
+        "Marca d'água SUBSTITUÍDA",
+        key="danfse_replaced",
+        help="Para NFS-es substituídas (NT 008/2026, item 2.5.2). "
+        "Se CANCELADA também estiver ativa, prevalece CANCELADA.",
+    )
+    opts["display_canhoto"] = st.toggle(
+        "Canhoto de cientificação",
+        key="danfse_canhoto",
+        help="Bloco opcional na base do documento (NT 008/2026, item 2.1.13).",
+    )
     opts["price_precision"] = st.number_input(
         "Casas decimais de valores",
         0,
         10,
-        4,
+        2,
         key="danfse_price_precision",
         help="Casas decimais de valores monetários e alíquotas "
-        "(use 2 para o formato monetário usual).",
+        "(o leiaute v2.0 da NT 008/2026 usa 2 casas).",
     )
-    opts.update(margin_inputs("danfse"))
+    opts.update(
+        margin_inputs(
+            "danfse",
+            top=(0, 50, 2),
+            bottom=(0, 50, 2),
+            left=(0, 50, 2),
+            right=(0, 50, 2),
+            left_help="A NT 008/2026 fixa margens entre 1,5 e 2,0 mm.",
+        )
+    )
     return opts
 
 
@@ -488,6 +529,8 @@ def build_danfse_config(o):
         decimal_config=danfse.DecimalConfig(price_precision=o["price_precision"]),
         font_type=danfse.FontType[o["font_type"]],
         watermark_cancelled=o["watermark_cancelled"],
+        watermark_replaced=o["watermark_replaced"],
+        display_canhoto=o["display_canhoto"],
     )
 
 
@@ -752,11 +795,17 @@ if results:
                 "Pré-visualização indisponível neste ambiente. "
                 "Use o botão de download acima."
             )
-        if preview["doc"] != "DACCe":
+        if preview["doc"] not in ("DACCe", "DANFSE"):
             st.caption(
-                "NF-e, CT-e, MDF-e e NFS-e de homologação ou sem protocolo "
+                "NF-e, CT-e e MDF-e de homologação ou sem protocolo "
                 'de autorização recebem a marca d\'água "SEM VALOR FISCAL" '
                 "automaticamente."
+            )
+        elif preview["doc"] == "DANFSE":
+            st.caption(
+                "NFS-e de homologação (tpAmb=2) recebe a expressão "
+                '"NFS-e SEM VALIDADE JURÍDICA" no cabeçalho, conforme '
+                "a NT 008/2026."
             )
 
 st.divider()

@@ -41,6 +41,7 @@
                 <nDPS>999</nDPS>
                 <serie>1</serie>
                 <dCompet>2026-04-07</dCompet>
+                <tpEmit>1</tpEmit>
                 <prest>
                     <CNPJ>11222333000144</CNPJ>
                     <xNome>Serviços de Limpeza e Conservação</xNome>
@@ -66,7 +67,7 @@
                         <xLgr>Rua Vereador Pedro Paulo</xLgr>
                         <nro>691</nro>
                         <xBairro>Jardim das Oliveiras</xBairro>
-                        <cMun>29543408</cMun>
+                        <cMun>2304400</cMun>
                         <xMun>Fortaleza</xMun>
                         <UF>CE</UF>
                         <CEP>60821425</CEP>

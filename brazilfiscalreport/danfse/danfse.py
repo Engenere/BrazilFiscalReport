@@ -1159,7 +1159,7 @@ class Danfse(xFPDF):
         if self.data["municipal_taxes"]["suppressed"]:
             height += STRIP_H
         else:
-            height += STRIP_H + 0.5 + 4 * ROW_H
+            height += 4 * ROW_H
         height += ROW_H  # tributação federal, linha 1
         if self.data["federal_taxes"]["show_pis_cofins"]:
             height += ROW_H
@@ -1175,11 +1175,11 @@ class Danfse(xFPDF):
         if taxes["suppressed"]:
             self._strip(TXT_NO_ISSQN)
             return
-        self._title_strip("TRIBUTAÇÃO MUNICIPAL (ISSQN)")
         y = self.get_y()
-        self._field(0, 1, y, "Tipo de Tributação do ISSQN", taxes["issqn_tax"])
+        self._block_title(y, "TRIBUTAÇÃO MUNICIPAL (ISSQN)")
+        self._field(1, 1, y, "Tipo de Tributação do ISSQN", taxes["issqn_tax"])
         self._field(
-            1,
+            2,
             2,
             y,
             "Município / Sigla UF / País da Incidência do ISSQN",

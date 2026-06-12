@@ -267,7 +267,6 @@ class Danfse(xFPDF):
         self.colw = self.bw / 4
 
         self.data = self._parse_xml()
-        self._draw_watermark()
         self._draw_header()
         self._draw_identification()
         self._draw_provider()
@@ -286,6 +285,10 @@ class Danfse(xFPDF):
         self.set_line_width(LINE_BORDER)
         self.rect(x=self.l_margin, y=self.t_margin, w=self.epw, h=self.eph)
         self.set_line_width(LINE_DIVIDER)
+
+        # Por último, acima dos quadros sombreados; a transparência preserva
+        # a leitura do conteúdo sob a marca d'água.
+        self._draw_watermark()
 
     # ------------------------------------------------------------------
     # Parse
@@ -878,17 +881,19 @@ class Danfse(xFPDF):
         else:
             return
         # NT 008/2026, §2.5: diagonal, formato normal, mínimo 50pt, Arial
-        # (Helvetica como equivalente métrico), cinza K35.
+        # (Helvetica como equivalente métrico), cinza K35 — obtido com preto
+        # a 35% de opacidade, que sobre o papel equivale ao K35 e mantém o
+        # conteúdo legível sob a marca d'água.
         font_size = 60
         self.set_font("Helvetica", "", font_size)
         width = self.get_string_width(watermark_text)
-        self.set_text_color(166, 166, 166)
         height = font_size * 0.25
         x_center = (self.w - width) / 2
         y_center = (self.h + height) / 2
-        with self.rotation(55, x_center + (width / 2), y_center - (height / 2)):
+        with self.local_context(fill_opacity=0.35), self.rotation(
+            55, x_center + (width / 2), y_center - (height / 2)
+        ):
             self.text(x_center, y_center, watermark_text)
-        self.set_text_color(0, 0, 0)
 
     def _draw_header(self):
         y0 = self.t_margin + 1

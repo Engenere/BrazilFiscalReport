@@ -20,6 +20,55 @@ def extract_text(node: Element, tag: str) -> str:
     return get_tag_text(node, URL, tag)
 
 
+UF_CODE_TO_INITIALS = {
+    "11": "RO",
+    "12": "AC",
+    "13": "AM",
+    "14": "RR",
+    "15": "PA",
+    "16": "AP",
+    "17": "TO",
+    "21": "MA",
+    "22": "PI",
+    "23": "CE",
+    "24": "RN",
+    "25": "PB",
+    "26": "PE",
+    "27": "AL",
+    "28": "SE",
+    "29": "BA",
+    "31": "MG",
+    "32": "ES",
+    "33": "RJ",
+    "35": "SP",
+    "41": "PR",
+    "42": "SC",
+    "43": "RS",
+    "50": "MS",
+    "51": "MT",
+    "52": "GO",
+    "53": "DF",
+}
+
+
+def uf_from_ibge_code(code: str) -> str:
+    """UF derivada dos 2 primeiros dígitos do código IBGE do município."""
+    return UF_CODE_TO_INITIALS.get((code or "")[:2], "")
+
+
+def ellipsize(text: str, limit: int) -> str:
+    """Reticências quando o texto supera o limite de caracteres (NT 008/2026)."""
+    if text and len(text) > limit:
+        return f"{text[:limit]}..."
+    return text
+
+
+def join_city_uf(city: str, uf: str) -> str:
+    if city and uf:
+        return f"{city} - {uf}"
+    return city or uf or "-"
+
+
 class Danfse(xFPDF):
     def __init__(self, xml, config: DanfseConfig = None):
         super().__init__(unit="mm", format="A4")
@@ -43,6 +92,7 @@ class Danfse(xFPDF):
         self._draw_header()
         self._draw_issuer()
         self._draw_taker()
+        self._draw_intermediary()
         self._draw_service_provided()
         self._draw_taxes()
         self._draw_amount()
@@ -74,6 +124,7 @@ class Danfse(xFPDF):
         emit = self.root.find(f"{URL}emit")
         enderNac = emit.find(f"{URL}enderNac")
         prest = dps.find(f"{URL}prest")
+        prest_end = prest.find(f"{URL}end")
         regTrib = prest.find(f"{URL}regTrib")
         serv = dps.find(f"{URL}serv")
         valores = self.root.find(f"{URL}valores")
@@ -89,7 +140,7 @@ class Danfse(xFPDF):
             "3": "Optante - Microempresa ou Empresa de Pequeno Porte (ME/EPP)",
         }
         opSimpNac = extract_text(regTrib, "opSimpNac")
-        simples = simples_op.get(opSimpNac, "Não Optante")
+        simples = ellipsize(simples_op.get(opSimpNac, "-"), 37)
 
         tax_regim_op = {
             "1": (
@@ -107,7 +158,7 @@ class Danfse(xFPDF):
             ),
         }
         reg_ap_trib = extract_text(regTrib, "regApTribSN")
-        tax_regim = tax_regim_op.get(reg_ap_trib, "")
+        tax_regim = ellipsize(tax_regim_op.get(reg_ap_trib, ""), 77)
 
         special_tax_type = {
             "0": "Nenhum",
@@ -120,7 +171,7 @@ class Danfse(xFPDF):
             "9": "Outros",
         }
         reg_esp_trib = extract_text(regTrib, "regEspTrib")
-        special_tax_regim = special_tax_type.get(reg_esp_trib, "Nenhum")
+        special_tax_regim = special_tax_type.get(reg_esp_trib, "-")
 
         description = extract_text(serv, "xDescServ") or ""
 
@@ -142,19 +193,20 @@ class Danfse(xFPDF):
 
         issqn_tax = {
             "1": "Operação Tributável",
-            "2": "Imunidade",
-            "3": "Exportação de serviço",
-            "4": "Não Incidência",
+            "2": "Exportação de serviço",
+            "3": "Não Incidência",
+            "4": "Imunidade",
         }
         trib_issqn = extract_text(dps, "tribISSQN")
-        issqn = issqn_tax.get(trib_issqn, "Operação Tributável")
+        issqn = issqn_tax.get(trib_issqn, "-")
 
         issqn_retention_type = {
             "1": "Não Retido",
             "2": "Retido pelo Tomador",
-            "3": "Retido pelo Intermediario",
+            "3": "Retido pelo Intermediário",
         }
         issqn_type = extract_text(dps, "tpRetISSQN")
+        issqn_retention = issqn_retention_type.get(issqn_type, "-")
 
         issqn_value = extract_text(valores, "vISSQN")
         issqn_retained = issqn_value if issqn_type in ["2", "3"] else 0
@@ -185,6 +237,65 @@ class Danfse(xFPDF):
             extract_text(dps, "vDescCond"), self.price_precision
         )
 
+        # Benefício Municipal: descrição de tpBM (NFSe/infNFSe/valores),
+        # textos do leiaute ADN da NFS-e nacional.
+        bm = dps.find(f"{URL}BM")
+        p_red_bcbm = extract_text(bm, "pRedBCBM") if bm is not None else ""
+        v_red_bcbm = extract_text(bm, "vRedBCBM") if bm is not None else ""
+        municipal_benefit_type = {
+            "1": "Isenção",
+            "2": f"Redução da BC em {format_number(p_red_bcbm, self.price_precision)}%"
+            if p_red_bcbm
+            else "Redução da Base de Cálculo",
+            "3": f"Redução da BC em R$ "
+            f"{format_number(v_red_bcbm, self.price_precision)}"
+            if v_red_bcbm
+            else "Redução da Base de Cálculo",
+            "4": "Alíquota Diferenciada",
+        }
+        tp_bm = extract_text(valores, "tpBM")
+        municipal_benefit = ellipsize(municipal_benefit_type.get(tp_bm, "-"), 37)
+
+        v_calc_bm = extract_text(valores, "vCalcBM") or v_red_bcbm
+        municipal_benefit_math = (
+            f"R$ {format_number(v_calc_bm, self.price_precision)}" if v_calc_bm else "-"
+        )
+
+        # Total Deduções/Reduções: vDR (DPS/infDPS/valores/vDedRed) ou
+        # vCalcDR (infNFSe/valores), somado a vCalcReeRepRes
+        # (infNFSe/IBSCBS/valores) quando presente.
+        vDedRed = dps.find(f"{URL}vDedRed")
+        ded_red_value = extract_text(vDedRed, "vDR") if vDedRed is not None else ""
+        if not ded_red_value:
+            ded_red_value = extract_text(valores, "vCalcDR")
+        v_calc_ree = extract_text(inf_nfse, "vCalcReeRepRes")
+        if ded_red_value or v_calc_ree:
+            total_dr = float(ded_red_value or 0) + float(v_calc_ree or 0)
+            deduct_reduc_amount = f"R$ {format_number(total_dr, self.price_precision)}"
+        else:
+            deduct_reduc_amount = "-"
+
+        # Dados cadastrais do prestador: NFSe/infNFSe/DPS/infDPS/prest/, com
+        # fallback para infNFSe/emit quando a tag não consta de prest/ e o
+        # emitente é o próprio prestador (tpEmit=1 ou ausente).
+        tp_emit = extract_text(dps, "tpEmit")
+        emit_fb = emit if tp_emit in ("", "1") else None
+        if prest_end is not None:
+            issuer_address = format_address(prest_end)
+            issuer_cep = extract_text(prest_end, "CEP")
+            issuer_city = join_city_uf(
+                extract_text(prest_end, "xMun") or extract_text(inf_nfse, "xLocEmi"),
+                uf_from_ibge_code(extract_text(prest_end, "cMun"))
+                or extract_text(prest_end, "UF"),
+            )
+        else:
+            ender_nac_fb = enderNac if emit_fb is not None else None
+            issuer_address = format_address(ender_nac_fb)
+            issuer_cep = extract_text(ender_nac_fb, "CEP")
+            issuer_city = join_city_uf(
+                extract_text(inf_nfse, "xLocEmi"), extract_text(emit_fb, "UF")
+            )
+
         data = {
             "environment": extract_text(dps, "tpAmb"),
             "key_nfse": inf_nfse.attrib.get("Id")[3:],
@@ -197,29 +308,37 @@ class Danfse(xFPDF):
             "dps_number": extract_text(dps, "nDPS"),
             "dps_serie": extract_text(dps, "serie"),
             "issuer": {
-                "id": format_cpf_cnpj(extract_text(emit, "CNPJ"))
-                or format_cpf_cnpj(extract_text(emit, "CPF")),
-                "municipal_registration": extract_text(emit, "IM") or "-",
-                "phone": format_phone(extract_text(emit, "fone")) or "-",
-                "name": extract_text(emit, "xNome")
-                or extract_text(emit, "xFant")
+                "id": format_cpf_cnpj(extract_text(prest, "CNPJ"))
+                or format_cpf_cnpj(extract_text(prest, "CPF"))
+                or extract_text(prest, "NIF")
+                or format_cpf_cnpj(extract_text(emit_fb, "CNPJ"))
+                or format_cpf_cnpj(extract_text(emit_fb, "CPF"))
                 or "-",
-                "email": extract_text(emit, "email") or "-",
-                "address": format_address(enderNac),
-                "city": (
-                    f"{extract_text(inf_nfse, 'xLocEmi')} - "
-                    f"{extract_text(emit, 'UF')}"
-                ),
-                "cep": format_cep(extract_text(enderNac, "CEP")),
+                "municipal_registration": extract_text(prest, "IM")
+                or extract_text(emit_fb, "IM")
+                or "-",
+                "phone": format_phone(
+                    extract_text(prest, "fone") or extract_text(emit_fb, "fone")
+                )
+                or "-",
+                "name": extract_text(prest, "xNome")
+                or extract_text(emit_fb, "xNome")
+                or "-",
+                "email": extract_text(prest, "email")
+                or extract_text(emit_fb, "email")
+                or "-",
+                "address": issuer_address or "-",
+                "city": issuer_city,
+                "cep": format_cep(issuer_cep) if issuer_cep else "-",
                 "simples": simples,
-                "tax_regim": tax_regim if simples == "3" else "-",
+                "tax_regim": tax_regim or "-",
             },
             "service": {
                 "national_tax_code": national_tax_code,
                 "municipal_tax_code": extract_text(serv, "cTribMun") or "-",
-                "place_of_provision": (
-                    f"{extract_text(inf_nfse, 'xLocPrestacao')} - "
-                    f"{extract_text(emit, 'UF')}"
+                "place_of_provision": join_city_uf(
+                    extract_text(inf_nfse, "xLocPrestacao"),
+                    uf_from_ibge_code(extract_text(serv, "cLocPrestacao")),
                 ),
                 "country": extract_text(serv, "cPaisPrestacao") or "-",
                 "description": description,
@@ -227,28 +346,25 @@ class Danfse(xFPDF):
             "municipal_taxes": {
                 "issqn_tax": issqn,
                 "country": extract_text(dps, "cPaisResult") or "-",
-                "city": (
-                    f"{extract_text(inf_nfse, 'xLocIncid')} - "
-                    f"{extract_text(emit, 'UF')}"
-                    or "Nenhum"
+                "city": join_city_uf(
+                    extract_text(inf_nfse, "xLocIncid"),
+                    uf_from_ibge_code(extract_text(inf_nfse, "cLocIncid")),
                 ),
                 "special_tax_regim": special_tax_regim,
                 "immunity_type": extract_text(dps, "tpImunidade") or "-",
-                "suspension_issqn": "Não",
+                "suspension_issqn": "-",
                 "suspension_number": "-",
-                "municipal_benefit": "-",
+                "municipal_benefit": municipal_benefit,
                 "service_amount": f"R$ {_vserv}",
                 "discount_unconditioned": "-",
-                "deduct_reduc_amount": "-",
-                "municipal_benefit_math": "-",
+                "deduct_reduc_amount": deduct_reduc_amount,
+                "municipal_benefit_math": municipal_benefit_math,
                 "calculation_basis": f"R$ {_bc}",
                 "aliq_applied": f"{format_number(_aliq_val, self.price_precision)}%"
                 if _aliq_val
                 else "-",
-                "issqn_retention": issqn_retention_type[issqn_type],
-                "issqn_cleared": f"R$ {_issqn_clear}"
-                if issqn_type == "1"
-                else f"R$ {format_number(0, self.price_precision)}",
+                "issqn_retention": issqn_retention,
+                "issqn_cleared": f"R$ {_issqn_clear}" if issqn_value else "-",
             },
             "total_value": {
                 "service_amount": f"R$ {_vserv}",
@@ -285,7 +401,7 @@ class Danfse(xFPDF):
                 "email": extract_text(toma, "email") or "-",
                 "address": format_address(toma),
                 "city": "-",
-                "cep": format_cep(extract_text(toma, "CEP")),
+                "cep": format_cep(extract_text(toma, "CEP") or ""),
             }
         else:
             data["taker"] = {
@@ -303,44 +419,39 @@ class Danfse(xFPDF):
         if intermed is not None:
             data["intermed"] = {
                 "id": format_cpf_cnpj(extract_text(intermed, "CNPJ"))
-                or format_cpf_cnpj(extract_text(intermed, "CPF")),
+                or format_cpf_cnpj(extract_text(intermed, "CPF"))
+                or extract_text(intermed, "NIF")
+                or "-",
                 "municipal_registration": extract_text(intermed, "IM") or "-",
-                "phone": extract_text(intermed, "phone") or "-",
+                "phone": format_phone(extract_text(intermed, "fone")) or "-",
                 "name": extract_text(intermed, "xNome") or "-",
                 "email": extract_text(intermed, "email") or "-",
-                "address": format_address(intermed),
-                "city": "",
-                "cep": format_cep(extract_text(intermed, "CEP")),
+                "address": format_address(intermed) or "-",
+                "city": join_city_uf(
+                    extract_text(intermed, "xMun"),
+                    uf_from_ibge_code(extract_text(intermed, "cMun"))
+                    or extract_text(intermed, "UF"),
+                ),
+                "cep": format_cep(extract_text(intermed, "CEP") or ""),
             }
         else:
-            data["intermed"] = {
-                "id": "-",
-                "municipal_registration": "-",
-                "phone": "-",
-                "name": "-",
-                "email": "-",
-                "address": "-",
-                "city": "-",
-                "cep": "-",
-            }
+            data["intermed"] = None
 
         exigSusp = dps.find(f"{URL}exigSusp")
         if exigSusp is not None:
             issqn_suspension_exigibility = {
-                "1": "Exigibilidade do ISSQN Suspensa por Decisão Judicial",
-                "2": "Exigibilidade do ISSQN Suspensa por Processo Administrativo",
+                "1": "Exigibilidade Suspensa por Decisão Judicial",
+                "2": "Exigibilidade Suspensa por Processo Administrativo",
             }
             iss_susp = extract_text(exigSusp, "tpSusp")
-            issqn_suspension = issqn_suspension_exigibility[iss_susp]
-
-            data["municipal_taxes"]["suspension_issqn"] = issqn_suspension
-            data["municipal_taxes"]["suspension_number"] = extract_text(
-                exigSusp, "nProcesso"
-            )
-
-        bm = dps.find(f"{URL}BM")
-        if bm is not None:
-            data["municipal_taxes"]["municipal_benefit"] = extract_text(bm, "nBM")
+            issqn_suspension = issqn_suspension_exigibility.get(iss_susp)
+            if issqn_suspension:
+                data["municipal_taxes"]["suspension_issqn"] = ellipsize(
+                    issqn_suspension, 37
+                )
+            n_processo = extract_text(exigSusp, "nProcesso")
+            if n_processo:
+                data["municipal_taxes"]["suspension_number"] = n_processo
 
         vDescCondIncond = dps.find(f"{URL}vDescCondIncond")
         if vDescCondIncond is not None:
@@ -349,52 +460,66 @@ class Danfse(xFPDF):
 
             data["total_value"]["discount_unconditioned"] = f"R$ {_vdesc_inc}"
 
-        vDedRed = dps.find(f"{URL}vDedRed")
-        if vDedRed is not None:
-            data["municipal_taxes"]["deduct_reduc_amount"] = (
-                f"R$ {format_number(extract_text(dps, 'vDR'), self.price_precision)}"
-            )
-
+        # Descrição das Contribuições Sociais Retidas: domínio de
+        # tpRetPisCofins conforme NT 007/2026 (códigos 0 a 9).
+        pis_cofins_retention_type = {
+            "0": "PIS/COFINS/CSLL Não Retidos",
+            "1": "PIS/COFINS Retido",
+            "2": "PIS/COFINS Não Retido",
+            "3": "PIS/COFINS/CSLL Retidos",
+            "4": "PIS/COFINS Retidos, CSLL Não Retido",
+            "5": "PIS Retido, COFINS/CSLL Não Retido",
+            "6": "COFINS Retido, PIS/CSLL Não Retido",
+            "7": "PIS Não Retido, COFINS/CSLL Retidos",
+            "8": "PIS/COFINS Não Retidos, CSLL Retido",
+            "9": "COFINS Não Retido, PIS/CSLL Retidos",
+        }
+        data["federal_taxes"] = {
+            "irrf": "-",
+            "previdenciary_contribution": "-",
+            "social_contribution": "-",
+            "social_description": "-",
+            "pis_debit": "-",
+            "cofins_debit": "-",
+        }
         tribFed = dps.find(f"{URL}tribFed")
         if tribFed is not None:
-            _vcp = extract_text(tribFed, "vRetCP") if tribFed else None
-            _csll = extract_text(tribFed, "vRetCSLL") if tribFed else None
-            data["federal_taxes"] = {
-                "irrf": extract_text(tribFed, "vRetIRRF") or "-",
-                "previdenciary_contribution": (
-                    f"R$ {format_number(_vcp, self.price_precision)}" if _vcp else "-"
-                ),
-                "social_contribution": (
-                    f"R$ {format_number(_csll, self.price_precision)}" if _csll else "-"
-                ),
-                "social_description": "-",
-                "pis_debit": "-",
-                "cofins_debit": "-",
-            }
-
-            piscofins = tribFed.find(f"{URL}piscofins")
-            if piscofins is not None:
-                pis = extract_text(piscofins, "vPis")
-                cofins = extract_text(piscofins, "vCofins")
-                pis_cofins_debit = float(pis or 0) + float(cofins or 0)
-                data["federal_taxes"]["pis_debit"] = (
+            federal_taxes = data["federal_taxes"]
+            _irrf = extract_text(tribFed, "vRetIRRF")
+            _vcp = extract_text(tribFed, "vRetCP")
+            _csll = extract_text(tribFed, "vRetCSLL")
+            if _irrf:
+                federal_taxes["irrf"] = (
+                    f"R$ {format_number(_irrf, self.price_precision)}"
+                )
+            if _vcp:
+                federal_taxes["previdenciary_contribution"] = (
+                    f"R$ {format_number(_vcp, self.price_precision)}"
+                )
+            if _csll:
+                federal_taxes["social_contribution"] = (
+                    f"R$ {format_number(_csll, self.price_precision)}"
+                )
+            tp_ret_pis_cofins = extract_text(tribFed, "tpRetPisCofins")
+            if tp_ret_pis_cofins in pis_cofins_retention_type:
+                federal_taxes["social_description"] = ellipsize(
+                    pis_cofins_retention_type[tp_ret_pis_cofins], 35
+                )
+            pis = extract_text(tribFed, "vPis")
+            cofins = extract_text(tribFed, "vCofins")
+            if pis:
+                federal_taxes["pis_debit"] = (
                     f"R$ {format_number(pis, self.price_precision)}"
                 )
-                data["federal_taxes"]["cofins_debit"] = (
+            if cofins:
+                federal_taxes["cofins_debit"] = (
                     f"R$ {format_number(cofins, self.price_precision)}"
                 )
+            if pis or cofins:
+                pis_cofins_debit = float(pis or 0) + float(cofins or 0)
                 data["total_value"]["pis_cofins_debit"] = (
                     f"R$ {format_number(pis_cofins_debit, self.price_precision)}"
                 )
-        else:
-            data["federal_taxes"] = {
-                "irrf": "-",
-                "previdenciary_contribution": "-",
-                "social_contribution": "-",
-                "social_description": "-",
-                "pis_debit": "-",
-                "cofins_debit": "-",
-            }
 
         infoCompl = serv.find(f"{URL}infoCompl")
         if infoCompl is not None:
@@ -703,7 +828,15 @@ class Danfse(xFPDF):
         # Simples Nacional na Data de Competência - Valor
         self.set_font(self.default_font, "", 8)
         self.set_xy(x=x_margin + 3, y=section_start_y + 21)
-        self.cell(w=col_width, h=7, text=self.data["issuer"]["simples"], align="L")
+        self.cell(
+            w=col_width,
+            h=7,
+            text=self.long_field(
+                text=self.data["issuer"]["simples"],
+                limit=col_width * 2,
+            ),
+            align="L",
+        )
 
         # Regime de Apuração Tributária pelo SN
         self.set_font(self.default_font, "B", 7)
@@ -715,7 +848,15 @@ class Danfse(xFPDF):
         # Regime de Apuração Tributária pelo SN - Valor
         self.set_font(self.default_font, "", 8)
         self.set_xy(x=x_margin + (col_width * 2), y=section_start_y + 21)
-        self.cell(w=col_width, h=7, text=self.data["issuer"]["tax_regim"], align="L")
+        self.cell(
+            w=col_width,
+            h=7,
+            text=self.long_field(
+                text=self.data["issuer"]["tax_regim"],
+                limit=col_width * 2,
+            ),
+            align="L",
+        )
 
         self.set_font(self.default_font, "B", 7)
         self.set_dash_pattern(dash=0, gap=0)
@@ -848,7 +989,6 @@ class Danfse(xFPDF):
         self.set_xy(x=x_margin + (col_width * 3), y=section_start_y + 13)
         self.cell(w=col_width, h=7, text=self.data["taker"]["cep"], align="L")
 
-        self.set_font(self.default_font, "B", 7)
         self.set_dash_pattern(dash=0, gap=0)
         self.line(
             x1=x_margin + 2,
@@ -856,23 +996,160 @@ class Danfse(xFPDF):
             x2=x_margin + page_width - 2,
             y2=y_margin + 28,
         )
+        self.set_y(y_margin + 28)
 
-        if self.data["intermed"]["id"]:
+    def _draw_intermediary(self):
+        x_margin = self.l_margin
+        y_margin = self.y
+        page_width = self.epw
+        intermed = self.data["intermed"]
+
+        if intermed is None:
+            # Nota 2 da NT 008/2026: bloco reduzido apenas com o texto fixo
+            # quando o grupo interm não consta do XML.
             self.set_font(self.default_font, "", 8)
-            self.set_xy(x=x_margin + 3, y=section_start_y + 19)
+            self.set_xy(x=x_margin + 3, y=y_margin)
             self.cell(
                 w=0,
                 h=3,
-                text="INTERMEDIÁRIO DO SERVIÇO NÃO IDENTIFICADO NA NFS-e",
+                text="INTERMEDIÁRIO DA OPERAÇÃO NÃO IDENTIFICADO NA NFS-e",
                 align="C",
             )
+            self.set_dash_pattern(dash=0, gap=0)
+            self.line(
+                x1=x_margin + 2,
+                y1=y_margin + 3,
+                x2=x_margin + page_width - 2,
+                y2=y_margin + 3,
+            )
+            self.set_y(y_margin)
+            return
 
+        col_width = self.epw / 4
+        section_start_y = y_margin + 2
+
+        # INTERMEDIÁRIO DA OPERAÇÃO
+        self.set_font(self.default_font, "B", 8)
+        self.set_xy(x=x_margin + 3, y=section_start_y)
+        self.cell(w=col_width, h=1, text="INTERMEDIÁRIO DA OPERAÇÃO", align="L")
+
+        # CNPJ / CPF / NIF
+        self.set_font(self.default_font, "B", 7)
+        self.set_xy(x=x_margin + col_width, y=section_start_y)
+        self.cell(w=col_width, h=1, text="CNPJ / CPF / NIF", align="L")
+
+        # CNPJ / CPF / NIF - Valor
+        self.set_font(self.default_font, "", 8)
+        self.set_xy(x=x_margin + col_width, y=section_start_y)
+        self.cell(w=col_width, h=7, text=intermed["id"], align="L")
+
+        # Inscrição Municipal
+        self.set_font(self.default_font, "B", 7)
+        self.set_xy(x=x_margin + (col_width * 2), y=section_start_y)
+        self.cell(w=col_width, h=1, text="Inscrição Municipal", align="L")
+
+        # Inscrição Municipal - Valor
+        self.set_font(self.default_font, "", 8)
+        self.set_xy(x=x_margin + (col_width * 2), y=section_start_y)
+        self.cell(
+            w=col_width,
+            h=7,
+            text=intermed["municipal_registration"],
+            align="L",
+        )
+
+        # Telefone
+        self.set_font(self.default_font, "B", 7)
+        self.set_xy(x=x_margin + (col_width * 3), y=section_start_y)
+        self.cell(w=col_width, h=1, text="Telefone", align="L")
+
+        # Telefone - Valor
+        self.set_font(self.default_font, "", 8)
+        self.set_xy(x=x_margin + (col_width * 3), y=section_start_y)
+        self.cell(w=col_width, h=7, text=intermed["phone"], align="L")
+
+        # Nome / Nome Empresarial
+        self.set_font(self.default_font, "B", 7)
+        self.set_xy(x=x_margin + 3, y=section_start_y + 6)
+        self.cell(w=col_width, h=2, text="Nome / Nome Empresarial", align="L")
+
+        # Nome / Nome Empresarial - Valor
+        self.set_font(self.default_font, "", 8)
+        self.set_xy(x=x_margin + 3, y=section_start_y + 6)
+        self.cell(
+            w=col_width,
+            h=7,
+            text=self.long_field(
+                text=intermed["name"],
+                limit=col_width * 2,
+            ),
+            align="L",
+        )
+
+        # E-mail
+        self.set_font(self.default_font, "B", 7)
+        self.set_xy(x=x_margin + (col_width * 2), y=section_start_y + 6)
+        self.cell(w=col_width, h=2, text="E-mail", align="L")
+
+        # E-mail - Valor
+        self.set_font(self.default_font, "", 8)
+        self.set_xy(x=x_margin + (col_width * 2), y=section_start_y + 6)
+        self.cell(
+            w=col_width,
+            h=7,
+            text=self.long_field(
+                text=intermed["email"],
+                limit=col_width * 2,
+            ),
+            align="L",
+        )
+
+        # Endereço
+        self.set_font(self.default_font, "B", 7)
+        self.set_xy(x=x_margin + 3, y=section_start_y + 13)
+        self.cell(w=col_width, h=2, text="Endereço", align="L")
+
+        # Endereço - Valor
+        self.set_font(self.default_font, "", 8)
+        self.set_xy(x=x_margin + 3, y=section_start_y + 13)
+        self.cell(
+            w=col_width,
+            h=7,
+            text=self.long_field(
+                text=intermed["address"],
+                limit=col_width * 2,
+            ),
+            align="L",
+        )
+
+        # Município
+        self.set_font(self.default_font, "B", 7)
+        self.set_xy(x=x_margin + (col_width * 2), y=section_start_y + 13)
+        self.cell(w=col_width, h=2, text="Município", align="L")
+
+        # Município - Valor
+        self.set_font(self.default_font, "", 8)
+        self.set_xy(x=x_margin + (col_width * 2), y=section_start_y + 13)
+        self.cell(w=col_width, h=7, text=intermed["city"], align="L")
+
+        # CEP
+        self.set_font(self.default_font, "B", 7)
+        self.set_xy(x=x_margin + (col_width * 3), y=section_start_y + 13)
+        self.cell(w=col_width, h=2, text="CEP", align="L")
+
+        # CEP - Valor
+        self.set_font(self.default_font, "", 8)
+        self.set_xy(x=x_margin + (col_width * 3), y=section_start_y + 13)
+        self.cell(w=col_width, h=7, text=intermed["cep"], align="L")
+
+        self.set_dash_pattern(dash=0, gap=0)
         self.line(
             x1=x_margin + 2,
-            y1=y_margin + 31,
+            y1=y_margin + 21,
             x2=x_margin + page_width - 2,
-            y2=y_margin + 31,
+            y2=y_margin + 21,
         )
+        self.set_y(y_margin + 18)
 
     def _draw_service_provided(self):
         x_margin = self.l_margin
@@ -1060,7 +1337,10 @@ class Danfse(xFPDF):
         self.cell(
             w=col_width,
             h=8,
-            text=self.data["municipal_taxes"]["suspension_issqn"],
+            text=self.long_field(
+                text=self.data["municipal_taxes"]["suspension_issqn"],
+                limit=col_width,
+            ),
             align="L",
         )
 
@@ -1090,7 +1370,10 @@ class Danfse(xFPDF):
         self.cell(
             w=col_width,
             h=8,
-            text=self.data["municipal_taxes"]["municipal_benefit"],
+            text=self.long_field(
+                text=self.data["municipal_taxes"]["municipal_benefit"],
+                limit=col_width,
+            ),
             align="L",
         )
 
@@ -1283,7 +1566,10 @@ class Danfse(xFPDF):
         self.cell(
             w=col_width,
             h=8,
-            text=self.data["federal_taxes"]["social_description"],
+            text=self.long_field(
+                text=self.data["federal_taxes"]["social_description"],
+                limit=col_width,
+            ),
             align="L",
         )
 

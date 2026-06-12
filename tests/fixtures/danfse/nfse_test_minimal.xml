@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NFSe xmlns="http://www.sped.fazenda.gov.br/nfse">
+    <infNFSe versao="1.01" Id="NFS42046082240248250000160000000000066666666666666666">
+        <xLocEmi>Curitiba</xLocEmi>
+        <xLocPrestacao>Curitiba</xLocPrestacao>
+        <nNFSe>666</nNFSe>
+        <verAplic>SefinNacional_1.6.0</verAplic>
+        <ambGer>1</ambGer>
+        <tpEmis>1</tpEmis>
+        <procEmi>1</procEmi>
+        <cStat>100</cStat>
+        <dhProc>2026-03-01T10:00:00-03:00</dhProc>
+        <nDFSe>117997</nDFSe>
+        <emit>
+            <CNPJ>90449244000149</CNPJ>
+            <xNome>Empresa Exemplo Ltda</xNome>
+        </emit>
+        <valores>
+            <vLiq>1000.00</vLiq>
+        </valores>
+        <DPS versao="1.00">
+            <infDPS Id="DPS666">
+                <tpAmb>1</tpAmb>
+                <dhEmi>2026-03-01T09:00:00-03:00</dhEmi>
+                <nDPS>666</nDPS>
+                <serie>1</serie>
+                <dCompet>2026-03-01</dCompet>
+                <prest>
+                    <CNPJ>90449244000149</CNPJ>
+                </prest>
+                <serv>
+                    <cServ>
+                        <cTribNac>010501</cTribNac>
+                        <xDescServ>Serviço de exemplo</xDescServ>
+                    </cServ>
+                </serv>
+                <valores>
+                    <vServPrest>
+                        <vServ>1000.00</vServ>
+                    </vServPrest>
+                </valores>
+            </infDPS>
+        </DPS>
+    </infNFSe>
+</NFSe>

@@ -35,6 +35,24 @@ def test_danfse_default_hom(tmp_path, load_danfse):
     assert_pdf_equal(danfse, pdf_path, tmp_path)
 
 
+def test_danfse_intermediary(tmp_path, load_danfse):
+    config = DanfseConfig(
+        margins=Margins(top=2, right=2, bottom=2, left=2),
+    )
+    danfse = load_danfse("nfse_test_interm.xml", config=config)
+    pdf_path = get_pdf_output_path("danfse", "danfse_intermediary")
+    assert_pdf_equal(danfse, pdf_path, tmp_path)
+
+
+def test_danfse_minimal(tmp_path, load_danfse):
+    config = DanfseConfig(
+        margins=Margins(top=2, right=2, bottom=2, left=2),
+    )
+    danfse = load_danfse("nfse_test_minimal.xml", config=config)
+    pdf_path = get_pdf_output_path("danfse", "danfse_minimal")
+    assert_pdf_equal(danfse, pdf_path, tmp_path)
+
+
 def test_danfse_cancelled(tmp_path, load_danfse):
     config = DanfseConfig(
         margins=Margins(top=2, right=2, bottom=2, left=2), watermark_cancelled=True

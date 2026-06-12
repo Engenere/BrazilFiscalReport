@@ -8,7 +8,7 @@
 pip install brazilfiscalreport
 ```
 
-This installs the core library with support for **DANFE** and **DACCe**.
+This installs the core library with support for **DANFE** and **DACCe**. Requires Python 3.8+.
 
 ### Optional dependencies
 
@@ -26,6 +26,12 @@ Some document types require additional packages:
     pip install 'brazilfiscalreport[damdfe]'
     ```
 
+=== "DANFSE"
+
+    ```bash
+    pip install 'brazilfiscalreport[danfse]'
+    ```
+
 === "CLI"
 
     ```bash
@@ -35,7 +41,7 @@ Some document types require additional packages:
 === "All extras"
 
     ```bash
-    pip install 'brazilfiscalreport[dacte,damdfe,cli]'
+    pip install 'brazilfiscalreport[dacte,damdfe,danfse,cli]'
     ```
 
 ## Quick Start
@@ -55,6 +61,9 @@ with open("nfe.xml", "r", encoding="utf8") as file:
 danfe = Danfe(xml=xml_content)
 danfe.output("danfe.pdf")
 ```
+
+!!! tip "No XML at hand?"
+    Grab a sample from [tests/fixtures](https://github.com/Engenere/BrazilFiscalReport/tree/main/tests/fixtures) or [try the online demo](https://brazilfiscalreport.streamlit.app) with your own file.
 
 The same pattern applies to all document types:
 
@@ -94,6 +103,15 @@ The same pattern applies to all document types:
     damdfe.output("damdfe.pdf")
     ```
 
+=== "DANFSE"
+
+    ```python
+    from brazilfiscalreport.danfse import Danfse
+
+    danfse = Danfse(xml=xml_content)
+    danfse.output("danfse.pdf")
+    ```
+
 ### Using the CLI
 
 For quick generation from the terminal:
@@ -103,11 +121,12 @@ bfrep danfe /path/to/nfe.xml
 bfrep dacce /path/to/cce.xml
 bfrep dacte /path/to/cte.xml
 bfrep damdfe /path/to/mdfe.xml
+bfrep danfse /path/to/nfse.xml
 ```
 
 See the [CLI documentation](cli.md) for configuration options.
 
 ## Next steps
 
-- Learn about customization options for each document type: [DANFE](danfe.md), [DACTE](dacte.md), [DAMDFE](damdfe.md), [DACCe](dacce.md)
+- Learn about customization options for each document type: [DANFE](danfe.md), [DACTE](dacte.md), [DAMDFE](damdfe.md), [DACCe](dacce.md), [DANFSE](danfse.md)
 - Configure the [CLI](cli.md) for batch generation

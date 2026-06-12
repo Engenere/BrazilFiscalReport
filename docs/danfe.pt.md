@@ -1,5 +1,7 @@
 DANFE (Documento Auxiliar da Nota Fiscal Eletrônica) é uma representação impressa da NF-e (Nota Fiscal Eletrônica) usada no Brasil. Contém os principais detalhes da transação, como vendedor, comprador, produtos e impostos.
 
+![Exemplo de DANFE gerado a partir do XML de NF-e](assets/screenshots/danfe.png){ width="480" }
+
 ## Uso Básico
 
 === "Python"
@@ -27,7 +29,7 @@ DANFE (Documento Auxiliar da Nota Fiscal Eletrônica) é uma representação imp
 
 ## Personalizando o DANFE 🎨
 
-Esta seção descreve como personalizar a saída PDF do DANFE usando a classe `DanfeConfig`. Você pode ajustar diversas configurações como margens, fontes e configurações de impostos de acordo com suas necessidades.
+Esta seção descreve como personalizar a saída PDF do DANFE usando a classe `DanfeConfig`. Você pode ajustar diversas configurações como margens, fontes e marcas d'água de acordo com suas necessidades.
 
 ### Opções de Configuração ⚙️
 
@@ -51,7 +53,7 @@ Aqui está uma descrição de todas as opções de configuração disponíveis e
 
 - **Tipo**: `Margins`
 - **Campos**: `top`, `right`, `bottom`, `left` (todos do tipo `Number`)
-- **Descrição**: Define as margens da página do documento PDF.
+- **Descrição**: Define as margens da página do documento PDF, em milímetros.
 - **Exemplo**:
     ```python
     config.margins = Margins(top=5, right=5, bottom=5, left=5)
@@ -72,16 +74,20 @@ Aqui está uma descrição de todas as opções de configuração disponíveis e
 - **Padrão**: `TIMES`
 
 ---
+
 **Tamanho da Fonte**
 
 - **Tipo**: `FontSize` (Enum)
 - **Valores**: `BIG`, `SMALL`
-- **Descrição**: Tamanho da fonte usado em todo o documento PDF.
+- **Descrição**: Tamanho da fonte usado em todo o documento PDF. Os valores são multiplicadores aplicados sobre os tamanhos base (`SMALL` = 1.0, `BIG` = 1.35).
 - **Exemplo**:
     ```python
     config.font_size = FontSize.BIG
     ```
 - **Padrão**: `SMALL`
+
+!!! note
+    `FontSize.BIG` só tem efeito com `FontType.TIMES`; com `COURIER` o tamanho `SMALL` é sempre usado.
 
 ---
 
@@ -97,7 +103,7 @@ Aqui está uma descrição de todas as opções de configuração disponíveis e
 - **Padrão**: `TOP` quando retrato, `LEFT` quando orientação paisagem.
 
 !!! note
-    Na orientação paisagem, a posição do recibo é no lado esquerdo; personalização não é permitida.
+    A orientação da página é determinada automaticamente pela tag `tpImp` do XML da NF-e (`1` = retrato, caso contrário paisagem) e não é configurável. Na orientação paisagem, a posição do recibo é forçada para o lado esquerdo; personalização não é permitida.
 
 ---
 
@@ -110,7 +116,7 @@ Aqui está uma descrição de todas as opções de configuração disponíveis e
     ```python
     config.decimal_config = DecimalConfig(price_precision=2, quantity_precision=2)
     ```
-- **Padrão**: `4`
+- **Padrão**: `4` para `price_precision` e `quantity_precision`.
 
 ---
 
@@ -126,7 +132,7 @@ Aqui está uma descrição de todas as opções de configuração disponíveis e
 - **Padrão**: `STANDARD_ICMS_IPI`
 
 !!! warning
-    Este recurso ainda não foi implementado.
+    Este recurso ainda não foi implementado; defini-lo atualmente não tem efeito na saída.
 
 ---
 
@@ -145,12 +151,25 @@ Aqui está uma descrição de todas as opções de configuração disponíveis e
 
 **Exibir PIS COFINS**
 
-- **Tipo**: `Bool`
+- **Tipo**: `bool`
 - **Valores**: `True`, `False`
 - **Descrição**: Define se os impostos PIS e COFINS devem ser exibidos nos totais do DANFE.
 - **Exemplo**:
     ```python
     config.display_pis_cofins = True
+    ```
+- **Padrão**: `False`
+
+---
+
+**Quebra de linha nas informações complementares**
+
+- **Tipo**: `bool`
+- **Valores**: `True`, `False`
+- **Descrição**: Quebra a linha em cada `";"` encontrado nas informações complementares (`infCpl`) do DANFE.
+- **Exemplo**:
+    ```python
+    config.infcpl_semicolon_newline = True
     ```
 - **Padrão**: `False`
 
@@ -187,18 +206,42 @@ Aqui está uma descrição de todas as opções de configuração disponíveis e
 **Marca d'água Cancelada**
 
 - **Tipo**: `bool`
-- **Descrição**: Quando definido como `True`, exibe uma marca d'água "CANCELADA" no DANFE para notas fiscais canceladas. Para arquivos XML sem a tag `protNFe`, uma marca d'água "SEM VALOR FISCAL" é exibida independentemente desta configuração.
+- **Descrição**: Quando definido como `True`, exibe uma marca d'água "CANCELADA" no DANFE para notas fiscais canceladas. Se o XML for do ambiente de homologação, o texto passa a ser "CANCELADA - SEM VALOR FISCAL".
 - **Exemplo**:
     ```python
     config.watermark_cancelled = True
     ```
 - **Padrão**: `False`
 
+!!! note
+    Independentemente desta configuração, uma marca d'água "SEM VALOR FISCAL" é desenhada automaticamente sempre que o XML não tem protocolo de autorização (`protNFe`) ou foi emitido em ambiente de homologação (`tpAmb` = 2). Quando `watermark_cancelled=True`, a marca de cancelamento tem precedência.
+
+---
+
+**Carimbo de Rodapé (Footer Stamp)**
+
+- **Tipo**: `FooterStamp`
+- **Campos**:
+    - `logo` (`Optional[Union[str, BytesIO, bytes]]`): imagem do logo; padrão `None`.
+    - `text` (`str`): texto exibido à esquerda do logo; padrão `""`.
+    - `height` (`Number`): área vertical, em mm, reservada para o carimbo; padrão `5`.
+    - `logo_max_width` (`Number`): largura, em mm, da caixa usada para encaixar o logo preservando a proporção; padrão `20`.
+    - `spacing` (`Number`): espaçamento vertical, em mm, entre a área de conteúdo e o carimbo; padrão `1`.
+- **Descrição**: Desenha um carimbo personalizado (logo + texto) em todas as páginas da nota, alinhado à direita na margem da página. A área do carimbo é reservada automaticamente dentro da margem inferior — não é necessário aumentar `Margins.bottom` para abrir espaço.
+- **Exemplo**:
+    ```python
+    config.footer_stamp = FooterStamp(
+        logo="path/to/logo.png",
+        text="Powered by",
+    )
+    ```
+- **Padrão**: `FooterStamp()` (vazio — nada é desenhado).
+
 ---
 
 ### Exemplo de Uso com Personalização
 
-Veja como configurar um objeto ``DanfeConfig`` com um conjunto completo de personalizações::
+Veja como configurar um objeto `DanfeConfig` com um conjunto completo de personalizações:
 
 ```python
 from brazilfiscalreport.danfe import (
@@ -206,11 +249,11 @@ from brazilfiscalreport.danfe import (
     DanfeConfig,
     DecimalConfig,
     FontType,
+    FooterStamp,
     InvoiceDisplay,
     Margins,
     ProductDescriptionConfig,
     ReceiptPosition,
-    TaxConfiguration,
 )
 
 # Caminho para o arquivo XML
@@ -226,13 +269,16 @@ config = DanfeConfig(
     margins=Margins(top=10, right=10, bottom=10, left=10),
     receipt_pos=ReceiptPosition.BOTTOM,
     decimal_config=DecimalConfig(price_precision=2, quantity_precision=2),
-    tax_configuration=TaxConfiguration.ICMS_ST,
     invoice_display=InvoiceDisplay.FULL_DETAILS,
     font_type=FontType.TIMES,
     display_pis_cofins=True,
     product_description_config=ProductDescriptionConfig(
         display_branch=True,
         display_additional_info=True,
+    ),
+    footer_stamp=FooterStamp(
+        logo='path/to/footer_logo.png',
+        text='Powered by',
     ),
 )
 

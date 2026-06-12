@@ -1,5 +1,7 @@
 DANFE (Auxiliary Document of the Electronic Invoice) is a printed representation of the NF-e (Electronic Invoice) used in Brazil. It contains key details about the transaction, such as the seller, buyer, products, and taxes.
 
+![Example of a DANFE generated from an NF-e XML](assets/screenshots/danfe.png){ width="480" }
+
 ## Basic Usage
 
 === "Python"
@@ -27,7 +29,7 @@ DANFE (Auxiliary Document of the Electronic Invoice) is a printed representation
 
 ## Customizing DANFE 🎨
 
-This section describes how to customize the PDF output of the DANFE using the `DanfeConfig` class. You can adjust various settings such as margins, fonts, and tax configurations according to your needs.
+This section describes how to customize the PDF output of the DANFE using the `DanfeConfig` class. You can adjust various settings such as margins, fonts, and watermarks according to your needs.
 
 ### Configuration Options ⚙️
 
@@ -51,7 +53,7 @@ Here is a breakdown of all the configuration options available in `DanfeConfig`:
 
 - **Type**: `Margins`
 - **Fields**: `top`, `right`, `bottom`, `left` (all of type `Number`)
-- **Description**: Sets the page margins for the PDF document.
+- **Description**: Sets the page margins for the PDF document, in millimeters.
 - **Example**:
     ```python
     config.margins = Margins(top=5, right=5, bottom=5, left=5)
@@ -72,16 +74,20 @@ Here is a breakdown of all the configuration options available in `DanfeConfig`:
 - **Default**: `TIMES`
 
 ---
+
 **Font Size**
 
 - **Type**: `FontSize` (Enum)
 - **Values**: `BIG`, `SMALL`
-- **Description**: Font size used throughout the PDF document.
+- **Description**: Font size used throughout the PDF document. The values are multipliers applied to the base sizes (`SMALL` = 1.0, `BIG` = 1.35).
 - **Example**:
     ```python
     config.font_size = FontSize.BIG
     ```
 - **Default**: `SMALL`
+
+!!! note
+    `FontSize.BIG` only takes effect with `FontType.TIMES`; with `COURIER` the `SMALL` size is always used.
 
 ---
 
@@ -97,7 +103,7 @@ Here is a breakdown of all the configuration options available in `DanfeConfig`:
 - **Default**: `TOP` when portrait, `LEFT` when landscape orientation.
 
 !!! note
-    In landscape orientation, the receipt position is far left; customization is not permitted.
+    The page orientation is determined automatically by the `tpImp` tag of the NF-e XML (`1` = portrait, otherwise landscape) and is not configurable. In landscape orientation, the receipt position is forced to the far left; customization is not permitted.
 
 ---
 
@@ -110,7 +116,7 @@ Here is a breakdown of all the configuration options available in `DanfeConfig`:
     ```python
     config.decimal_config = DecimalConfig(price_precision=2, quantity_precision=2)
     ```
-- **Default**: `4`
+- **Default**: `4` for both `price_precision` and `quantity_precision`.
 
 ---
 
@@ -126,7 +132,7 @@ Here is a breakdown of all the configuration options available in `DanfeConfig`:
 - **Default**: `STANDARD_ICMS_IPI`
 
 !!! warning
-    This feature is not yet implemented.
+    This feature is not yet implemented; setting it currently has no effect on the output.
 
 ---
 
@@ -145,7 +151,7 @@ Here is a breakdown of all the configuration options available in `DanfeConfig`:
 
 **Display PIS COFINS**
 
-- **Type**: `Bool`
+- **Type**: `bool`
 - **Values**: `True`, `False`
 - **Description**: Whether or not to display PIS and COFINS taxes in the DANFE totals.
 - **Example**:
@@ -158,12 +164,12 @@ Here is a breakdown of all the configuration options available in `DanfeConfig`:
 
 **Line break in supplementary information**
 
-- **Type**: `Bool`
+- **Type**: `bool`
 - **Values**: `True`, `False`
-- **Description**: Break the line using";" in the supplementary information (infCpl) of the DANFE.
+- **Description**: Break the line on each `";"` found in the supplementary information (`infCpl`) of the DANFE.
 - **Example**:
     ```python
-    config.infcpl_semicolon_newline= True
+    config.infcpl_semicolon_newline = True
     ```
 - **Default**: `False`
 
@@ -200,12 +206,15 @@ Here is a breakdown of all the configuration options available in `DanfeConfig`:
 **Watermark Cancelled**
 
 - **Type**: `bool`
-- **Description**: When set to `True`, displays a "CANCELADA" watermark on the DANFE for cancelled invoices. For XML files without the `protNFe` tag, a "SEM VALOR FISCAL" watermark is displayed regardless of this setting.
+- **Description**: When set to `True`, displays a "CANCELADA" watermark on the DANFE for cancelled invoices. If the XML belongs to the homologation environment, the text becomes "CANCELADA - SEM VALOR FISCAL".
 - **Example**:
     ```python
     config.watermark_cancelled = True
     ```
 - **Default**: `False`
+
+!!! note
+    Independently of this setting, a "SEM VALOR FISCAL" watermark is drawn automatically whenever the XML has no authorization protocol (`protNFe`) or was issued in the homologation environment (`tpAmb` = 2). When `watermark_cancelled=True`, the cancellation watermark takes precedence.
 
 ---
 
@@ -232,7 +241,7 @@ Here is a breakdown of all the configuration options available in `DanfeConfig`:
 
 ### Usage Example with Customization
 
-Here’s how to set up a ``DanfeConfig`` object with a full set of customizations::
+Here's how to set up a `DanfeConfig` object with a full set of customizations:
 
 ```python
 from brazilfiscalreport.danfe import (
@@ -245,7 +254,6 @@ from brazilfiscalreport.danfe import (
     Margins,
     ProductDescriptionConfig,
     ReceiptPosition,
-    TaxConfiguration,
 )
 
 # Path to the XML file
@@ -261,7 +269,6 @@ config = DanfeConfig(
     margins=Margins(top=10, right=10, bottom=10, left=10),
     receipt_pos=ReceiptPosition.BOTTOM,
     decimal_config=DecimalConfig(price_precision=2, quantity_precision=2),
-    tax_configuration=TaxConfiguration.ICMS_ST,
     invoice_display=InvoiceDisplay.FULL_DETAILS,
     font_type=FontType.TIMES,
     display_pis_cofins=True,

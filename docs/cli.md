@@ -1,6 +1,7 @@
-Generate DANFE, DACCe, DACTE, and DAMDFE documents directly from the terminal.
-The PDF will be saved in the current directory, and you can create
-a `config.yaml` file with issuer details and other configurations.
+Generate DANFE, DACCe, DACTE, DAMDFE, and DANFSE documents directly from the terminal.
+The PDF is saved in the current working directory using the same base name as the
+XML file (e.g., `nfe.xml` → `nfe.pdf`), and you can create a `config.yaml` file
+with issuer details and other configurations.
 
 ## Installation
 
@@ -20,28 +21,34 @@ bfrep --version
 
 ## Commands
 
-### DANFE
+### [DANFE](danfe.md)
 
 ```bash
 bfrep danfe /path/to/nfe.xml
 ```
 
-### DACCe
+### [DACCe](dacce.md)
 
 ```bash
 bfrep dacce /path/to/cce.xml
 ```
 
-### DACTE
+### [DACTE](dacte.md)
 
 ```bash
 bfrep dacte /path/to/cte.xml
 ```
 
-### DAMDFE
+### [DAMDFE](damdfe.md)
 
 ```bash
 bfrep damdfe /path/to/mdfe.xml
+```
+
+### [DANFSE](danfse.md)
+
+```bash
+bfrep danfse /path/to/nfse.xml
 ```
 
 ## Configuration File ⚙️
@@ -67,4 +74,15 @@ BOTTOM_MARGIN: 5.0
 LEFT_MARGIN: 5.0
 ```
 
-**Note**: The `ISSUER` section is used only by the `dacce` command. The `LOGO` and margin settings apply to `danfe`, `dacte`, and `damdfe` commands. If no `config.yaml` is found, default values are used.
+Each setting applies to a different set of commands:
+
+| Setting | Applies to |
+|---------|------------|
+| `ISSUER` | `dacce` only |
+| `LOGO` | `danfe`, `dacte`, `damdfe` |
+| `TOP/RIGHT/BOTTOM/LEFT_MARGIN` | `danfe`, `dacte`, `damdfe`, `danfse` |
+
+If no `config.yaml` is found, default values are used. If the `LOGO` path does not exist, it is ignored with a console warning and the document is generated without a logo.
+
+!!! warning
+    For `dacce`, configuring the `ISSUER` section is effectively required — without a `config.yaml`, placeholder issuer data ("EMPRESA LTDA" / "AV. TEST, 100") is printed on the PDF.

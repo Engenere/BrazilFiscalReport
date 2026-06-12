@@ -1,5 +1,7 @@
 DACCe (Documento Auxiliar da Carta de Correção Eletrônica) é uma representação impressa da CC-e (Carta de Correção Eletrônica) usada no Brasil. Fornece detalhes sobre correções feitas em uma NF-e (Nota Fiscal Eletrônica) emitida anteriormente, incluindo o texto de correção, a chave da nota referenciada e informações do protocolo.
 
+![Exemplo de DACCe gerado a partir do XML de CC-e](assets/screenshots/dacce.png){ width="480" }
+
 ## Uso Básico
 
 === "Python"
@@ -27,6 +29,9 @@ DACCe (Documento Auxiliar da Carta de Correção Eletrônica) é uma representa�
     bfrep dacce /path/to/cce.xml
     ```
 
+    !!! note
+        O comando `dacce` lê os dados do emitente da seção `ISSUER` de um `config.yaml` no diretório de trabalho — veja a [documentação do CLI](cli.md). Sem ele, dados fictícios de emitente são impressos no PDF. Adicionar logo via CLI não é suportado para o DACCe; use a API Python.
+
 ## Personalizando o DACCe 🎨
 
 A classe `DaCCe` aceita os seguintes parâmetros:
@@ -46,7 +51,7 @@ A classe `DaCCe` aceita os seguintes parâmetros:
 **emitente**
 
 - **Tipo**: `dict` ou `None`
-- **Descrição**: Um dicionário contendo as informações do emitente. Quando fornecido, os dados do emitente são exibidos no cabeçalho do DACCe.
+- **Descrição**: Um dicionário contendo as informações do emitente. Quando fornecido, os dados do emitente são exibidos no cabeçalho do DACCe. Todas as seis chaves são obrigatórias quando o dicionário é informado; chaves ausentes geram `KeyError`.
 - **Chaves**: `nome`, `end`, `bairro`, `cidade`, `uf`, `fone`
 - **Exemplo**:
     ```python
@@ -66,7 +71,7 @@ A classe `DaCCe` aceita os seguintes parâmetros:
 **image**
 
 - **Tipo**: `str`, `BytesIO`, `bytes` ou `None`
-- **Descrição**: Caminho para um arquivo de imagem do logo ou dados binários da imagem a ser exibida no cabeçalho junto com as informações do emitente.
+- **Descrição**: Caminho para um arquivo de imagem do logo ou dados binários da imagem a ser exibida no cabeçalho junto com as informações do emitente. O valor é repassado diretamente ao [fpdf2](https://github.com/py-pdf/fpdf2), então URLs e instâncias de `PIL.Image.Image` também são aceitos.
 - **Exemplo**:
     ```python
     image = "path/to/logo.jpg"

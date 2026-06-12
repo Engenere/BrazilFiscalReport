@@ -798,8 +798,10 @@ class Danfse(xFPDF):
         self.line(x1=self.bx, y1=y, x2=self.bx + self.bw, y2=y)
 
     def _shade(self, x, y, w, h):
+        # Pequeno recuo no topo para não cobrir a linha divisória do bloco
+        # anterior (desenhada centrada em y).
         self.set_fill_color(SHADE_GRAY, SHADE_GRAY, SHADE_GRAY)
-        self.rect(x=x, y=y, w=w, h=h, style="F")
+        self.rect(x=x, y=y + 0.15, w=w, h=h - 0.15, style="F")
 
     def _block_title(self, y, text):
         self._shade(self._col(0), y, self.colw, ROW_H)

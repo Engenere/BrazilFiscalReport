@@ -18,10 +18,29 @@ Python library for generating Brazilian auxiliary fiscal documents in PDF from X
 
 ## Output Examples
 
-| [**DANFE**](https://engenere.github.io/BrazilFiscalReport/danfe/) | [**DACTE**](https://engenere.github.io/BrazilFiscalReport/dacte/) | [**DAMDFE**](https://engenere.github.io/BrazilFiscalReport/damdfe/) | [**DACCe**](https://engenere.github.io/BrazilFiscalReport/dacce/) | [**DANFSE**](https://engenere.github.io/BrazilFiscalReport/danfse/) |
-|:---:|:---:|:---:|:---:|:---:|
-| [<img src="https://raw.githubusercontent.com/Engenere/BrazilFiscalReport/main/docs/assets/screenshots/danfe.png" alt="DANFE generated in PDF" width="150">](https://engenere.github.io/BrazilFiscalReport/danfe/) | [<img src="https://raw.githubusercontent.com/Engenere/BrazilFiscalReport/main/docs/assets/screenshots/dacte.png" alt="DACTE generated in PDF" width="150">](https://engenere.github.io/BrazilFiscalReport/dacte/) | [<img src="https://raw.githubusercontent.com/Engenere/BrazilFiscalReport/main/docs/assets/screenshots/damdfe.png" alt="DAMDFE generated in PDF" width="150">](https://engenere.github.io/BrazilFiscalReport/damdfe/) | [<img src="https://raw.githubusercontent.com/Engenere/BrazilFiscalReport/main/docs/assets/screenshots/dacce.png" alt="DACCe generated in PDF" width="150">](https://engenere.github.io/BrazilFiscalReport/dacce/) | [<img src="https://raw.githubusercontent.com/Engenere/BrazilFiscalReport/main/docs/assets/screenshots/danfse.png" alt="DANFSE generated in PDF" width="150">](https://engenere.github.io/BrazilFiscalReport/danfse/) |
-| <sub>Documento Auxiliar da Nota Fiscal Eletrônica<br>**NF-e** → PDF</sub> | <sub>Documento Auxiliar do Conhecimento de Transporte Eletrônico<br>**CT-e** → PDF</sub> | <sub>Documento Auxiliar do Manifesto Eletrônico de Documentos Fiscais<br>**MDF-e** → PDF</sub> | <sub>Documento Auxiliar da Carta de Correção Eletrônica<br>**CC-e** → PDF</sub> | <sub>Documento Auxiliar da Nota Fiscal de Serviços Eletrônica<br>**NFS-e** → PDF</sub> |
+<table>
+  <tr>
+    <td align="center" width="20%"><a href="https://engenere.github.io/BrazilFiscalReport/danfe/"><b>DANFE</b></a></td>
+    <td align="center" width="20%"><a href="https://engenere.github.io/BrazilFiscalReport/dacte/"><b>DACTE</b></a></td>
+    <td align="center" width="20%"><a href="https://engenere.github.io/BrazilFiscalReport/damdfe/"><b>DAMDFE</b></a></td>
+    <td align="center" width="20%"><a href="https://engenere.github.io/BrazilFiscalReport/dacce/"><b>DACCe</b></a></td>
+    <td align="center" width="20%"><a href="https://engenere.github.io/BrazilFiscalReport/danfse/"><b>DANFSE</b></a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://engenere.github.io/BrazilFiscalReport/danfe/"><img src="https://raw.githubusercontent.com/Engenere/BrazilFiscalReport/main/docs/assets/screenshots/danfe.png" alt="DANFE generated in PDF" width="150"></a></td>
+    <td align="center"><a href="https://engenere.github.io/BrazilFiscalReport/dacte/"><img src="https://raw.githubusercontent.com/Engenere/BrazilFiscalReport/main/docs/assets/screenshots/dacte.png" alt="DACTE generated in PDF" width="150"></a></td>
+    <td align="center"><a href="https://engenere.github.io/BrazilFiscalReport/damdfe/"><img src="https://raw.githubusercontent.com/Engenere/BrazilFiscalReport/main/docs/assets/screenshots/damdfe.png" alt="DAMDFE generated in PDF" width="150"></a></td>
+    <td align="center"><a href="https://engenere.github.io/BrazilFiscalReport/dacce/"><img src="https://raw.githubusercontent.com/Engenere/BrazilFiscalReport/main/docs/assets/screenshots/dacce.png" alt="DACCe generated in PDF" width="150"></a></td>
+    <td align="center"><a href="https://engenere.github.io/BrazilFiscalReport/danfse/"><img src="https://raw.githubusercontent.com/Engenere/BrazilFiscalReport/main/docs/assets/screenshots/danfse.png" alt="DANFSE generated in PDF" width="150"></a></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Documento Auxiliar da Nota Fiscal Eletrônica<br><b>NF-e</b> → PDF</sub></td>
+    <td align="center"><sub>Documento Auxiliar do Conhecimento de Transporte Eletrônico<br><b>CT-e</b> → PDF</sub></td>
+    <td align="center"><sub>Documento Auxiliar do Manifesto Eletrônico de Documentos Fiscais<br><b>MDF-e</b> → PDF</sub></td>
+    <td align="center"><sub>Documento Auxiliar da Carta de Correção Eletrônica<br><b>CC-e</b> → PDF</sub></td>
+    <td align="center"><sub>Documento Auxiliar da Nota Fiscal de Serviços Eletrônica<br><b>NFS-e</b> → PDF</sub></td>
+  </tr>
+</table>
 
 ## Why BrazilFiscalReport?
 

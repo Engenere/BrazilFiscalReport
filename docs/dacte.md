@@ -1,4 +1,6 @@
-DACTE (Auxiliary Document of the Electronic Transportation Bill) is a printed document used in Brazil to accompany the electronic transportation invoice (CT-e). It serves as a simplified version of the CT-e, providing key details about the shipment, such as cargo information, sender and receiver, and transport company data.
+DACTE (Auxiliary Document of the Electronic Transportation Bill) is a printed document used in Brazil to accompany the electronic transportation invoice (CT-e). It serves as a simplified version of the CT-e, providing key details about the shipment, such as cargo information, sender and receiver, and transport company data. All transport modes are supported — road, air, water, rail, pipeline and multimodal.
+
+![Example of a DACTE generated from a CT-e XML](assets/screenshots/dacte.png){ width="480" }
 
 ## Basic Usage
 
@@ -51,38 +53,12 @@ Here is a breakdown of all the configuration options available in `DacteConfig`:
 
 - **Type**: `Margins`
 - **Fields**: `top`, `right`, `bottom`, `left` (all of type `Number`)
-- **Description**: Sets the page margins for the PDF document.
+- **Description**: Sets the page margins for the PDF document, in millimeters.
 - **Example**:
     ```python
     config.margins = Margins(top=5, right=5, bottom=5, left=5)
     ```
 - **Default**: top, right, bottom, and left are set to 5 mm.
-
----
-
-**Receipt Position**
-
-- **Type**: `ReceiptPosition` (Enum)
-- **Values**: `TOP`, `BOTTOM`, `LEFT`
-- **Description**: Position of the receipt section in the DACTE.
-- **Example**:
-    ```python
-    config.receipt_pos = ReceiptPosition.BOTTOM
-    ```
-- **Default**: `TOP`
-
----
-
-**Decimal Configuration**
-
-- **Type**: `DecimalConfig`
-- **Fields**: `price_precision`, `quantity_precision` (both `int`)
-- **Description**: Defines the number of decimal places for prices and quantities.
-- **Example**:
-    ```python
-    config.decimal_config = DecimalConfig(price_precision=2, quantity_precision=2)
-    ```
-- **Default**: `4` for both fields.
 
 ---
 
@@ -99,30 +75,73 @@ Here is a breakdown of all the configuration options available in `DacteConfig`:
 
 ---
 
+**Display IBS/CBS**
+
+- **Type**: `bool`
+- **Description**: When set to `True`, adds an "IBS E CBS" column to the tax information block, showing the state IBS, municipal IBS and CBS rates and amounts extracted from the `IBSCBS` group of the CT-e XML (Brazilian tax reform — Reforma Tributária).
+- **Example**:
+    ```python
+    config.display_ibs_cbs = True
+    ```
+- **Default**: `False`
+
+---
+
+**Receipt Position**
+
+- **Type**: `ReceiptPosition` (Enum)
+- **Values**: `TOP`, `BOTTOM`, `LEFT`
+- **Example**:
+    ```python
+    config.receipt_pos = ReceiptPosition.BOTTOM
+    ```
+- **Default**: `TOP`
+
+!!! warning
+    This option is not yet implemented for the DACTE: the receipt is always rendered at the top, and the layout is determined automatically by the print orientation (`tpImp`) of the CT-e XML. Setting it currently has no effect on the output.
+
+---
+
+**Decimal Configuration**
+
+- **Type**: `DecimalConfig`
+- **Fields**: `price_precision`, `quantity_precision` (both `int`)
+- **Example**:
+    ```python
+    config.decimal_config = DecimalConfig(price_precision=2, quantity_precision=2)
+    ```
+- **Default**: `4` for both fields.
+
+!!! warning
+    This option is not yet implemented for the DACTE: monetary values are always formatted with 2 decimal places. Setting it currently has no effect on the output.
+
+---
+
 **Watermark Cancelled**
 
 - **Type**: `bool`
-- **Description**: When set to `True`, displays a "CANCELADA" watermark on the DACTE for cancelled documents.
+- **Description**: When set to `True`, displays a "CANCELADA" watermark on the DACTE for cancelled documents. If the XML belongs to the homologation environment, the text becomes "CANCELADA - SEM VALOR FISCAL".
 - **Example**:
     ```python
     config.watermark_cancelled = True
     ```
 - **Default**: `False`
 
+!!! note
+    Independently of this setting, a "SEM VALOR FISCAL" watermark is drawn automatically whenever the XML has no authorization protocol (`protCTe`) or was issued in the homologation environment (`tpAmb` = 2). When `watermark_cancelled=True`, the cancellation watermark takes precedence.
+
 ---
 
 ### Usage Example with Customization
 
-Here's how to set up a DacteConfig object with a full set of customizations:
+Here's how to set up a `DacteConfig` object with a full set of customizations:
 
 ```python
 from brazilfiscalreport.dacte import (
     Dacte,
     DacteConfig,
-    DecimalConfig,
     FontType,
     Margins,
-    ReceiptPosition,
 )
 
 # Path to the XML file
@@ -136,9 +155,8 @@ with open(xml_file_path, "r", encoding="utf8") as file:
 config = DacteConfig(
     logo='path/to/logo.png',
     margins=Margins(top=10, right=10, bottom=10, left=10),
-    receipt_pos=ReceiptPosition.BOTTOM,
-    decimal_config=DecimalConfig(price_precision=2, quantity_precision=2),
     font_type=FontType.TIMES,
+    display_ibs_cbs=True,
 )
 
 # Use this config when creating a Dacte instance

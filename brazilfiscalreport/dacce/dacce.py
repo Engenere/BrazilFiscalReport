@@ -43,6 +43,7 @@ class DaCCe(xFPDF):
         self.line(90, 10, 90, 43)
 
         text = ""
+        emitente_nome = ""
         if emitente:
             emitente_nome = emitente["nome"]
             text = (

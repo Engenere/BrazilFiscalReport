@@ -4,6 +4,8 @@ Contribuições são bem-vindas! Veja como configurar o projeto para desenvolvim
 
 ## Configuração do Ambiente de Desenvolvimento
 
+A biblioteca suporta Python 3.8+ (o CI testa do 3.8 ao 3.13), então mantenha o código compatível com 3.8.
+
 1. Clone o repositório:
 
     ```bash
@@ -16,9 +18,13 @@ Contribuições são bem-vindas! Veja como configurar o projeto para desenvolvim
     ```bash
     python -m venv .venv
     source .venv/bin/activate  # Linux/macOS
-    pip install -e '.[dacte,damdfe,cli]'
+    .venv\Scripts\activate     # Windows
+    pip install -e '.[dacte,damdfe,danfse,cli]'
     pip install pytest pytest-cov ruff
     ```
+
+    !!! note
+        O `requirements.txt` da raiz pertence ao app demo Streamlit (`streamlit_app.py`), não ao desenvolvimento da biblioteca — use a instalação editável acima.
 
 3. Instale os hooks do pre-commit:
 
@@ -29,7 +35,7 @@ Contribuições são bem-vindas! Veja como configurar o projeto para desenvolvim
 
 ## Executando Testes
 
-O projeto usa `pytest` para testes. Você também precisará do `qpdf` instalado para testes de comparação de PDF:
+O projeto usa `pytest` para testes. Instalar o `qpdf` é fortemente recomendado: sem ele, os testes de comparação de PDF caem para comparações por hash, muito mais difíceis de depurar (o CI sempre o instala).
 
 ```bash
 # Instalar qpdf (Ubuntu/Debian)
@@ -47,7 +53,7 @@ pytest tests/test_danfe.py
 
 ## Estilo de Código
 
-O projeto usa [Ruff](https://github.com/astral-sh/ruff) para linting e formatação. Os hooks do pre-commit verificarão automaticamente seu código antes de cada commit.
+O projeto usa [Ruff](https://github.com/astral-sh/ruff) para linting e formatação. Os hooks do pre-commit verificarão automaticamente seu código antes de cada commit (o hook executa uma versão fixada do Ruff, então a saída dele é a fonte de verdade).
 
 ```bash
 # Verificação manual
@@ -65,6 +71,26 @@ BFR_GENERATE_EXPECTED=1 pytest tests/test_danfe.py
 
 !!! warning
     Só regenere PDFs de referência quando você intencionalmente alterou a saída PDF. Sempre revise a diferença visual antes de fazer o commit.
+
+!!! note
+    Não defina `generate=True` diretamente no código de teste — um hook do pre-commit (`no-generate-true`) bloqueia isso. Sempre use a variável de ambiente `BFR_GENERATE_EXPECTED=1`.
+
+## Trabalhando na Documentação
+
+O site de documentação usa [MkDocs Material](https://squidfunk.github.io/mkdocs-material/) com o plugin [mkdocs-static-i18n](https://github.com/ultrabug/mkdocs-static-i18n). Cada página é um par de arquivos: `page.md` (inglês) e `page.pt.md` (português) — mantenha os dois em sincronia ao editar.
+
+```bash
+pip install mkdocs-material mkdocs-static-i18n
+mkdocs serve  # prévia ao vivo em http://127.0.0.1:8000
+```
+
+O site é publicado automaticamente quando alterações em `docs/**` chegam ao branch `main`.
+
+As capturas de tela dos documentos em `docs/assets/screenshots/` são geradas a partir das fixtures de teste. Para regenerá-las após uma mudança de leiaute (requer `poppler-utils` para o `pdftoppm`):
+
+```bash
+python scripts/generate_screenshots.py
+```
 
 ## Enviando Alterações
 

@@ -1,4 +1,6 @@
-DANFSE (Auxiliary Document of the Electronic Service Invoice) is a printed document used in Brazil to accompany the electronic service invoice (NFS-e). It serves as a simplified version of the NFS-e, providing key details about the service provided, such as issuer and taker information, tax details, and total amounts.
+DANFSe (Auxiliary Document of the Electronic Service Invoice) is a printed document used in Brazil to accompany the electronic service invoice (NFS-e). It serves as a simplified version of the NFS-e, providing key details about the service provided, such as issuer and taker information, tax details, and total amounts.
+
+![Example of a DANFSe generated from an NFS-e XML](assets/screenshots/danfse.png){ width="480" }
 
 The layout follows the **DANFSe v2.0** model defined by Technical Note **NT 008/2026 (SE/CGNFS-e)**, including the Recipient (Destinatário), IBS/CBS taxation and optional acknowledgment stub (canhoto) blocks introduced by the Brazilian consumption tax reform (RTC).
 
@@ -16,7 +18,7 @@ The layout follows the **DANFSe v2.0** model defined by Technical Note **NT 008/
     with open(xml_file_path, "r", encoding="utf8") as file:
         xml_content = file.read()
 
-    # Instantiate the DANFSE object with the loaded XML content
+    # Instantiate the DANFSe object with the loaded XML content
     danfse = Danfse(xml=xml_content)
     danfse.output('output_danfse.pdf')
     ```
@@ -27,9 +29,9 @@ The layout follows the **DANFSe v2.0** model defined by Technical Note **NT 008/
     bfrep danfse /path/to/nfse.xml
     ```
 
-## Customizing DANFSE
+## Customizing DANFSe
 
-This section describes how to customize the PDF output of the DANFSE using the `DanfseConfig` class. You can adjust various settings such as margins and fonts according to your needs.
+This section describes how to customize the PDF output of the DANFSe using the `DanfseConfig` class. You can adjust various settings such as margins and fonts according to your needs.
 
 ### Margins
 

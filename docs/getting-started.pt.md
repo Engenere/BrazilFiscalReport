@@ -8,7 +8,7 @@
 pip install brazilfiscalreport
 ```
 
-Isso instala a biblioteca principal com suporte para **DANFE** e **DACCe**.
+Isso instala a biblioteca principal com suporte para **DANFE** e **DACCe**. Requer Python 3.8+.
 
 ### Dependências opcionais
 
@@ -26,6 +26,12 @@ Alguns tipos de documentos requerem pacotes adicionais:
     pip install 'brazilfiscalreport[damdfe]'
     ```
 
+=== "DANFSe"
+
+    ```bash
+    pip install 'brazilfiscalreport[danfse]'
+    ```
+
 === "CLI"
 
     ```bash
@@ -35,7 +41,7 @@ Alguns tipos de documentos requerem pacotes adicionais:
 === "Todos os extras"
 
     ```bash
-    pip install 'brazilfiscalreport[dacte,damdfe,cli]'
+    pip install 'brazilfiscalreport[dacte,damdfe,danfse,cli]'
     ```
 
 ## Início Rápido
@@ -55,6 +61,9 @@ with open("nfe.xml", "r", encoding="utf8") as file:
 danfe = Danfe(xml=xml_content)
 danfe.output("danfe.pdf")
 ```
+
+!!! tip "Sem um XML em mãos?"
+    Pegue um exemplo em [tests/fixtures](https://github.com/Engenere/BrazilFiscalReport/tree/main/tests/fixtures) ou [teste a demo online](https://brazilfiscalreport.streamlit.app) com o seu próprio arquivo.
 
 O mesmo padrão se aplica a todos os tipos de documentos:
 
@@ -94,6 +103,15 @@ O mesmo padrão se aplica a todos os tipos de documentos:
     damdfe.output("damdfe.pdf")
     ```
 
+=== "DANFSe"
+
+    ```python
+    from brazilfiscalreport.danfse import Danfse
+
+    danfse = Danfse(xml=xml_content)
+    danfse.output("danfse.pdf")
+    ```
+
 ### Usando o CLI
 
 Para geração rápida pelo terminal:
@@ -103,11 +121,12 @@ bfrep danfe /path/to/nfe.xml
 bfrep dacce /path/to/cce.xml
 bfrep dacte /path/to/cte.xml
 bfrep damdfe /path/to/mdfe.xml
+bfrep danfse /path/to/nfse.xml
 ```
 
 Veja a [documentação do CLI](cli.md) para opções de configuração.
 
 ## Próximos passos
 
-- Conheça as opções de personalização para cada tipo de documento: [DANFE](danfe.md), [DACTE](dacte.md), [DAMDFE](damdfe.md), [DACCe](dacce.md)
+- Conheça as opções de personalização para cada tipo de documento: [DANFE](danfe.md), [DACTE](dacte.md), [DAMDFE](damdfe.md), [DACCe](dacce.md), [DANFSe](danfse.md)
 - Configure o [CLI](cli.md) para geração em lote

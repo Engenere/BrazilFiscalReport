@@ -10,6 +10,8 @@
 
 Python library for generating Brazilian auxiliary fiscal documents in PDF from XML documents.
 
+Every Brazilian electronic invoice is issued by the tax authority as an XML file. This library turns that XML into the official, printable PDF that has to accompany the goods or service: **NF-e → DANFE**, **CT-e → DACTE**, **MDF-e → DAMDFE**, **CC-e → DACCe**, **NFS-e → DANFSE**.
+
 > 🇧🇷 Biblioteca Python para gerar em PDF os documentos auxiliares das notas fiscais — **DANFE**, **DACTE**, **DAMDFE**, **DACCe** e **DANFSE** — a partir do XML de NF-e, CT-e, MDF-e, CC-e e NFS-e. **[Documentação em português →](https://engenere.github.io/BrazilFiscalReport/pt/)**
 
 **[Documentation](https://engenere.github.io/BrazilFiscalReport/)** | **[PyPI](https://pypi.org/project/BrazilFiscalReport/)** | **[Try it Online](https://brazilfiscalreport.streamlit.app)**
@@ -32,11 +34,11 @@ Python library for generating Brazilian auxiliary fiscal documents in PDF from X
     <td align="center"><a href="https://engenere.github.io/BrazilFiscalReport/danfse/"><img src="https://raw.githubusercontent.com/Engenere/BrazilFiscalReport/main/docs/assets/screenshots/danfse.png" alt="DANFSE generated in PDF" width="150"></a></td>
   </tr>
   <tr>
-    <td align="center"><sub>Documento Auxiliar da Nota Fiscal Eletrônica<br><b>NF-e</b> → PDF</sub></td>
-    <td align="center"><sub>Documento Auxiliar do Conhecimento de Transporte Eletrônico<br><b>CT-e</b> → PDF</sub></td>
-    <td align="center"><sub>Documento Auxiliar do Manifesto Eletrônico de Documentos Fiscais<br><b>MDF-e</b> → PDF</sub></td>
-    <td align="center"><sub>Documento Auxiliar da Carta de Correção Eletrônica<br><b>CC-e</b> → PDF</sub></td>
-    <td align="center"><sub>Documento Auxiliar da Nota Fiscal de Serviços Eletrônica<br><b>NFS-e</b> → PDF</sub></td>
+    <td align="center"><sub><b>NF-e</b> → PDF<br>Electronic invoice (goods)</sub></td>
+    <td align="center"><sub><b>CT-e</b> → PDF<br>Freight bill</sub></td>
+    <td align="center"><sub><b>MDF-e</b> → PDF<br>Cargo manifest</sub></td>
+    <td align="center"><sub><b>CC-e</b> → PDF<br>Correction letter</sub></td>
+    <td align="center"><sub><b>NFS-e</b> → PDF<br>Service invoice</sub></td>
   </tr>
 </table>
 
@@ -76,6 +78,8 @@ danfe = Danfe(xml=xml_content)
 danfe.output("danfe.pdf")
 ```
 
+> `nfe.xml` is the authorized XML your ERP or the SEFAZ portal returns once the invoice is approved.
+
 The same pattern works for every document type — import the matching class (`Dacte`, `Damdfe`, `Danfse`, `DaCCe`), pass the XML and call `.output()`.
 
 ### Customization
@@ -84,6 +88,9 @@ Need a logo, custom margins or a different font? Pass a config object:
 
 ```python
 from brazilfiscalreport.danfe import Danfe, DanfeConfig, Margins, FontType
+
+with open("nfe.xml", encoding="utf8") as file:
+    xml_content = file.read()
 
 config = DanfeConfig(
     logo="logo.png",

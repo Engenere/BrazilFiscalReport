@@ -50,6 +50,7 @@
                 <nDPS>777</nDPS>
                 <serie>1</serie>
                 <dCompet>2026-05-10</dCompet>
+                <tpEmit>1</tpEmit>
                 <prest>
                     <CNPJ>11222333000144</CNPJ>
                     <IM>123456</IM>

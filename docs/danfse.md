@@ -1,17 +1,8 @@
-DANFSe (Auxiliary Document of the Electronic Service Invoice — "Documento Auxiliar da NFS-e") is a printed document used in Brazil to accompany the electronic service invoice (NFS-e). It serves as a simplified version of the NFS-e, providing key details about the service provided, such as issuer and taker information, tax details, and total amounts. The generated PDF follows the layout of the Brazilian National NFS-e System and includes a QR code for authenticity verification at the national portal.
+DANFSe (Auxiliary Document of the Electronic Service Invoice) is a printed document used in Brazil to accompany the electronic service invoice (NFS-e). It serves as a simplified version of the NFS-e, providing key details about the service provided, such as issuer and taker information, tax details, and total amounts.
 
 ![Example of a DANFSe generated from an NFS-e XML](assets/screenshots/danfse.png){ width="480" }
 
-!!! note "Supported XML layout"
-    The accepted XML is the NFS-e **National Standard** (Sistema Nacional NFS-e, namespace `http://www.sped.fazenda.gov.br/nfse`). Municipal ABRASF layouts are not supported.
-
-## Installation
-
-The DANFSe requires the `qrcode` optional dependency:
-
-```bash
-pip install 'brazilfiscalreport[danfse]'
-```
+The layout follows the **DANFSe v2.0** model defined by Technical Note **NT 008/2026 (SE/CGNFS-e)**, including the Recipient (Destinatário), IBS/CBS taxation and optional acknowledgment stub (canhoto) blocks introduced by the Brazilian consumption tax reform (RTC).
 
 ## Basic Usage
 
@@ -38,94 +29,84 @@ pip install 'brazilfiscalreport[danfse]'
     bfrep danfse /path/to/nfse.xml
     ```
 
-## Customizing DANFSe 🎨
+## Customizing DANFSe
 
-This section describes how to customize the PDF output of the DANFSe using the `DanfseConfig` class.
+This section describes how to customize the PDF output of the DANFSe using the `DanfseConfig` class. You can adjust various settings such as margins and fonts according to your needs.
 
-### Configuration Options ⚙️
+### Margins
 
----
-
-**Margins**
-
-- **Type**: `Margins`
-- **Fields**: `top`, `right`, `bottom`, `left` (all of type `Number`)
-- **Description**: Sets the page margins for the PDF document, in millimeters.
-- **Example**:
-    ```python
-    config.margins = Margins(top=10, right=10, bottom=10, left=10)
-    ```
-- **Default**: top, right, bottom, and left are set to 5 mm.
-
----
-
-**Font Type**
-
-- **Type**: `FontType` (Enum)
-- **Values**: `COURIER`, `TIMES`
-- **Description**: Font style used throughout the PDF document.
-- **Example**:
-    ```python
-    config.font_type = FontType.COURIER
-    ```
-- **Default**: `TIMES`
-
----
-
-**Decimal Configuration**
-
-- **Type**: `DecimalConfig`
-- **Fields**: `price_precision`, `quantity_precision` (both `int`; only `price_precision` affects the DANFSe)
-- **Description**: Defines the number of decimal places used for monetary values. With the default of `4`, amounts are printed like "R$ 1.000,0000" — set it to `2` for standard monetary display.
-- **Example**:
-    ```python
-    config.decimal_config = DecimalConfig(price_precision=2)
-    ```
-- **Default**: `4`
-
----
-
-**Watermark Cancelled**
-
-- **Type**: `bool`
-- **Description**: When set to `True`, displays a "CANCELADA" watermark on the DANFSe for cancelled documents. If the XML belongs to the homologation environment, the text becomes "CANCELADA - SEM VALOR FISCAL".
-- **Example**:
-    ```python
-    config.watermark_cancelled = True
-    ```
-- **Default**: `False`
-
-!!! note
-    Independently of this setting, a "SEM VALOR FISCAL" watermark is drawn automatically whenever the XML was issued in the homologation environment (`tpAmb` = 2).
-
----
-
-### Usage Example with Customization
+You can customize the margins of the PDF output by providing a `Margins` object. NT 008/2026 (item 2.2.2) requires margins between 1.5 mm and 2.0 mm; the default is 2 mm on all sides.
 
 ```python
-from brazilfiscalreport.danfse import (
-    Danfse,
-    DanfseConfig,
-    DecimalConfig,
-    FontType,
-    Margins,
-)
+from brazilfiscalreport.danfse import Danfse, DanfseConfig, Margins
 
-# Path to the XML file
-xml_file_path = 'nfse.xml'
-
-# Load XML Content
-with open(xml_file_path, "r", encoding="utf8") as file:
-    xml_content = file.read()
-
-# Create a configuration instance
 config = DanfseConfig(
-    margins=Margins(top=10, right=10, bottom=10, left=10),
-    font_type=FontType.TIMES,
-    decimal_config=DecimalConfig(price_precision=2),
+    margins=Margins(top=2, right=2, bottom=2, left=2)
 )
 
-# Use this config when creating a Danfse instance
 danfse = Danfse(xml=xml_content, config=config)
 danfse.output('output_danfse.pdf')
 ```
+
+### Font
+
+NT 008/2026 requires Arial for titles/labels and Microsoft Sans Serif for field contents. The library uses **Helvetica** by default, the metric-equivalent PDF core font, so no TTF embedding is needed. Times and Courier remain available:
+
+```python
+from brazilfiscalreport.danfse import Danfse, DanfseConfig, FontType
+
+config = DanfseConfig(font_type=FontType.HELVETICA)  # default
+
+danfse = Danfse(xml=xml_content, config=config)
+```
+
+### Decimal precision
+
+Monetary amounts and tax rates are printed with 2 decimal places by default, matching the `1-15V2`/`1-2V2` field formats of the NT 008/2026 layout:
+
+```python
+from brazilfiscalreport.danfse import Danfse, DanfseConfig, DecimalConfig
+
+config = DanfseConfig(decimal_config=DecimalConfig(price_precision=2))
+```
+
+### Cancelled Watermark
+
+To display a "CANCELADA" watermark on cancelled documents (NT 008/2026, item 2.5.1 — diagonal, regular style, gray K35):
+
+```python
+from brazilfiscalreport.danfse import Danfse, DanfseConfig
+
+config = DanfseConfig(watermark_cancelled=True)
+
+danfse = Danfse(xml=xml_content, config=config)
+danfse.output('output_danfse.pdf')
+```
+
+### Replaced Watermark
+
+To display a "SUBSTITUÍDA" watermark on replaced documents (NT 008/2026, item 2.5.2). When both `watermark_cancelled` and `watermark_replaced` are enabled, "CANCELADA" takes precedence:
+
+```python
+from brazilfiscalreport.danfse import Danfse, DanfseConfig
+
+config = DanfseConfig(watermark_replaced=True)
+```
+
+### Acknowledgment stub (canhoto)
+
+The canhoto is an optional block at the bottom of the document (NT 008/2026, item 2.1.13 and Note 11) with fields for acknowledgment date, signature and the NFS-e number/access key. It is disabled by default:
+
+```python
+from brazilfiscalreport.danfse import Danfse, DanfseConfig
+
+config = DanfseConfig(display_canhoto=True)
+```
+
+## Layout notes
+
+- Blocks without data in the XML are replaced by the fixed single-line texts of NT 008/2026 Notes 2–4 (e.g. "TOMADOR/ADQUIRENTE DA OPERAÇÃO NÃO IDENTIFICADO NA NFS-e"), and the freed space flows into the "Informações Complementares" block (§2.3).
+- When the `IBSCBS/dest` group is absent and the taker is present, the document prints "O DESTINATÁRIO É O PRÓPRIO TOMADOR/ADQUIRENTE DA OPERAÇÃO" (Note 3).
+- When `tpAmb=2` (homologation), the header shows "NFS-e SEM VALIDADE JURÍDICA" in red, as required by §2.4.3.
+- Municipality names for the provider/taker/recipient/intermediary addresses are resolved from the IBGE municipality table bundled with the package (`municipios_ibge.csv`).
+- The "Totais Aproximados dos Tributos" (Lei nº 12.741/2012) are always printed inside "Informações Complementares" in the fixed format of Note 10.

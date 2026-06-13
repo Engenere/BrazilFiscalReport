@@ -1,4 +1,4 @@
-Gere documentos DANFE, DACCe, DACTE, DAMDFE e DANFSE diretamente pelo terminal.
+Gere documentos DANFE, DACCe, DACTE, DAMDFE e DANFSe diretamente pelo terminal.
 O PDF é salvo no diretório de trabalho atual com o mesmo nome base do arquivo
 XML (ex.: `nfe.xml` → `nfe.pdf`), e você pode criar um arquivo `config.yaml`
 com detalhes do emitente e outras configurações.
@@ -45,7 +45,7 @@ bfrep dacte /path/to/cte.xml
 bfrep damdfe /path/to/mdfe.xml
 ```
 
-### [DANFSE](danfse.md)
+### [DANFSe](danfse.md)
 
 ```bash
 bfrep danfse /path/to/nfse.xml

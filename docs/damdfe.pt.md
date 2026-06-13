@@ -115,7 +115,7 @@ Alguns elementos são desenhados automaticamente com base no conteúdo do XML, s
 - Para emissão em contingência (`tpEmis`), uma marca d'água "EMISSÃO EM CONTINGÊNCIA" é desenhada e o quadro do protocolo exibe o prazo de 168 horas para autorização, calculado a partir da data de emissão.
 
 !!! note
-    Diferentemente do DANFE, DACTE e DANFSE, o DAMDFE ainda não oferece a opção `watermark_cancelled`.
+    Diferentemente do DANFE, DACTE e DANFSe, o DAMDFE ainda não oferece a opção `watermark_cancelled`.
 
 ---
 

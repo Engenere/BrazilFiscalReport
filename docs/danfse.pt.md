@@ -1,13 +1,13 @@
 DANFSe (Documento Auxiliar da NFS-e) é um documento impresso usado no Brasil para acompanhar a nota fiscal de serviços eletrônica (NFS-e). Ele serve como uma versão simplificada da NFS-e, fornecendo os principais detalhes do serviço prestado, como informações do emitente e do tomador, detalhes dos tributos e valores totais. O PDF gerado segue o leiaute do Sistema Nacional NFS-e e inclui QR Code para verificação de autenticidade no portal nacional.
 
-![Exemplo de DANFSE gerado a partir do XML de NFS-e](assets/screenshots/danfse.png){ width="480" }
+![Exemplo de DANFSe gerado a partir do XML de NFS-e](assets/screenshots/danfse.png){ width="480" }
 
 !!! note "Leiaute de XML suportado"
     O XML aceito é o da NFS-e no **Padrão Nacional** (Sistema Nacional NFS-e, namespace `http://www.sped.fazenda.gov.br/nfse`). Leiautes municipais ABRASF não são suportados.
 
 ## Instalação
 
-O DANFSE requer a dependência opcional `qrcode`:
+O DANFSe requer a dependência opcional `qrcode`:
 
 ```bash
 pip install 'brazilfiscalreport[danfse]'
@@ -27,7 +27,7 @@ pip install 'brazilfiscalreport[danfse]'
     with open(xml_file_path, "r", encoding="utf8") as file:
         xml_content = file.read()
 
-    # Instanciar o objeto DANFSE com o conteúdo XML carregado
+    # Instanciar o objeto DANFSe com o conteúdo XML carregado
     danfse = Danfse(xml=xml_content)
     danfse.output('output_danfse.pdf')
     ```
@@ -38,9 +38,9 @@ pip install 'brazilfiscalreport[danfse]'
     bfrep danfse /path/to/nfse.xml
     ```
 
-## Personalizando o DANFSE 🎨
+## Personalizando o DANFSe 🎨
 
-Esta seção descreve como personalizar a saída PDF do DANFSE usando a classe `DanfseConfig`.
+Esta seção descreve como personalizar a saída PDF do DANFSe usando a classe `DanfseConfig`.
 
 ### Opções de Configuração ⚙️
 
@@ -75,7 +75,7 @@ Esta seção descreve como personalizar a saída PDF do DANFSE usando a classe `
 **Configuração Decimal**
 
 - **Tipo**: `DecimalConfig`
-- **Campos**: `price_precision`, `quantity_precision` (ambos `int`; apenas `price_precision` tem efeito no DANFSE)
+- **Campos**: `price_precision`, `quantity_precision` (ambos `int`; apenas `price_precision` tem efeito no DANFSe)
 - **Descrição**: Define o número de casas decimais usado nos valores monetários. Com o padrão `4`, os valores saem como "R$ 1.000,0000" — defina `2` para a exibição monetária convencional.
 - **Exemplo**:
     ```python
@@ -88,7 +88,7 @@ Esta seção descreve como personalizar a saída PDF do DANFSE usando a classe `
 **Marca d'água Cancelada**
 
 - **Tipo**: `bool`
-- **Descrição**: Quando definido como `True`, exibe uma marca d'água "CANCELADA" no DANFSE para documentos cancelados. Se o XML for do ambiente de homologação, o texto passa a ser "CANCELADA - SEM VALOR FISCAL".
+- **Descrição**: Quando definido como `True`, exibe uma marca d'água "CANCELADA" no DANFSe para documentos cancelados. Se o XML for do ambiente de homologação, o texto passa a ser "CANCELADA - SEM VALOR FISCAL".
 - **Exemplo**:
     ```python
     config.watermark_cancelled = True

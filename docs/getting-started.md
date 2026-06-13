@@ -26,7 +26,7 @@ Some document types require additional packages:
     pip install 'brazilfiscalreport[damdfe]'
     ```
 
-=== "DANFSE"
+=== "DANFSe"
 
     ```bash
     pip install 'brazilfiscalreport[danfse]'
@@ -103,7 +103,7 @@ The same pattern applies to all document types:
     damdfe.output("damdfe.pdf")
     ```
 
-=== "DANFSE"
+=== "DANFSe"
 
     ```python
     from brazilfiscalreport.danfse import Danfse
@@ -128,5 +128,5 @@ See the [CLI documentation](cli.md) for configuration options.
 
 ## Next steps
 
-- Learn about customization options for each document type: [DANFE](danfe.md), [DACTE](dacte.md), [DAMDFE](damdfe.md), [DACCe](dacce.md), [DANFSE](danfse.md)
+- Learn about customization options for each document type: [DANFE](danfe.md), [DACTE](dacte.md), [DAMDFE](damdfe.md), [DACCe](dacce.md), [DANFSe](danfse.md)
 - Configure the [CLI](cli.md) for batch generation

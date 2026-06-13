@@ -115,7 +115,7 @@ Some elements are rendered automatically based on the XML content, with no confi
 - For contingency emission (`tpEmis`), an "EMISSÃO EM CONTINGÊNCIA" watermark is drawn and the protocol box shows the 168-hour authorization deadline computed from the emission date.
 
 !!! note
-    Unlike DANFE, DACTE and DANFSE, the DAMDFE does not offer a `watermark_cancelled` option yet.
+    Unlike DANFE, DACTE and DANFSe, the DAMDFE does not offer a `watermark_cancelled` option yet.
 
 ---
 

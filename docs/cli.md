@@ -1,4 +1,4 @@
-Generate DANFE, DACCe, DACTE, DAMDFE, and DANFSE documents directly from the terminal.
+Generate DANFE, DACCe, DACTE, DAMDFE, and DANFSe documents directly from the terminal.
 The PDF is saved in the current working directory using the same base name as the
 XML file (e.g., `nfe.xml` → `nfe.pdf`), and you can create a `config.yaml` file
 with issuer details and other configurations.
@@ -45,7 +45,7 @@ bfrep dacte /path/to/cte.xml
 bfrep damdfe /path/to/mdfe.xml
 ```
 
-### [DANFSE](danfse.md)
+### [DANFSe](danfse.md)
 
 ```bash
 bfrep danfse /path/to/nfse.xml

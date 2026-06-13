@@ -1,13 +1,13 @@
-DANFSE (Auxiliary Document of the Electronic Service Invoice — "Documento Auxiliar da NFS-e") is a printed document used in Brazil to accompany the electronic service invoice (NFS-e). It serves as a simplified version of the NFS-e, providing key details about the service provided, such as issuer and taker information, tax details, and total amounts. The generated PDF follows the layout of the Brazilian National NFS-e System and includes a QR code for authenticity verification at the national portal.
+DANFSe (Auxiliary Document of the Electronic Service Invoice — "Documento Auxiliar da NFS-e") is a printed document used in Brazil to accompany the electronic service invoice (NFS-e). It serves as a simplified version of the NFS-e, providing key details about the service provided, such as issuer and taker information, tax details, and total amounts. The generated PDF follows the layout of the Brazilian National NFS-e System and includes a QR code for authenticity verification at the national portal.
 
-![Example of a DANFSE generated from an NFS-e XML](assets/screenshots/danfse.png){ width="480" }
+![Example of a DANFSe generated from an NFS-e XML](assets/screenshots/danfse.png){ width="480" }
 
 !!! note "Supported XML layout"
     The accepted XML is the NFS-e **National Standard** (Sistema Nacional NFS-e, namespace `http://www.sped.fazenda.gov.br/nfse`). Municipal ABRASF layouts are not supported.
 
 ## Installation
 
-The DANFSE requires the `qrcode` optional dependency:
+The DANFSe requires the `qrcode` optional dependency:
 
 ```bash
 pip install 'brazilfiscalreport[danfse]'
@@ -27,7 +27,7 @@ pip install 'brazilfiscalreport[danfse]'
     with open(xml_file_path, "r", encoding="utf8") as file:
         xml_content = file.read()
 
-    # Instantiate the DANFSE object with the loaded XML content
+    # Instantiate the DANFSe object with the loaded XML content
     danfse = Danfse(xml=xml_content)
     danfse.output('output_danfse.pdf')
     ```
@@ -38,9 +38,9 @@ pip install 'brazilfiscalreport[danfse]'
     bfrep danfse /path/to/nfse.xml
     ```
 
-## Customizing DANFSE 🎨
+## Customizing DANFSe 🎨
 
-This section describes how to customize the PDF output of the DANFSE using the `DanfseConfig` class.
+This section describes how to customize the PDF output of the DANFSe using the `DanfseConfig` class.
 
 ### Configuration Options ⚙️
 
@@ -75,7 +75,7 @@ This section describes how to customize the PDF output of the DANFSE using the `
 **Decimal Configuration**
 
 - **Type**: `DecimalConfig`
-- **Fields**: `price_precision`, `quantity_precision` (both `int`; only `price_precision` affects the DANFSE)
+- **Fields**: `price_precision`, `quantity_precision` (both `int`; only `price_precision` affects the DANFSe)
 - **Description**: Defines the number of decimal places used for monetary values. With the default of `4`, amounts are printed like "R$ 1.000,0000" — set it to `2` for standard monetary display.
 - **Example**:
     ```python
@@ -88,7 +88,7 @@ This section describes how to customize the PDF output of the DANFSE using the `
 **Watermark Cancelled**
 
 - **Type**: `bool`
-- **Description**: When set to `True`, displays a "CANCELADA" watermark on the DANFSE for cancelled documents. If the XML belongs to the homologation environment, the text becomes "CANCELADA - SEM VALOR FISCAL".
+- **Description**: When set to `True`, displays a "CANCELADA" watermark on the DANFSe for cancelled documents. If the XML belongs to the homologation environment, the text becomes "CANCELADA - SEM VALOR FISCAL".
 - **Example**:
     ```python
     config.watermark_cancelled = True

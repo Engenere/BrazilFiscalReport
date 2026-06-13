@@ -104,17 +104,15 @@ Each document type accepts a configuration object for customization (logo, margi
 
 ## CLI
 
-Generate PDFs directly from the terminal:
-
 ```bash
-bfrep danfe /path/to/nfe.xml
-bfrep dacte /path/to/cte.xml
-bfrep damdfe /path/to/mdfe.xml
-bfrep dacce /path/to/cce.xml
-bfrep danfse /path/to/nfse.xml
+pip install 'brazilfiscalreport[cli]'
+
+bfrep danfe nfe.xml        # writes nfe.pdf in the current folder
 ```
 
-See the [CLI documentation](https://engenere.github.io/BrazilFiscalReport/cli/) for configuration options.
+`bfrep` ships one subcommand per document type — `danfe`, `dacte`, `damdfe`, `dacce` and `danfse` — each turning its XML into the matching PDF. Drop a `config.yaml` next to your files to set issuer data, logo and margins.
+
+See the [CLI documentation](https://engenere.github.io/BrazilFiscalReport/cli/) for all options.
 
 ## Dependencies
 

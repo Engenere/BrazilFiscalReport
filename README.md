@@ -8,8 +8,6 @@
 
 # Brazil Fiscal Report
 
-![Brazil Fiscal Report - XML to PDF](https://raw.githubusercontent.com/Engenere/BrazilFiscalReport/main/docs/assets/banner.svg)
-
 Python library for generating Brazilian auxiliary fiscal documents in PDF from XML documents.
 
 > 🇧🇷 Biblioteca Python para gerar em PDF os documentos auxiliares das notas fiscais — **DANFE**, **DACTE**, **DAMDFE**, **DACCe** e **DANFSE** — a partir do XML de NF-e, CT-e, MDF-e, CC-e e NFS-e. **[Documentação em português →](https://engenere.github.io/BrazilFiscalReport/pt/)**

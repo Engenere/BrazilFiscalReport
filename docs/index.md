@@ -8,8 +8,6 @@
 
 # Brazil Fiscal Report
 
-![Brazil Fiscal Report - XML to PDF](assets/banner.svg)
-
 Python library for generating Brazilian auxiliary fiscal documents in PDF from XML documents.
 
 ## Supported Documents

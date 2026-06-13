@@ -8,8 +8,6 @@
 
 # Brazil Fiscal Report
 
-![Brazil Fiscal Report - XML para PDF](assets/banner.svg)
-
 Biblioteca Python para geração de documentos fiscais auxiliares brasileiros em PDF a partir de documentos XML.
 
 ## Documentos Suportados

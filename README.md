@@ -12,7 +12,7 @@ Python library for generating Brazilian auxiliary fiscal documents in PDF from X
 
 Every Brazilian electronic invoice is issued by the tax authority as an XML file. This library turns that XML into the official, printable PDF that has to accompany the goods or service: **NF-e → DANFE**, **CT-e → DACTE**, **MDF-e → DAMDFE** and **NFS-e → DANFSE**. It also renders the **DACCe**, the printout for the NF-e correction-letter event (CC-e).
 
-> 🇧🇷 Biblioteca Python para gerar em PDF os documentos auxiliares das notas fiscais — **DANFE**, **DACTE**, **DAMDFE**, **DACCe** e **DANFSE** — a partir do XML de NF-e, CT-e, MDF-e, CC-e e NFS-e. **[Documentação em português →](https://engenere.github.io/BrazilFiscalReport/pt/)**
+> 🇧🇷 Biblioteca Python para gerar em PDF os documentos fiscais auxiliares — **DANFE**, **DACTE**, **DAMDFE** e **DANFSE** — a partir do XML de NF-e, CT-e, MDF-e e NFS-e. Também gera a **DACCe**, representação da carta de correção (CC-e) da NF-e. **[Documentação em português →](https://engenere.github.io/BrazilFiscalReport/pt/)**
 
 **[Documentation](https://engenere.github.io/BrazilFiscalReport/)** | **[PyPI](https://pypi.org/project/BrazilFiscalReport/)** | **[Try it Online](https://brazilfiscalreport.streamlit.app)**
 
@@ -110,7 +110,7 @@ pip install 'brazilfiscalreport[cli]'
 bfrep danfe nfe.xml        # writes nfe.pdf in the current folder
 ```
 
-`bfrep` ships one subcommand per document type — `danfe`, `dacte`, `damdfe`, `dacce` and `danfse` — each turning its XML into the matching PDF. Drop a `config.yaml` next to your files to set issuer data, logo and margins.
+`bfrep` ships one subcommand per document — `danfe`, `dacte`, `damdfe` and `danfse` (plus `dacce` for the NF-e correction letter) — each turning its XML into the matching PDF. Drop a `config.yaml` next to your files to set issuer data, logo and margins.
 
 See the [CLI documentation](https://engenere.github.io/BrazilFiscalReport/cli/) for all options.
 

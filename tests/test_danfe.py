@@ -380,3 +380,9 @@ def test_danfe_retirada_entrega(tmp_path, load_danfe):
     danfe = load_danfe("nfe_retirada_entrega.xml")
     pdf_path = get_pdf_output_path("danfe", "danfe_retirada_entrega")
     assert_pdf_equal(danfe, pdf_path, tmp_path)
+
+
+def test_danfe_cnpj_alfanumerico(tmp_path, load_danfe):
+    danfe = load_danfe("danfe_cnpj_alfanumerico.xml")
+    pdf_path = get_pdf_output_path("danfe", "danfe_cnpj_alfanumerico")
+    assert_pdf_equal(danfe, pdf_path, tmp_path)

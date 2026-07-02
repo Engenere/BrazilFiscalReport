@@ -50,12 +50,13 @@ def number_filter(doc):
 
 
 def format_cpf_cnpj(doc):
-    doc = number_filter(doc)
+    doc = re.sub(r"[^0-9A-Za-z]", "", doc).upper()
     if doc:
         if len(doc) > 11:
             doc = f"{doc:0>14.14}"
             doc = f"{doc[:2]}.{doc[2:5]}.{doc[5:8]}/{doc[8:12]}-{doc[-2:]}"
         else:
+            doc = number_filter(doc)
             doc = f"{doc:0>11.11}"
             doc = f"{doc[:3]}.{doc[3:6]}.{doc[6:9]}-{doc[9:]}"
     return doc

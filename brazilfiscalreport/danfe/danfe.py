@@ -524,7 +524,7 @@ class Danfe(xFPDF):
         when the environment is homologation.
         """
         is_production_environment = extract_text(self.ide, "tpAmb") == "1"
-        is_protocol_available = bool(self.prot_nfe)
+        is_protocol_available = self.prot_nfe is not None
 
         # Exit early if no watermark is needed
         watermark_text = None
@@ -1094,7 +1094,7 @@ class Danfe(xFPDF):
         block_entrega.render()
 
     def _draw_billing(self):
-        if not self.cobr:
+        if self.cobr is None:
             # Skip
             return
 
@@ -1451,7 +1451,7 @@ class Danfe(xFPDF):
         return row_info, add_info_lines, max_add_info_lines
 
     def _draw_issqn_calculation(self):
-        if not self.issqn_tot:
+        if self.issqn_tot is None:
             return
         # content data
         im = extract_text(self.emit, "IM")

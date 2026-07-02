@@ -125,7 +125,7 @@ class Damdfe(xFPDF):
 
     def _build_ciot_str(self):
         self.inf_ciot_str = []
-        if not self.inf_modal:
+        if self.inf_modal is None:
             return self.inf_ciot_str
 
         for ciot_node in self.inf_modal.findall(f"{URL}rodo/{URL}infANTT/{URL}infCIOT"):
@@ -237,7 +237,7 @@ class Damdfe(xFPDF):
         when the environment is homologation.
         """
         is_production_environment = extract_text(self.ide, "tpAmb") == "1"
-        is_protocol_available = bool(self.prot_mdfe)
+        is_protocol_available = self.prot_mdfe is not None
 
         # Exit early if no watermark is needed
         if is_production_environment and is_protocol_available:

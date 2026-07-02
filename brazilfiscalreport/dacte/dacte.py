@@ -72,7 +72,8 @@ class Dacte(xFPDF):
         self.outros = root.find(f"{URL}toma4")
         self.inf_prot = root.find(f"{URL}infProt")
         self.inf_cte_supl = root.find(f"{URL}infCTeSupl")
-        self.tomador = root.find(f"{URL}toma3") or self.outros
+        toma3 = root.find(f"{URL}toma3")
+        self.tomador = toma3 if toma3 is not None else self.outros
         self.inf_carga = root.find(f"{URL}infCarga")
         self.inf_doc = root.find(f"{URL}infDoc")
         self.v_prest = root.find(f"{URL}vPrest")

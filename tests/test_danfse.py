@@ -89,3 +89,12 @@ def test_danfse_cancelled_hom(tmp_path, load_danfse):
     danfse = load_danfse("nfse_test_hom.xml", config=config)
     pdf_path = get_pdf_output_path("danfse", "danfse_cancelled_hom")
     assert_pdf_equal(danfse, pdf_path, tmp_path)
+
+
+def test_danfse_cnpj_alfanumerico(tmp_path, load_danfse):
+    config = DanfseConfig(
+        margins=Margins(top=2, right=2, bottom=2, left=2),
+    )
+    danfse = load_danfse("nfse_test_cnpj_alfanumerico.xml", config=config)
+    pdf_path = get_pdf_output_path("danfse", "danfse_cnpj_alfanumerico")
+    assert_pdf_equal(danfse, pdf_path, tmp_path)

@@ -92,3 +92,9 @@ def test_damdfe_origem_destino_prestacao(tmp_path, load_damdfe):
     damdfe = load_damdfe("mdf-e_test_1.xml", config=damdfe_config)
     pdf_path = get_pdf_output_path("damdfe", "damdfe_origem_destino_prestacao")
     assert_pdf_equal(damdfe, pdf_path, tmp_path)
+
+
+def test_damdfe_cnpj_alfanumerico(tmp_path, load_damdfe):
+    damdfe = load_damdfe("mdf-e_cnpj_alfanumerico.xml")
+    pdf_path = get_pdf_output_path("damdfe", "damdfe_cnpj_alfanumerico")
+    assert_pdf_equal(damdfe, pdf_path, tmp_path)

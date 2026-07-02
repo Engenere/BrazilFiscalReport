@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NFSe xmlns="http://www.sped.fazenda.gov.br/nfse">
+    <infNFSe versao="1.01" Id="NFS42046082240248250000160000000000088888888888888888">
+        <xLocEmi>Feira de Santana</xLocEmi>
+        <xLocPrestacao>Feira de Santana</xLocPrestacao>
+        <nNFSe>888</nNFSe>
+        <cLocIncid>4204608</cLocIncid>
+        <xLocIncid>Criciúma</xLocIncid>
+        <xTribNac>Serviços de transporte</xTribNac>
+        <verAplic>SefinNacional_1.6.0</verAplic>
+        <ambGer>2</ambGer>
+        <tpEmis>1</tpEmis>
+        <procEmi>1</procEmi>
+        <cStat>100</cStat>
+        <dhProc>2026-04-07T14:00:00-03:00</dhProc>
+        <nDFSe>117998</nDFSe>
+        <emit>
+            <CNPJ>B9J5LWB1000111</CNPJ>
+            <xNome>Benício e Vinicius Transportes Ltda</xNome>
+            <enderNac>
+                <xLgr>Rua Bahia</xLgr>
+                <nro>948</nro>
+                <xBairro>Asa Branca</xBairro>
+                <cMun>123456</cMun>
+                <UF>BA</UF>
+                <CEP>44044304</CEP>
+            </enderNac>
+            <fone>75997723226</fone>
+            <email>compras@benicioeviniciustransportesltda.com.br</email>
+        </emit>
+        <valores>
+            <vBC>5000.00</vBC>
+            <vISSQN>150.00</vISSQN>
+            <vTotalRet>700.00</vTotalRet>
+            <vLiq>4300.00</vLiq>
+        </valores>
+        <DPS versao="1.00">
+            <infDPS Id="DPS888">
+                <tpAmb>2</tpAmb>
+                <dhEmi>2026-04-07T09:00:00-03:00</dhEmi>
+                <nDPS>999</nDPS>
+                <serie>1</serie>
+                <dCompet>2026-04-07</dCompet>
+                <tpEmit>1</tpEmit>
+                <prest>
+                    <CNPJ>CCHVZLWP000198</CNPJ>
+                    <xNome>Serviços de Limpeza e Conservação</xNome>
+                    <end>
+                        <xLgr>Rua Exemplo</xLgr>
+                        <nro>123</nro>
+                        <xBairro>Centro</xBairro>
+                        <cMun>2927408</cMun>
+                        <xMun>Salvador</xMun>
+                        <UF>BA</UF>
+                        <CEP>40000000</CEP>
+                    </end>
+                    <regTrib>
+                        <opSimpNac>1</opSimpNac>
+                        <regApTribSN>1</regApTribSN>
+                        <regEspTrib>2</regEspTrib>
+                    </regTrib>
+                </prest>
+                <toma>
+                    <CNPJ>9WHE64G2000170</CNPJ>
+                    <xNome>Sophia e Ester Esportes ME</xNome>
+                    <end>
+                        <xLgr>Rua Vereador Pedro Paulo</xLgr>
+                        <nro>691</nro>
+                        <xBairro>Jardim das Oliveiras</xBairro>
+                        <cMun>2304400</cMun>
+                        <xMun>Fortaleza</xMun>
+                        <UF>CE</UF>
+                        <CEP>60821425</CEP>
+                    </end>
+                </toma>
+                <serv>
+                    <cServ>
+                        <cTribNac>1401</cTribNac>
+                        <xDescServ>Serviço Prestado conforme CNAE 4929-9/02 – Preparação de documentos e serviços especializados de apoio administrativo não especificados anteriormente, referente ao mês de 02/2026.</xDescServ>
+                    </cServ>
+                </serv>
+                <valores>
+                    <vServPrest>
+                        <vServ>5000.00</vServ>
+                    </vServPrest>
+                    <trib>
+                        <tribMun>
+                            <tribISSQN>1</tribISSQN>
+                            <tpRetISSQN>2</tpRetISSQN>
+                            <vISSQN>150.00</vISSQN>
+                        </tribMun>
+                        <tribFed>
+                            <vRetCP>550.00</vRetCP>
+                        </tribFed>
+                    </trib>
+                </valores>
+            </infDPS>
+        </DPS>
+    </infNFSe>
+</NFSe>

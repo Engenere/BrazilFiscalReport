@@ -146,3 +146,9 @@ def test_dacte_reforma_tributaria(tmp_path, load_dacte):
     dacte = load_dacte("dacte_reforma_tributaria.xml", config=dacte_config)
     pdf_path = get_pdf_output_path("dacte", "dacte_reforma_tributaria")
     assert_pdf_equal(dacte, pdf_path, tmp_path)
+
+
+def test_dacte_cnpj_alfanumerico(tmp_path, load_dacte):
+    dacte = load_dacte("dacte_cnpj_alfanumerico.xml")
+    pdf_path = get_pdf_output_path("dacte", "dacte_cnpj_alfanumerico")
+    assert_pdf_equal(dacte, pdf_path, tmp_path)

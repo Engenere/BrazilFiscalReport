@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mdfeProc xmlns="http://www.portalfiscal.inf.br/mdfe" versao="3.00">
+    <MDFe xmlns="http://www.portalfiscal.inf.br/mdfe">
+        <infMDFe Id="MDFe42240802582975000109580010000000151986453241" versao="3.00">
+            <ide>
+                <cUF>42</cUF>
+                <tpAmb>2</tpAmb>
+                <tpEmit>2</tpEmit>
+                <mod>90</mod>
+                <serie>1</serie>
+                <nMDF>15</nMDF>
+                <cMDF>00000000</cMDF>
+                <cDV>8</cDV>
+                <modal>1</modal>
+                <dhEmi>2024-08-09T13:38:07-03:00</dhEmi>
+                <tpEmis>1</tpEmis>
+                <procEmi>0</procEmi>
+                <UFIni>SC</UFIni>
+                <UFFim>SC</UFFim>
+                <infMunCarrega>
+                    <cMunCarrega>0090001</cMunCarrega>
+                    <xMunCarrega>SÃO JOÃO BATISTA</xMunCarrega>
+                </infMunCarrega>
+                <infPercurso>
+                    <UFPer>SC</UFPer>
+                </infPercurso>
+                <infPercurso>
+                    <UFPer>SC</UFPer>
+                </infPercurso>
+                <dhIniViagem>2024-08-11T13:38:07-03:00</dhIniViagem>
+            </ide>
+            <emit>
+                <CNPJ>XT9CDVWJ000172</CNPJ>
+                <IE>9922334455</IE>
+                <xNome>EMPRESA FANTASMA</xNome>
+                <xFant>EMPRESA FANTASMA</xFant>
+                <enderEmit>
+                    <xLgr>RUA TESTE 0011</xLgr>
+                    <nro>0022</nro>
+                    <xCpl>KM 00</xCpl>
+                    <xBairro>COBRE</xBairro>
+                    <cMun>0099223</cMun>
+                    <xMun>CANELINHA</xMun>
+                    <CEP>88230000</CEP>
+                    <UF>SC</UF>
+                    <fone>48999999999</fone>
+                    <email>teste@gmail.com</email>
+                </enderEmit>
+            </emit>
+            <seg>
+                <respSeg>1</respSeg>
+                <CNPJ>9ZVYVN9L000185</CNPJ>
+                <infSeg>
+                    <xSeg>SEGURADO TESTE</xSeg>
+                    <CNPJ>9ZVYVN9L000185</CNPJ>
+                </infSeg>
+                <nApol>12345678901234567890</nApol>
+            </seg>
+            <seg>
+                <respSeg>1</respSeg>
+                <CNPJ>9ZVYVN9L000185</CNPJ>
+                <infSeg>
+                    <xSeg>SEGURADO TESTE</xSeg>
+                    <CNPJ>9ZVYVN9L000185</CNPJ>
+                </infSeg>
+                <nApol>12345678901234567890</nApol>
+                <nAver>1234567890123456789012345678901234567890</nAver>
+                <nAver>1234567890123456789012345678901234567890</nAver>
+                <nAver>1234567890123456789012345678901234567890</nAver>
+                <nAver>1234567890123456789012345678901234567890</nAver>
+            </seg>
+            <infModal versaoModal="3.00">
+                <rodo>
+                    <infANTT>
+                        <RNTRC>00000000</RNTRC>
+                        <infCIOT>
+                            <CIOT>520005530381</CIOT>
+                            <CNPJ>DVV96V6G000101</CNPJ>
+                        </infCIOT>
+                        <infPag>
+                           <xNome>EMPRESA FANTASMA</xNome>
+                           <CNPJ>DVV96V6G000101</CNPJ>
+                           <Comp>
+                              <tpComp>99</tpComp>
+                              <vComp>1000.00</vComp>
+                              <xComp>FRETE E OUTROS</xComp>
+                           </Comp>
+                           <vContrato>1000.00</vContrato>
+                           <indPag>1</indPag>
+                           <infPrazo>
+                              <nParcela>001</nParcela>
+                              <dVenc>2025-11-11</dVenc>
+                              <vParcela>1000.00</vParcela>
+                           </infPrazo>
+                           <infBanc>
+                              <PIX>00112233445566</PIX>
+                           </infBanc>
+                        </infPag>
+                    </infANTT>
+                    <veicTracao>
+                        <placa>RB09832</placa>
+                        <RENAVAM>09022129834</RENAVAM>
+                        <tara>2100</tara>
+                        <capKG>16000</capKG>
+                        <capM3>37</capM3>
+                        <condutor>
+                            <xNome>CONDUTOR TESTE</xNome>
+                            <CPF>92309230203</CPF>
+                        </condutor>
+                        <condutor>
+                            <xNome>CONDUTOR TESTE 1</xNome>
+                            <CPF>92309230203</CPF>
+                        </condutor>
+                        <condutor>
+                            <xNome>CONDUTOR TESTE 2</xNome>
+                            <CPF>92309230203</CPF>
+                        </condutor>
+                        <tpRod>02</tpRod>
+                        <tpCar>02</tpCar>
+                        <UF>SC</UF>
+                    </veicTracao>
+                </rodo>
+            </infModal>
+            <infDoc>
+                <infMunDescarga>
+                    <cMunDescarga>0909233</cMunDescarga>
+                    <xMunDescarga>BRUSQUE</xMunDescarga>
+                    <infNFe>
+                        <chNFe>09429847849344792357634954023782021734928955</chNFe>
+                    </infNFe>
+                    <infNFe>
+                        <chNFe>08429847849344792357634954023782021734928955</chNFe>
+                    </infNFe>
+                    <infNFe>
+                        <chNFe>09429847849344792357634954023782021734928955</chNFe>
+                    </infNFe>
+                    <infNFe>
+                        <chNFe>08429847849344792357634954023782021734928955</chNFe>
+                    </infNFe>
+                </infMunDescarga>
+            </infDoc>
+            <tot>
+                <qNFe>2</qNFe>
+                <vCarga>41873.80</vCarga>
+                <cUnid>01</cUnid>
+                <qCarga>7033.1300</qCarga>
+            </tot>
+            <autXML>
+                <CNPJ>DVV96V6G000101</CNPJ>
+            </autXML>
+            <infAdic>
+                    <infAdFisco>AUTORIZACAO SISTEMA TESTE LTDA: MOTORISTA 111.222.333-44: 999999/2026 2026-03-24 - PLACA ABC1D23 : 654321 2026-04-01 \\n TOTAL DE NOTAS FISCAIS: 2 - LACRES: 987654&amp;#10;&amp;#10; PLACA ABC1D23 - RENAVAM 12345678901 FROTA Pref.: 001 - PROPRIETARIO TESTE TESTE - IE ISENTO - RNTRC 12345678&amp;#13;&amp;#10;&amp;#13;&amp;#10; PLACA ABC1D23 - RENAVAM 12345678901 FROTA Pref.: 001 ; TOTAL MERCADORIA P/ AVERBACAO: 12345.67; TOTAL MERCADORIA CLIENTE SEGURO PROPRIO (RCFDC): 10.0; FRETE CIF: 100.0 - FRETE FOB: 200.0 - FRETE TERC: 300.0; T = TIPO DE FRETE (C-CIF, F-FOB, T-TERCEIRO); TEXTO FICTICIO PARA TESTE DE LIMITE DO PDF E QUEBRA DE LINHA; DESTINO DA PRESTACAO: AV EXEMPLO, 100, CENTRO, CIDADE TESTE/SC/(48) 3000-0000 UFS DO PERCURSO: SC/PR; DADOS FICTICIOS PARA HOMOLOGACAO;LINHA 1;LINHA 2;LINHA 3;LINHA 4;LINHA 5;LINHA 6;LINHA 7</infAdFisco>
+                <infCpl>Informações Complementares</infCpl>
+            </infAdic>
+        </infMDFe>
+        <infMDFeSupl>
+            <qrCodMDFe>
+                https://dfe-portal.svrs.rs.gov.br/mdfe/QRCode?chMDFe=42240802582975000109580010000000151908765432&amp;tpAmb=1
+            </qrCodMDFe>
+        </infMDFeSupl>
+    </MDFe>
+    <protMDFe versao="3.00" xmlns="http://www.portalfiscal.inf.br/mdfe">
+        <infProt Id="MDFe942240018699639">
+            <tpAmb>1</tpAmb>
+            <chMDFe>42240802582975000109580010000000151908765432</chMDFe>
+            <dhRecbto>2024-08-09T13:43:42-03:00</dhRecbto>
+            <nProt>942240018699639</nProt>
+            <digVal>KGdmh/XYMKRySFCfXZat4VFHo7g=</digVal>
+            <cStat>100</cStat>
+            <xMotivo>Autorizado o uso do MDF-e</xMotivo>
+        </infProt>
+    </protMDFe>
+</mdfeProc>

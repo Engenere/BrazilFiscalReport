@@ -43,6 +43,14 @@ def extract_text(node: Element, tag: str) -> str:
     return get_tag_text(node, URL, tag)
 
 
+def to_float(value: str) -> float:
+    """Converte valor numérico cru do XML, tolerando ausência/formato inválido."""
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return 0.0
+
+
 class Dacte(xFPDF):
     def __init__(self, xml, config: DacteConfig = None):
         super().__init__(unit="mm", format="A4")
@@ -357,7 +365,18 @@ class Dacte(xFPDF):
             w_text = w_rect - 4
         self.set_font(self.default_font, "B", 9)
         self.set_xy(x=x_text, y=y_text)
-        self.multi_cell(w=w_text, h=5, text=self.emit_name, border=0, align="C")
+        # O endereço abaixo é desenhado em Y fixo (y_text + 6), ou seja, só há uma
+        # linha de 5 mm reservada para o nome. Razão social longa quebrava em duas
+        # linhas e a segunda saía por cima da linha "CNPJ: ... IE: ...".
+        self.multi_cell(
+            w=w_text,
+            h=5,
+            text=self.long_field(
+                text=self.emit_name, limit=w_text, font_size=9, font_style="B"
+            ),
+            border=0,
+            align="C",
+        )
         self.set_font(self.default_font, "", 8)
         self.set_xy(x=x_text - 3, y=y_text + 6)
         self.multi_cell(w=w_text + 10, h=3, text=address, border=0, align="C")
@@ -1347,9 +1366,16 @@ class Dacte(xFPDF):
             self.cell(w=col_width / 2, h=4, text=titles[1], align="L")
 
         # Distribuir os componentes em 3 colunas com 3 linhas cada
-        col1 = self.comp_list[:3]  # Primeiros 3 componentes
-        col2 = self.comp_list[3:6]  # Próximos 3 componentes
-        col3 = self.comp_list[6:9]  # Últimos 3 componentes
+        comp_list = self.comp_list
+        # O bloco comporta no máximo 9 linhas; do 10º componente em diante o valor
+        # era simplesmente descartado, sem aviso. Agrega o excedente em "OUTROS"
+        # para que a soma exibida continue correspondendo ao que o XML declara.
+        if len(comp_list) > 9:
+            outros = sum(to_float(valor) for _, valor in comp_list[8:])
+            comp_list = comp_list[:8] + [("OUTROS", f"{outros:.2f}")]
+        col1 = comp_list[:3]  # Primeiros 3 componentes
+        col2 = comp_list[3:6]  # Próximos 3 componentes
+        col3 = comp_list[6:9]  # Últimos 3 componentes
 
         # Altura inicial para começo dos dados
         data_y = section_start_y + 6
@@ -1359,7 +1385,14 @@ class Dacte(xFPDF):
             current_y = data_y
             for comp in components:
                 self.set_xy(x_start, current_y)
-                self.cell(w=col_width / 2, h=4, text=comp[0], align="L")
+                # cell() não recorta nem quebra: nome largo invadia a coluna do
+                # valor, desenhada logo ao lado em posição absoluta.
+                self.cell(
+                    w=col_width / 2,
+                    h=4,
+                    text=self.long_field(text=comp[0], limit=col_width / 2),
+                    align="L",
+                )
                 self.set_xy(x_start + col_width / 2, current_y)
                 self.cell(w=col_width / 2, h=4, text=comp[1], align="L")
                 current_y += 4  # Incrementa a posição Y para o próximo item

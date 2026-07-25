@@ -152,3 +152,21 @@ def test_dacte_cnpj_alfanumerico(tmp_path, load_dacte):
     dacte = load_dacte("dacte_cnpj_alfanumerico.xml")
     pdf_path = get_pdf_output_path("dacte", "dacte_cnpj_alfanumerico")
     assert_pdf_equal(dacte, pdf_path, tmp_path)
+
+
+def test_dacte_icms_st_le_a_tag_correta(load_dacte):
+    """O campo ICMS ST deve vir de vICMSST, não de vICMS.
+
+    A fixture dacte_test_overload.xml declara vICMS=26.54 e vICMSST=20.00.
+    Antes da correção, v_icms_st repetia o vICMS (26,54) e o ICMS ST
+    declarado no XML nunca aparecia no DACTE.
+    """
+    dacte = load_dacte("dacte_test_overload.xml")
+    assert dacte.v_icms == "26,54"
+    assert dacte.v_icms_st == "20,00"
+
+
+def test_dacte_icms_st_zero_quando_nao_declarado(load_dacte):
+    """Sem vICMSST no XML (ex.: CST 00), o ICMS ST é zero — não o ICMS próprio."""
+    dacte = load_dacte("dacte_test_1.xml")
+    assert dacte.v_icms_st == "0,00"

@@ -1,3 +1,4 @@
+from importlib import import_module
 from pathlib import Path
 
 import click
@@ -29,6 +30,102 @@ def get_default_issuer():
     }
 
 
+def _load_module(module_name):
+    try:
+        return import_module(f"brazilfiscalreport.{module_name}")
+    except ImportError:
+        click.echo(
+            f"Error: The brazilfiscalreport package "
+            f"or its {module_name} module is not installed."
+        )
+        return None
+
+
+def _resolve_output_path(xml_path):
+    return (Path.cwd() / xml_path.stem).with_suffix(".pdf")
+
+
+def _read_xml(xml_path):
+    with open(xml_path, encoding="utf-8") as xml_file:
+        return xml_file.read()
+
+
+def _resolve_logo(config_data):
+    logo = config_data.get("LOGO")
+    if not logo:
+        return None
+    logo_path = Path(logo).resolve()
+    if not logo_path.exists():
+        click.echo("Logo file not found, proceeding without logo.")
+        return None
+    return logo_path
+
+
+def _build_margins(config_data, margins_cls):
+    return margins_cls(
+        top=config_data.get("TOP_MARGIN", margins_cls.top),
+        right=config_data.get("RIGHT_MARGIN", margins_cls.right),
+        bottom=config_data.get("BOTTOM_MARGIN", margins_cls.bottom),
+        left=config_data.get("LEFT_MARGIN", margins_cls.left),
+    )
+
+
+def _generate_document(module_name, doc_label, xml, build_instance):
+    """
+    Shared driver for the `bfrep` subcommands: resolves the module, reads
+    the XML/config, delegates instance creation to `build_instance`
+    (signature differs per document type) and writes the output PDF.
+    """
+    module = _load_module(module_name)
+    if module is None:
+        return
+
+    config_data = load_config()
+    xml_path = Path(xml).resolve()
+    xml_content = _read_xml(xml_path)
+
+    instance = build_instance(module, config_data, xml_content)
+    output_path = _resolve_output_path(xml_path)
+    instance.output(output_path)
+    click.echo(f"{doc_label} generated successfully: {output_path}")
+
+
+def _build_dacce(module, config_data, xml_content):
+    issuer = config_data.get("ISSUER", get_default_issuer())
+    return module.DaCCe(xml=xml_content, emitente=issuer)
+
+
+def _build_danfe(module, config_data, xml_content):
+    config = module.DanfeConfig(
+        margins=_build_margins(config_data, module.Margins),
+        logo=_resolve_logo(config_data),
+    )
+    return module.Danfe(xml=xml_content, config=config)
+
+
+def _build_dacte(module, config_data, xml_content):
+    config = module.DacteConfig(
+        margins=_build_margins(config_data, module.Margins),
+        logo=_resolve_logo(config_data),
+    )
+    return module.Dacte(xml=xml_content, config=config)
+
+
+def _build_damdfe(module, config_data, xml_content):
+    config = module.DamdfeConfig(
+        margins=_build_margins(config_data, module.Margins),
+        logo=_resolve_logo(config_data),
+    )
+    return module.Damdfe(xml=xml_content, config=config)
+
+
+def _build_danfse(module, config_data, xml_content):
+    # DanfseConfig has no `logo` field: DANFSe always uses the embedded
+    # NFS-e brasão, so no logo resolution here.
+    config = module.DanfseConfig(margins=_build_margins(config_data, module.Margins))
+    return module.Danfse(xml=xml_content, config=config)
+
+
 @click.group()
 @click.version_option(
     __version__, "-v", "--version", message="bfrep version %(version)s"
@@ -40,185 +137,31 @@ def cli():
 @cli.command("dacce")
 @click.argument("xml", type=click.Path(exists=True))
 def generate_dacce(xml):
-    try:
-        from brazilfiscalreport import dacce
-    except ImportError:
-        click.echo(
-            "Error: The brazilfiscalreport package"
-            "or its dacce module is not installed."
-        )
-        return
-
-    config_data = load_config()
-    issuer = config_data.get("ISSUER", get_default_issuer())
-
-    xml_path = Path(xml).resolve()
-    output_path = Path.cwd() / xml_path.stem
-    output_path = output_path.with_suffix(".pdf")
-
-    with open(xml_path, encoding="utf-8") as xml_file:
-        xml_content = xml_file.read()
-
-    dacce_instance = dacce.DaCCe(xml=xml_content, emitente=issuer)
-    dacce_instance.output(output_path)
-    click.echo(f"DACCe generated successfully: {output_path}")
+    _generate_document("dacce", "DACCe", xml, _build_dacce)
 
 
 @cli.command("danfe")
 @click.argument("xml", type=click.Path(exists=True))
 def generate_danfe(xml):
-    try:
-        from brazilfiscalreport import danfe
-    except ImportError:
-        click.echo(
-            "Error: The brazilfiscalreport package"
-            "or its danfe module is not installed."
-        )
-        return
-
-    config_data = load_config()
-    logo = config_data.get("LOGO")
-    top = config_data.get("TOP_MARGIN", danfe.Margins.top)
-    right = config_data.get("RIGHT_MARGIN", danfe.Margins.right)
-    bottom = config_data.get("BOTTOM_MARGIN", danfe.Margins.bottom)
-    left = config_data.get("LEFT_MARGIN", danfe.Margins.left)
-
-    xml_path = Path(xml).resolve()
-    output_path = Path.cwd() / xml_path.stem
-    output_path = output_path.with_suffix(".pdf")
-    logo_path = Path(logo).resolve() if logo else None
-
-    if logo_path and not logo_path.exists():
-        click.echo("Logo file not found, proceeding without logo.")
-        logo_path = None
-
-    with open(xml_path, encoding="utf-8") as xml_file:
-        xml_content = xml_file.read()
-
-    config = danfe.DanfeConfig(
-        margins=danfe.Margins(top=top, right=right, bottom=bottom, left=left),
-        logo=logo_path,
-    )
-
-    danfe_instance = danfe.Danfe(xml=xml_content, config=config)
-    danfe_instance.output(output_path)
-    click.echo(f"DANFE generated successfully: {output_path}")
+    _generate_document("danfe", "DANFE", xml, _build_danfe)
 
 
 @cli.command("dacte")
 @click.argument("xml", type=click.Path(exists=True))
 def generate_dacte(xml):
-    try:
-        from brazilfiscalreport import dacte
-    except ImportError:
-        click.echo(
-            "Error: The brazilfiscalreport package"
-            "or its dacte module is not installed."
-        )
-        return
-
-    config_data = load_config()
-    logo = config_data.get("LOGO")
-    top = config_data.get("TOP_MARGIN", dacte.Margins.top)
-    right = config_data.get("RIGHT_MARGIN", dacte.Margins.right)
-    bottom = config_data.get("BOTTOM_MARGIN", dacte.Margins.bottom)
-    left = config_data.get("LEFT_MARGIN", dacte.Margins.left)
-
-    xml_path = Path(xml).resolve()
-    output_path = Path.cwd() / xml_path.stem
-    output_path = output_path.with_suffix(".pdf")
-    logo_path = Path(logo).resolve() if logo else None
-
-    if logo_path and not logo_path.exists():
-        click.echo("Logo file not found, proceeding without logo.")
-        logo_path = None
-
-    with open(xml_path, encoding="utf-8") as xml_file:
-        xml_content = xml_file.read()
-
-    config = dacte.DacteConfig(
-        margins=dacte.Margins(top=top, right=right, bottom=bottom, left=left),
-        logo=logo_path,
-    )
-
-    dacte_instance = dacte.Dacte(xml=xml_content, config=config)
-    dacte_instance.output(output_path)
-    click.echo(f"DACTE generated successfully: {output_path}")
+    _generate_document("dacte", "DACTE", xml, _build_dacte)
 
 
 @cli.command("damdfe")
 @click.argument("xml", type=click.Path(exists=True))
 def generate_damdfe(xml):
-    try:
-        from brazilfiscalreport import damdfe
-    except ImportError:
-        click.echo(
-            "Error: The brazilfiscalreport package "
-            "or its damdfe module is not installed."
-        )
-        return
-
-    config_data = load_config()
-    logo = config_data.get("LOGO")
-    top = config_data.get("TOP_MARGIN", damdfe.Margins.top)
-    right = config_data.get("RIGHT_MARGIN", damdfe.Margins.right)
-    bottom = config_data.get("BOTTOM_MARGIN", damdfe.Margins.bottom)
-    left = config_data.get("LEFT_MARGIN", damdfe.Margins.left)
-
-    xml_path = Path(xml).resolve()
-    output_path = Path.cwd() / xml_path.stem
-    output_path = output_path.with_suffix(".pdf")
-    logo_path = Path(logo).resolve() if logo else None
-
-    if logo_path and not logo_path.exists():
-        click.echo("Logo file not found, proceeding without logo.")
-        logo_path = None
-
-    with open(xml_path, encoding="utf-8") as xml_file:
-        xml_content = xml_file.read()
-
-    config = damdfe.DamdfeConfig(
-        margins=damdfe.Margins(top=top, right=right, bottom=bottom, left=left),
-        logo=logo_path,
-    )
-
-    damdfe_instance = damdfe.Damdfe(xml=xml_content, config=config)
-    damdfe_instance.output(output_path)
-    click.echo(f"DAMDFE generated successfully: {output_path}")
+    _generate_document("damdfe", "DAMDFE", xml, _build_damdfe)
 
 
 @cli.command("danfse")
 @click.argument("xml", type=click.Path(exists=True))
 def generate_danfse(xml):
-    try:
-        from brazilfiscalreport import danfse
-    except ImportError:
-        click.echo(
-            "Error: The brazilfiscalreport package"
-            "or its danfse module is not installed."
-        )
-        return
-
-    config_data = load_config()
-    top = config_data.get("TOP_MARGIN", danfse.Margins.top)
-    right = config_data.get("RIGHT_MARGIN", danfse.Margins.right)
-    bottom = config_data.get("BOTTOM_MARGIN", danfse.Margins.bottom)
-    left = config_data.get("LEFT_MARGIN", danfse.Margins.left)
-
-    xml_path = Path(xml).resolve()
-    output_path = Path.cwd() / xml_path.stem
-    output_path = output_path.with_suffix(".pdf")
-
-    with open(xml_path, encoding="utf-8") as xml_file:
-        xml_content = xml_file.read()
-
-    config = danfse.DanfseConfig(
-        margins=danfse.Margins(top=top, right=right, bottom=bottom, left=left)
-    )
-
-    danfse_instance = danfse.Danfse(xml=xml_content, config=config)
-    danfse_instance.output(output_path)
-    click.echo(f"DANFSE generated successfully: {output_path}")
+    _generate_document("danfse", "DANFSE", xml, _build_danfse)
 
 
 if __name__ == "__main__":

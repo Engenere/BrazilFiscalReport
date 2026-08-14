@@ -1310,7 +1310,12 @@ class Dacte(xFPDF):
         self.vbc = format_number(extract_text(self.imp, "vBC"), precision=2)
         self.p_icms = format_number(extract_text(self.imp, "pICMS"), precision=2)
         self.v_icms = format_number(extract_text(self.imp, "vICMS"), precision=2)
-        self.v_icms_st = format_number(extract_text(self.imp, "vICMS"), precision=2)
+        # vICMSSTRet (grupo ICMS60) é o único campo de ST do leiaute do CT-e —
+        # aqui vinha o vICMS, ou seja, o ICMS próprio impresso na coluna ICMS ST.
+        # Ausente (CST 00, 20, 45, 90...), format_number devolve "0,00".
+        self.v_icms_st = format_number(
+            extract_text(self.imp, "vICMSSTRet"), precision=2
+        )
         self.p_red_bc = format_number(extract_text(self.imp, "pRedBC"), precision=2)
         g_ibscbs = (
             self.imp_ibscbs.find(f"{URL}gIBSCBS")

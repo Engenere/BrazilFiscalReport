@@ -1361,7 +1361,16 @@ class Dacte(xFPDF):
                 self.set_xy(x_start, current_y)
                 self.cell(w=col_width / 2, h=4, text=comp[0], align="L")
                 self.set_xy(x_start + col_width / 2, current_y)
-                self.cell(w=col_width / 2, h=4, text=comp[1], align="L")
+                # O vComp vinha cru do XML ("331.77"), enquanto o VALOR TOTAL DO
+                # SERVIÇO impresso na coluna ao lado já sai formatado ("1.234,56").
+                # Formatado aqui, e não em comp_list, para o valor seguir numérico
+                # para quem precisar somá-lo.
+                self.cell(
+                    w=col_width / 2,
+                    h=4,
+                    text=format_number(comp[1], precision=2),
+                    align="L",
+                )
                 current_y += 4  # Incrementa a posição Y para o próximo item
 
         # Imprime cada coluna

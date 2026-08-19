@@ -357,7 +357,18 @@ class Dacte(xFPDF):
             w_text = w_rect - 4
         self.set_font(self.default_font, "B", 9)
         self.set_xy(x=x_text, y=y_text)
-        self.multi_cell(w=w_text, h=5, text=self.emit_name, border=0, align="C")
+        # O endereço abaixo é desenhado em Y fixo (y_text + 6), ou seja, só há uma
+        # linha de 5 mm reservada para o nome. Razão social longa quebrava em duas
+        # linhas e a segunda saía por cima da linha "CNPJ: ... IE: ...".
+        self.multi_cell(
+            w=w_text,
+            h=5,
+            text=self.long_field(
+                text=self.emit_name, limit=w_text, font_size=9, font_style="B"
+            ),
+            border=0,
+            align="C",
+        )
         self.set_font(self.default_font, "", 8)
         self.set_xy(x=x_text - 3, y=y_text + 6)
         self.multi_cell(w=w_text + 10, h=3, text=address, border=0, align="C")
@@ -1359,7 +1370,16 @@ class Dacte(xFPDF):
             current_y = data_y
             for comp in components:
                 self.set_xy(x_start, current_y)
-                self.cell(w=col_width / 2, h=4, text=comp[0], align="L")
+                # cell() não recorta nem quebra: nome largo invadia a coluna do
+                # valor, desenhada logo ao lado em posição absoluta.
+                self.cell(
+                    w=col_width / 2,
+                    h=4,
+                    text=self.long_field(
+                        text=comp[0], limit=col_width / 2, font_size=8
+                    ),
+                    align="L",
+                )
                 self.set_xy(x_start + col_width / 2, current_y)
                 # O vComp vinha cru do XML ("331.77"), enquanto o VALOR TOTAL DO
                 # SERVIÇO impresso na coluna ao lado já sai formatado ("1.234,56").

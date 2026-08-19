@@ -5,6 +5,7 @@ import textwrap
 import warnings
 import xml.etree.ElementTree as ET
 from io import BytesIO
+from typing import Optional
 from xml.etree.ElementTree import Element
 
 from barcode.codex import Code128
@@ -41,6 +42,14 @@ from .dacte_conf import (
 
 def extract_text(node: Element, tag: str) -> str:
     return get_tag_text(node, URL, tag)
+
+
+def to_float(value: Optional[str]) -> float:
+    """Converte valor numérico cru do XML, tolerando ausência/formato inválido."""
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return 0.0
 
 
 class Dacte(xFPDF):
@@ -1358,9 +1367,19 @@ class Dacte(xFPDF):
             self.cell(w=col_width / 2, h=4, text=titles[1], align="L")
 
         # Distribuir os componentes em 3 colunas com 3 linhas cada
-        col1 = self.comp_list[:3]  # Primeiros 3 componentes
-        col2 = self.comp_list[3:6]  # Próximos 3 componentes
-        col3 = self.comp_list[6:9]  # Últimos 3 componentes
+        comp_list = self.comp_list
+        # O bloco comporta no máximo 9 linhas; do 10º componente em diante o valor
+        # era simplesmente descartado, sem aviso — e a soma dos componentes
+        # exibidos deixava de bater com o vTPrest impresso ao lado. Agrega o
+        # excedente numa linha "DEMAIS" para preservar a soma. O rótulo não é
+        # "OUTROS" porque xNome é texto livre e um componente real pode se
+        # chamar assim.
+        if len(comp_list) > 9:
+            demais = sum(to_float(valor) for _, valor in comp_list[8:])
+            comp_list = comp_list[:8] + [("DEMAIS", f"{demais:.2f}")]
+        col1 = comp_list[:3]  # Primeiros 3 componentes
+        col2 = comp_list[3:6]  # Próximos 3 componentes
+        col3 = comp_list[6:9]  # Últimos 3 componentes
 
         # Altura inicial para começo dos dados
         data_y = section_start_y + 6

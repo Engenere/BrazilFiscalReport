@@ -10,6 +10,4 @@ This is a fork of the [nfe_utils](https://github.com/edsonbernar/nfe_utils) proj
 For questions or support, feel free to open an issue or join the discussions in the repository. Contributions are welcome — see the [contributing guide](contributing.md).
 
 ## Maintainer 🛠️
-Developed and maintained by [Engenere](https://engenere.one/).
-
-[![Engenere](https://storage.googleapis.com/eng-imagens/logo-fundo-preto.webp)](https://engenere.one/)
+Developed and maintained by [Engenere](https://github.com/Engenere).

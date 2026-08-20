@@ -31,6 +31,17 @@ def textos_posicionados(pdf_bytes):
     return achados
 
 
+def valor_impresso(texto):
+    """Converte um valor como saiu no PDF ("1.740,00") em float, ou None.
+
+    Os componentes são desenhados formatados em pt-BR, então ler o número de
+    volta pede o caminho inverso — separador de milhar fora, vírgula por ponto.
+    """
+    if not re.fullmatch(r"\d{1,3}(?:\.\d{3})*,\d{2}", texto):
+        return None
+    return float(texto.replace(".", "").replace(",", "."))
+
+
 @pytest.fixture
 def xml_dacte(load_xml):
     return load_xml("dacte/dacte_test_1.xml")
@@ -56,7 +67,7 @@ def test_componentes_alem_do_nono_aparecem_agregados(xml_dacte):
     # Os 8 primeiros saem individualmente; do 9º ao 12º somam 90+100+110+120.
     assert "COMP 8" in texto
     assert "COMP 9" not in texto
-    assert "420.00" in texto, "a linha agregada não preserva a soma do excedente"
+    assert "420,00" in texto, "a linha agregada não preserva a soma do excedente"
 
 
 def test_nove_componentes_saem_sem_agregacao(xml_dacte):
@@ -85,11 +96,8 @@ def test_soma_dos_componentes_exibidos_bate_com_o_total(xml_dacte):
         # As 3 colunas partilham a baseline, então cada linha do quadro é somada
         # uma vez só — daí o set de baselines em vez de iterar sobre os nomes.
         baselines = {y for y, _, _ in exibidos}
-        total_exibido = sum(
-            to_float(v)
-            for y, _, v in trechos
-            if y in baselines and re.fullmatch(r"\d+\.\d{2}", v)
-        )
+        valores = (valor_impresso(v) for y, _, v in trechos if y in baselines)
+        total_exibido = sum(v for v in valores if v is not None)
 
         esperado = sum(i * 10 for i in range(1, quantidade + 1))
         assert total_exibido == esperado, (

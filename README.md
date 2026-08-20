@@ -120,6 +120,4 @@ BrazilFiscalReport is free software licensed under the [LGPL-3.0](https://github
 
 ## Maintainer
 
-Developed and maintained by [Engenere](https://engenere.one/). Issues and pull requests are welcome — see the [contributing guide](https://engenere.github.io/BrazilFiscalReport/contributing/).
-
-[![Engenere](https://storage.googleapis.com/eng-imagens/logo-fundo-preto.webp)](https://engenere.one/)
+Developed and maintained by [Engenere](https://github.com/Engenere). Issues and pull requests are welcome — see the [contributing guide](https://engenere.github.io/BrazilFiscalReport/contributing/).

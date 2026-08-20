@@ -152,3 +152,31 @@ def test_dacte_cnpj_alfanumerico(tmp_path, load_dacte):
     dacte = load_dacte("dacte_cnpj_alfanumerico.xml")
     pdf_path = get_pdf_output_path("dacte", "dacte_cnpj_alfanumerico")
     assert_pdf_equal(dacte, pdf_path, tmp_path)
+
+
+def test_dacte_icms_st(tmp_path, load_dacte):
+    """CT-e com ICMS retido por substituição tributária (CST 60)."""
+    dacte = load_dacte("dacte_icms_st.xml")
+    pdf_path = get_pdf_output_path("dacte", "dacte_icms_st")
+    assert_pdf_equal(dacte, pdf_path, tmp_path)
+
+
+def test_dacte_icms_st_le_vicmsstret(load_dacte):
+    """A coluna ICMS ST vem de vICMSSTRet, não do vICMS.
+
+    vICMSSTRet (grupo ICMS60) é o único campo de ST do leiaute do CT-e. Antes
+    o campo repetia o vICMS, ou seja, imprimia o ICMS próprio como se fosse ST.
+    """
+    dacte = load_dacte("dacte_icms_st.xml")
+    assert dacte.v_icms_st == "20,00"
+
+
+def test_dacte_icms_st_zero_quando_nao_declarado(load_dacte):
+    """Sem ST no XML (CST 00), a coluna é zero — não o ICMS próprio.
+
+    Era o caso mais grave: um CT-e sem substituição tributária nenhuma exibia
+    o vICMS na coluna ICMS ST, sugerindo uma ST que não existe.
+    """
+    dacte = load_dacte("dacte_test_1.xml")
+    assert dacte.v_icms == "26,54"
+    assert dacte.v_icms_st == "0,00"

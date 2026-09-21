@@ -126,6 +126,12 @@ def _build_danfse(module, config_data, xml_content):
     return module.Danfse(xml=xml_content, config=config)
 
 
+def _build_danfce(module, config_data, xml_content):
+    # DanfceConfig has no `logo` field
+    config = module.DanfceConfig(margins=_build_margins(config_data, module.Margins))
+    return module.Danfce(xml=xml_content, config=config)
+
+
 @click.group()
 @click.version_option(
     __version__, "-v", "--version", message="bfrep version %(version)s"
@@ -162,6 +168,12 @@ def generate_damdfe(xml):
 @click.argument("xml", type=click.Path(exists=True))
 def generate_danfse(xml):
     _generate_document("danfse", "DANFSE", xml, _build_danfse)
+
+
+@cli.command("danfce")
+@click.argument("xml", type=click.Path(exists=True))
+def generate_danfce(xml):
+    _generate_document("danfce", "DANFCE", xml, _build_danfce)
 
 
 if __name__ == "__main__":

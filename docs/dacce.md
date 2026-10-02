@@ -32,6 +32,12 @@ DACCe (Auxiliary Document of the Electronic Correction Letter) is a printed repr
     !!! note
         The `dacce` command reads the issuer data from the `ISSUER` section of a `config.yaml` in the working directory — see the [CLI documentation](cli.md). Without it, placeholder issuer data is printed on the PDF. Adding a logo via CLI is not supported for DACCe; use the Python API.
 
+## Output notes
+
+- The recipient is printed as **CNPJ** (`CNPJDest`) or, for an individual, as **CPF** (`CPFDest`).
+- Events registered in the homologation environment (`tpAmb` = 2) get a **SEM VALOR FISCAL** watermark, like the DANFE.
+- Line breaks in the correction text are kept, including `\n` sent as a literal backslash and `n`.
+
 ## Customizing DACCe 🎨
 
 The `DaCCe` class accepts the following parameters:
@@ -52,7 +58,7 @@ The `DaCCe` class accepts the following parameters:
 
 - **Type**: `dict` or `None`
 - **Description**: A dictionary containing the issuer (emitente) information. When provided, the issuer details are displayed in the header of the DACCe. All six keys are required when the dictionary is provided; missing keys raise a `KeyError`.
-- **Keys**: `nome`, `end`, `bairro`, `cidade`, `uf`, `fone`
+- **Keys**: `nome`, `end`, `bairro`, `cidade`, `uf`, `fone`. Optional: `cnpj` and `ie`, printed in an extra line of the header when present.
 - **Example**:
     ```python
     emitente = {
@@ -62,6 +68,8 @@ The `DaCCe` class accepts the following parameters:
         "cidade": "SÃO PAULO",
         "uf": "SP",
         "fone": "(11) 1234-5678",
+        "cnpj": "01234567890123",  # optional
+        "ie": "123456789012",  # optional
     }
     ```
 - **Default**: `None` (no issuer info displayed).

@@ -32,6 +32,12 @@ DACCe (Documento Auxiliar da Carta de Correção Eletrônica) é uma representa�
     !!! note
         O comando `dacce` lê os dados do emitente da seção `ISSUER` de um `config.yaml` no diretório de trabalho — veja a [documentação do CLI](cli.md). Sem ele, dados fictícios de emitente são impressos no PDF. Adicionar logo via CLI não é suportado para o DACCe; use a API Python.
 
+## Notas sobre a saída
+
+- O destinatário é impresso como **CNPJ** (`CNPJDest`) ou, no caso de pessoa física, como **CPF** (`CPFDest`).
+- Eventos registrados em homologação (`tpAmb` = 2) recebem a marca d'água **SEM VALOR FISCAL**, como no DANFE.
+- As quebras de linha do texto da correção são mantidas, inclusive `\n` enviado como barra invertida literal seguida de `n`.
+
 ## Personalizando o DACCe 🎨
 
 A classe `DaCCe` aceita os seguintes parâmetros:
@@ -52,7 +58,7 @@ A classe `DaCCe` aceita os seguintes parâmetros:
 
 - **Tipo**: `dict` ou `None`
 - **Descrição**: Um dicionário contendo as informações do emitente. Quando fornecido, os dados do emitente são exibidos no cabeçalho do DACCe. Todas as seis chaves são obrigatórias quando o dicionário é informado; chaves ausentes geram `KeyError`.
-- **Chaves**: `nome`, `end`, `bairro`, `cidade`, `uf`, `fone`
+- **Chaves**: `nome`, `end`, `bairro`, `cidade`, `uf`, `fone`. Opcionais: `cnpj` e `ie`, impressos em uma linha extra do cabeçalho quando informados.
 - **Exemplo**:
     ```python
     emitente = {
@@ -62,6 +68,8 @@ A classe `DaCCe` aceita os seguintes parâmetros:
         "cidade": "SÃO PAULO",
         "uf": "SP",
         "fone": "(11) 1234-5678",
+        "cnpj": "01234567890123",  # opcional
+        "ie": "123456789012",  # opcional
     }
     ```
 - **Padrão**: `None` (nenhuma informação do emitente exibida).

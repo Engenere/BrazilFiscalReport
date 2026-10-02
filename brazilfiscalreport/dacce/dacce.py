@@ -38,12 +38,20 @@ class DaCCe(xFPDF):
 
         self.add_page(orientation="P", format="A4")
 
+        # Homologation watermark (drawn first, so the text stays on top of it)
+        tp_amb = get_tag_text(node=inf_ret_Event, url=URL, tag="tpAmb") or get_tag_text(
+            node=inf_event, url=URL, tag="tpAmb"
+        )
+        if tp_amb == "2":
+            self._draw_homologation_watermark()
+
         # Emitente
         self.rect(x=10, y=10, w=190, h=33, style="")
         self.line(90, 10, 90, 43)
 
         text = ""
         emitente_nome = ""
+        shift = 0
         if emitente:
             emitente_nome = emitente["nome"]
             text = (
@@ -51,6 +59,16 @@ class DaCCe(xFPDF):
                 f"{emitente['bairro']}\n"
                 f"{emitente['cidade']} - {emitente['uf']} {emitente['fone']}"
             )
+            # Optional keys: CNPJ and IE of the issuer
+            ids = []
+            if emitente.get("cnpj"):
+                ids.append(f"CNPJ: {format_cpf_cnpj(emitente['cnpj'])}")
+            if emitente.get("ie"):
+                ids.append(f"IE: {emitente['ie']}")
+            if ids:
+                text += "\n" + "  ".join(ids)
+                # Four lines do not fit below the name at the usual position
+                shift = 3
 
         if image:
             col_ = 23
@@ -62,10 +80,10 @@ class DaCCe(xFPDF):
             col_end = 24
             w_ = 80
 
-        self.set_xy(x=col_, y=16)
+        self.set_xy(x=col_, y=16 - shift)
         self.set_font("Helvetica", "B", 10)
         self.multi_cell(w=w_, h=4, text=emitente_nome, border=0, align="C", fill=False)
-        self.set_xy(x=11, y=col_end)
+        self.set_xy(x=11, y=col_end - shift)
         self.set_font("Helvetica", "", 8)
         self.multi_cell(w=80, h=4, text=text, border=0, align="C", fill=False)
 
@@ -128,9 +146,13 @@ class DaCCe(xFPDF):
 
         self.set_font("Helvetica", "B", 9)
 
-        text = "CNPJ Destinatário:  %s" % format_cpf_cnpj(
-            get_tag_text(node=inf_ret_Event, url=URL, tag="CNPJDest")
-        )
+        cnpj_dest = get_tag_text(node=inf_ret_Event, url=URL, tag="CNPJDest")
+        cpf_dest = get_tag_text(node=inf_ret_Event, url=URL, tag="CPFDest")
+        if cpf_dest and not cnpj_dest:
+            label, doc_dest = "CPF", cpf_dest
+        else:
+            label, doc_dest = "CNPJ", cnpj_dest
+        text = f"{label} Destinatário:  {format_cpf_cnpj(doc_dest or '')}"
         self.text(x=12, y=71, text=text)
 
         text = (
@@ -152,13 +174,15 @@ class DaCCe(xFPDF):
         self.rect(x=10, y=104, w=190, h=170, style="")
 
         self.set_xy(x=11, y=106)
-        text = get_tag_text(node=det_event, url=URL, tag="xCorrecao")
+        text = get_tag_text(node=det_event, url=URL, tag="xCorrecao") or ""
+        # Some issuers send the line breaks as a literal backslash + n
+        text = text.replace("\\r\\n", "\n").replace("\\n", "\n")
         self.multi_cell(w=185, h=4, text=text, border=0, align="L", fill=False)
 
         self.set_xy(x=11, y=265)
         text = (
             "Este documento é uma representação gráfica da CC-e e "
-            "foi impresso apenas para sua informação e não possue validade "
+            "foi impresso apenas para sua informação e não possui validade "
             "fiscal.\nA CC-e deve ser recebida e mantida em arquivo "
             "eletrônico XML e pode ser consultada através dos portais "
             "das SEFAZ."
@@ -166,3 +190,17 @@ class DaCCe(xFPDF):
 
         self.set_font("Helvetica", "I", 8)
         self.multi_cell(w=185, h=4, text=text, border=0, align="C", fill=False)
+
+    def _draw_homologation_watermark(self):
+        """Draw the "SEM VALOR FISCAL" watermark, as the DANFE does."""
+        watermark_text = "SEM VALOR FISCAL"
+        font_size = 50
+        self.set_font("Helvetica", "B", font_size)
+        width = self.get_string_width(watermark_text)
+        height = font_size * 0.25
+        x_center = (self.w - width) / 2
+        y_center = (self.h + height) / 2
+        self.set_text_color(r=220, g=150, b=150)
+        with self.rotation(55, x_center + (width / 2), y_center - (height / 2)):
+            self.text(x_center, y_center, watermark_text)
+        self.set_text_color(r=0, g=0, b=0)

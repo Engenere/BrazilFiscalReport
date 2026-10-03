@@ -10,9 +10,9 @@
 
 Python library for generating Brazilian auxiliary fiscal documents in PDF from XML documents.
 
-Every Brazilian electronic invoice is issued by the tax authority as an XML file. This library turns that XML into the official, printable PDF that has to accompany the goods or service: **NF-e → DANFE**, **CT-e → DACTE**, **MDF-e → DAMDFE** and **NFS-e → DANFSe**. It also renders the **DACCe**, the printout for the NF-e correction-letter event (CC-e).
+Every Brazilian electronic invoice is issued by the tax authority as an XML file. This library turns that XML into the official, printable PDF that has to accompany the goods or service: **NF-e → DANFE**, **CT-e → DACTE**, **MDF-e → DAMDFE**, **NFS-e → DANFSe** and **NFC-e → DANFCe**. It also renders the **DACCe**, the printout for the NF-e correction-letter event (CC-e).
 
-> 🇧🇷 Biblioteca Python para gerar em PDF os documentos fiscais auxiliares — **DANFE**, **DACTE**, **DAMDFE** e **DANFSe** — a partir do XML de NF-e, CT-e, MDF-e e NFS-e. Também gera a **DACCe**, representação da carta de correção (CC-e) da NF-e. **[Documentação em português →](https://engenere.github.io/BrazilFiscalReport/pt/)**
+> 🇧🇷 Biblioteca Python para gerar em PDF os documentos fiscais auxiliares — **DANFE**, **DACTE**, **DAMDFE**, **DANFSe** e **DANFCe** — a partir do XML de NF-e, CT-e, MDF-e, NFS-e e NFC-e. Também gera a **DACCe**, representação da carta de correção (CC-e) da NF-e. **[Documentação em português →](https://engenere.github.io/BrazilFiscalReport/pt/)**
 
 **[Documentation](https://engenere.github.io/BrazilFiscalReport/)** | **[PyPI](https://pypi.org/project/BrazilFiscalReport/)** | **[Try it Online](https://brazilfiscalreport.streamlit.app)**
 
@@ -20,29 +20,32 @@ Every Brazilian electronic invoice is issued by the tax authority as an XML file
 
 <table>
   <tr>
-    <td align="center" width="25%"><a href="https://engenere.github.io/BrazilFiscalReport/danfe/"><b>DANFE</b></a></td>
-    <td align="center" width="25%"><a href="https://engenere.github.io/BrazilFiscalReport/dacte/"><b>DACTE</b></a></td>
-    <td align="center" width="25%"><a href="https://engenere.github.io/BrazilFiscalReport/damdfe/"><b>DAMDFE</b></a></td>
-    <td align="center" width="25%"><a href="https://engenere.github.io/BrazilFiscalReport/danfse/"><b>DANFSe</b></a></td>
+    <td align="center" width="20%"><a href="https://engenere.github.io/BrazilFiscalReport/danfe/"><b>DANFE</b></a></td>
+    <td align="center" width="20%"><a href="https://engenere.github.io/BrazilFiscalReport/dacte/"><b>DACTE</b></a></td>
+    <td align="center" width="20%"><a href="https://engenere.github.io/BrazilFiscalReport/damdfe/"><b>DAMDFE</b></a></td>
+    <td align="center" width="20%"><a href="https://engenere.github.io/BrazilFiscalReport/danfse/"><b>DANFSe</b></a></td>
+    <td align="center" width="20%"><a href="https://engenere.github.io/BrazilFiscalReport/danfce/"><b>DANFCe</b></a></td>
   </tr>
   <tr>
     <td align="center"><a href="https://engenere.github.io/BrazilFiscalReport/danfe/"><img src="https://raw.githubusercontent.com/Engenere/BrazilFiscalReport/main/docs/assets/screenshots/danfe.png" alt="DANFE generated in PDF" width="150"></a></td>
     <td align="center"><a href="https://engenere.github.io/BrazilFiscalReport/dacte/"><img src="https://raw.githubusercontent.com/Engenere/BrazilFiscalReport/main/docs/assets/screenshots/dacte.png" alt="DACTE generated in PDF" width="150"></a></td>
     <td align="center"><a href="https://engenere.github.io/BrazilFiscalReport/damdfe/"><img src="https://raw.githubusercontent.com/Engenere/BrazilFiscalReport/main/docs/assets/screenshots/damdfe.png" alt="DAMDFE generated in PDF" width="150"></a></td>
     <td align="center"><a href="https://engenere.github.io/BrazilFiscalReport/danfse/"><img src="https://raw.githubusercontent.com/Engenere/BrazilFiscalReport/main/docs/assets/screenshots/danfse.png" alt="DANFSe generated in PDF" width="150"></a></td>
+    <td align="center"><a href="https://engenere.github.io/BrazilFiscalReport/danfce/"><img src="https://raw.githubusercontent.com/Engenere/BrazilFiscalReport/main/docs/assets/screenshots/danfce.png" alt="DANFCe generated in PDF" width="150"></a></td>
   </tr>
   <tr>
     <td align="center"><sub><b>NF-e</b> → PDF<br>Electronic invoice (goods)</sub></td>
     <td align="center"><sub><b>CT-e</b> → PDF<br>Freight bill</sub></td>
     <td align="center"><sub><b>MDF-e</b> → PDF<br>Cargo manifest</sub></td>
     <td align="center"><sub><b>NFS-e</b> → PDF<br>Service invoice</sub></td>
+    <td align="center"><sub><b>NFC-e</b> → PDF<br>Consumer receipt</sub></td>
   </tr>
 </table>
 
 ## Why BrazilFiscalReport?
 
 - 🐍 **Pure Python** — built on [fpdf2](https://github.com/py-pdf/fpdf2); no wkhtmltopdf, no headless browser, no HTML templates
-- 📄 **4 document types** — DANFE, DACTE, DAMDFE and DANFSe (plus the DACCe correction-letter event), straight from the official XML
+- 📄 **5 document types** — DANFE, DACTE, DAMDFE, DANFSe and DANFCe (plus the DACCe correction-letter event), straight from the official XML
 - 🎨 **Customizable** — issuer logo, margins, fonts, decimal precision, cancellation watermarks and more
 - ⚡ **3 ways to use it** — Python API, `bfrep` command line, or the [online demo](https://brazilfiscalreport.streamlit.app)
 - ✅ **Python 3.10+** — tested on Python 3.10 through 3.14
@@ -59,8 +62,9 @@ This installs the core library with support for **DANFE** and **DACCe**. For add
 pip install 'brazilfiscalreport[dacte]'   # DACTE support (requires qrcode)
 pip install 'brazilfiscalreport[damdfe]'  # DAMDFE support (requires qrcode)
 pip install 'brazilfiscalreport[danfse]'  # DANFSe support (requires qrcode)
+pip install 'brazilfiscalreport[danfce]'  # DANFCe support (requires qrcode)
 pip install 'brazilfiscalreport[cli]'     # CLI tool
-pip install 'brazilfiscalreport[dacte,damdfe,danfse,cli]'  # All extras
+pip install 'brazilfiscalreport[dacte,damdfe,danfse,danfce,cli]'  # All extras
 ```
 
 ## Quick Start
@@ -77,7 +81,7 @@ danfe.output("danfe.pdf")
 
 > `nfe.xml` is the authorized XML your ERP or the SEFAZ portal returns once the invoice is approved.
 
-The same pattern works for every document type — import the matching class (`Dacte`, `Damdfe`, `Danfse`, `DaCCe`), pass the XML and call `.output()`.
+The same pattern works for every document type — import the matching class (`Dacte`, `Damdfe`, `Danfse`, `Danfce`, `DaCCe`), pass the XML and call `.output()`.
 
 ### Customization
 
@@ -110,7 +114,7 @@ pip install 'brazilfiscalreport[cli]'
 bfrep danfe nfe.xml        # writes nfe.pdf in the current folder
 ```
 
-`bfrep` ships one subcommand per document — `danfe`, `dacte`, `damdfe` and `danfse` (plus `dacce` for the NF-e correction letter) — each turning its XML into the matching PDF. Drop a `config.yaml` next to your files to set issuer data, logo and margins.
+`bfrep` ships one subcommand per document — `danfe`, `dacte`, `damdfe`, `danfse` and `danfce` (plus `dacce` for the NF-e correction letter) — each turning its XML into the matching PDF. Drop a `config.yaml` next to your files to set issuer data, logo and margins.
 
 See the [CLI documentation](https://engenere.github.io/BrazilFiscalReport/cli/) for all options.
 

@@ -55,6 +55,10 @@ damdfe = [
 danfse = [
     "qrcode",
 ]
+# DANFCe specific dependencies
+danfce = [
+    "qrcode",
+]
 # Dependencies CLI
 cli = [
     "click",

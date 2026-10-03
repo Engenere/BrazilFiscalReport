@@ -32,6 +32,12 @@ Some document types require additional packages:
     pip install 'brazilfiscalreport[danfse]'
     ```
 
+=== "DANFCe"
+
+    ```bash
+    pip install 'brazilfiscalreport[danfce]'
+    ```
+
 === "CLI"
 
     ```bash
@@ -41,7 +47,7 @@ Some document types require additional packages:
 === "All extras"
 
     ```bash
-    pip install 'brazilfiscalreport[dacte,damdfe,danfse,cli]'
+    pip install 'brazilfiscalreport[dacte,damdfe,danfse,danfce,cli]'
     ```
 
 ## Quick Start
@@ -112,6 +118,15 @@ The same pattern applies to all document types:
     danfse.output("danfse.pdf")
     ```
 
+=== "DANFCe"
+
+    ```python
+    from brazilfiscalreport.danfce import Danfce
+
+    danfce = Danfce(xml=xml_content)
+    danfce.output("danfce.pdf")
+    ```
+
 ### Using the CLI
 
 For quick generation from the terminal:
@@ -122,11 +137,12 @@ bfrep dacce /path/to/cce.xml
 bfrep dacte /path/to/cte.xml
 bfrep damdfe /path/to/mdfe.xml
 bfrep danfse /path/to/nfse.xml
+bfrep danfce /path/to/nfce.xml
 ```
 
 See the [CLI documentation](cli.md) for configuration options.
 
 ## Next steps
 
-- Learn about customization options for each document type: [DANFE](danfe.md), [DACTE](dacte.md), [DAMDFE](damdfe.md), [DACCe](dacce.md), [DANFSe](danfse.md)
+- Learn about customization options for each document type: [DANFE](danfe.md), [DACTE](dacte.md), [DAMDFE](damdfe.md), [DACCe](dacce.md), [DANFSe](danfse.md), [DANFCe](danfce.md)
 - Configure the [CLI](cli.md) for batch generation

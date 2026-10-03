@@ -73,12 +73,19 @@ def build_danfse():
     return Danfse(xml=read_fixture("danfse/nfse_test_prod.xml"))
 
 
+def build_danfce():
+    from brazilfiscalreport.danfce import Danfce
+
+    return Danfce(xml=read_fixture("danfce/danfce_default.xml"))
+
+
 BUILDERS = {
     "danfe": build_danfe,
     "dacce": build_dacce,
     "dacte": build_dacte,
     "damdfe": build_damdfe,
     "danfse": build_danfse,
+    "danfce": build_danfce,
 }
 
 

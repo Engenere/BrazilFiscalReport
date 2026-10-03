@@ -1,4 +1,4 @@
-Gere documentos DANFE, DACCe, DACTE, DAMDFE e DANFSe diretamente pelo terminal.
+Gere documentos DANFE, DACCe, DACTE, DAMDFE, DANFSe e DANFCe diretamente pelo terminal.
 O PDF é salvo no diretório de trabalho atual com o mesmo nome base do arquivo
 XML (ex.: `nfe.xml` → `nfe.pdf`), e você pode criar um arquivo `config.yaml`
 com detalhes do emitente e outras configurações.
@@ -51,6 +51,12 @@ bfrep damdfe /path/to/mdfe.xml
 bfrep danfse /path/to/nfse.xml
 ```
 
+### [DANFCe](danfce.md)
+
+```bash
+bfrep danfce /path/to/nfce.xml
+```
+
 ## Arquivo de Configuração ⚙️
 
 Crie um arquivo `config.yaml` no diretório onde você executa o comando. Este arquivo permite configurar detalhes do emitente, logo e margens.
@@ -80,8 +86,8 @@ Cada configuração se aplica a um conjunto diferente de comandos:
 | Configuração | Aplica-se a |
 |--------------|-------------|
 | `ISSUER` | apenas `dacce` |
-| `LOGO` | `danfe`, `dacte`, `damdfe` |
-| `TOP/RIGHT/BOTTOM/LEFT_MARGIN` | `danfe`, `dacte`, `damdfe`, `danfse` |
+| `LOGO` | `danfe`, `dacte`, `damdfe`, `danfce` |
+| `TOP/RIGHT/BOTTOM/LEFT_MARGIN` | `danfe`, `dacte`, `damdfe`, `danfse`, `danfce` |
 
 Se nenhum `config.yaml` for encontrado, os valores padrão são utilizados. Se o caminho do `LOGO` não existir, ele é ignorado com um aviso no console e o documento é gerado sem logo.
 

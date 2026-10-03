@@ -19,6 +19,7 @@ Biblioteca Python para geração de documentos fiscais auxiliares brasileiros em
 | [![Prévia do DAMDFE](assets/screenshots/damdfe.png){ width="120" }](damdfe.md) | [**DAMDFE**](damdfe.md) — Documento Auxiliar do Manifesto Eletrônico de Documentos Fiscais | MDF-e |
 | [![Prévia do DACCe](assets/screenshots/dacce.png){ width="120" }](dacce.md) | [**DACCe**](dacce.md) — Documento Auxiliar da Carta de Correção Eletrônica | CC-e |
 | [![Prévia do DANFSe](assets/screenshots/danfse.png){ width="120" }](danfse.md) | [**DANFSe**](danfse.md) — Documento Auxiliar da Nota Fiscal de Serviços Eletrônica | NFS-e |
+| [![Prévia do DANFCe](assets/screenshots/danfce.png){ width="120" }](danfce.md) | [**DANFCe**](danfce.md) — Documento Auxiliar da Nota Fiscal de Consumidor Eletrônica | NFC-e |
 
 ## Modos de Uso
 
@@ -45,4 +46,4 @@ Faça upload do seu XML fiscal e obtenha o PDF instantaneamente — sem precisar
 - [FPDF2](https://github.com/py-pdf/fpdf2) - Biblioteca de criação de PDF para Python
 - [phonenumbers](https://github.com/daviddrysdale/python-phonenumbers) - Formatação de números de telefone
 - [python-barcode](https://github.com/WhyNotHugo/python-barcode) - Geração de código de barras
-- [qrcode](https://github.com/lincolnloop/python-qrcode) - Geração de QR code (necessário para DACTE, DAMDFE e DANFSe)
+- [qrcode](https://github.com/lincolnloop/python-qrcode) - Geração de QR code (necessário para DACTE, DAMDFE, DANFSe e DANFCe)

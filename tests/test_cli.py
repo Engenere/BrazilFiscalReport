@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 from click.testing import CliRunner
 
@@ -31,3 +33,11 @@ def test_generate_damdfe(runner):
     xml_path = "tests/fixtures/damdfe/mdf-e_test_1.xml"
     result = runner.invoke(cli, ["damdfe", xml_path])
     assert result.exit_code == 0, result.output
+
+
+def test_generate_danfce(runner, tmp_path):
+    xml_path = Path("tests/fixtures/danfce/danfce_default.xml").resolve()
+    with runner.isolated_filesystem(temp_dir=tmp_path):
+        result = runner.invoke(cli, ["danfce", str(xml_path)])
+        assert result.exit_code == 0, result.output
+        assert Path("danfce_default.pdf").exists()

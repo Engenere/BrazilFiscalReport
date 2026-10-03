@@ -67,6 +67,14 @@ def chunks(cString, nLen):
         yield cString[start : start + nLen]
 
 
+def to_float(value):
+    """Converte valor numérico cru do XML, tolerando ausência/formato inválido."""
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return 0.0
+
+
 def format_number(cNumber, precision=0, group_sep=".", decimal_sep=","):
     if not cNumber:
         cNumber = "0"

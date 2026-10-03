@@ -20,6 +20,7 @@ from ..utils import (
     get_date_utc,
     get_tag_text,
     limit_text,
+    to_float,
 )
 from ..xfpdf import xFPDF
 from .config import DacteConfig, ModalType, ReceiptPosition
@@ -41,14 +42,6 @@ from .dacte_conf import (
 
 def extract_text(node: Element, tag: str) -> str:
     return get_tag_text(node, URL, tag)
-
-
-def to_float(value: str | None) -> float:
-    """Converte valor numérico cru do XML, tolerando ausência/formato inválido."""
-    try:
-        return float(value)
-    except (TypeError, ValueError):
-        return 0.0
 
 
 class Dacte(xFPDF):

@@ -53,6 +53,10 @@ plugins:
             Changelog: Changelog
             Contributing: Contribuindo
             About: Sobre
+            Tax Reform: Reforma Tributária
+            Overview: Visão geral
+            Research: Pesquisa
+            Roadmap: Roadmap
 
 markdown_extensions:
   - admonition
@@ -77,6 +81,10 @@ nav:
       - DAMDFE: damdfe.md
       - DACCe: dacce.md
       - DANFSE: danfse.md
+  - Tax Reform:
+      - Overview: reforma-tributaria/index.md
+      - Research: reforma-tributaria/research.md
+      - Roadmap: reforma-tributaria/roadmap.md
   - CLI: cli.md
   - Changelog: changelog.md
   - Contributing: contributing.md

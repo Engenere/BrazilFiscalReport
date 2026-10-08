@@ -12,3 +12,14 @@ updates:
       - dependency-name: qrcode
     commit-message:
       prefix: "CI"
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    # Um PR por mês com todas as actions, em vez de um por action.
+    groups:
+      actions:
+        patterns:
+          - "*"
+    commit-message:
+      prefix: "CI"

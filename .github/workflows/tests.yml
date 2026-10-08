@@ -20,9 +20,9 @@ jobs:
           - {name: "Python 3.13", python: "3.13", os: "ubuntu"}
           - {name: "Python 3.14", python: "3.14", os: "ubuntu"}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Set up Python ${{ matrix.python }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python }}
       - name: Install qpdf ⚙️
@@ -35,7 +35,7 @@ jobs:
         run: |
           pytest --cov=./brazilfiscalreport --cov-report=xml --cov-branch --doctest-glob="docs/*.md"
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v4.0.1
+        uses: codecov/codecov-action@v7.1.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: Engenere/BrazilFiscalReport

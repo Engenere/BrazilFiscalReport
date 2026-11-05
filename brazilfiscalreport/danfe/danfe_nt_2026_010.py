@@ -20,6 +20,7 @@ from ..utils import (
     get_date_utc,
     get_tag_text,
     merge_if_different,
+    summarize_volumes,
 )
 from ..xfpdf import xFPDF
 from .config import DanfeConfig, FontSize, InvoiceDisplay, ReceiptPosition
@@ -1555,13 +1556,22 @@ class DanfeNt2026010(xFPDF):
         veic_placa = extract_text(veic_transp, "placa")
         veic_uf = extract_text(veic_transp, "UF")
         veic_rntc = extract_text(veic_transp, "RNTC")
-        vol = self.transp.find(f"{URL}vol")
-        q_vol = extract_text(vol, "qVol")
-        esp = extract_text(vol, "esp")
-        marca = extract_text(vol, "marca")
-        n_vol = extract_text(vol, "nVol")
-        peso_b = format_number(extract_text(vol, "pesoB"), precision=3)
-        peso_l = format_number(extract_text(vol, "pesoL"), precision=3)
+        # A NF-e pode ter vários grupos vol; o DANFE tem uma linha só, com
+        # quantidade e pesos somados.
+        vol = summarize_volumes(self.transp.findall(f"{URL}vol"), URL)
+        font_size_cont = self.get_font_size("FONT_SIZE_CONT", True)
+        w_vol_esp = 30
+        w_vol_marca = 30
+        w_vol_n_vol = 45
+        esp = self.long_field(text=vol.esp, limit=w_vol_esp, font_size=font_size_cont)
+        marca = self.long_field(
+            text=vol.marca, limit=w_vol_marca, font_size=font_size_cont
+        )
+        n_vol = self.long_field(
+            text=vol.n_vol, limit=w_vol_n_vol, font_size=font_size_cont
+        )
+        peso_b = format_number(vol.peso_b, precision=3)
+        peso_l = format_number(vol.peso_l, precision=3)
 
         fields_line1 = [
             BaseFieldInfo(w=0, description="NOME / RAZÃO SOCIAL", content=name),
@@ -1593,10 +1603,10 @@ class DanfeNt2026010(xFPDF):
         ]
 
         fields_line3 = [
-            BaseFieldInfo(w=25, description="QUANTIDADE", content=q_vol),
-            BaseFieldInfo(w=30, description="ESPÉCIE", content=esp),
-            BaseFieldInfo(w=30, description="MARCA", content=marca),
-            BaseFieldInfo(w=45, description="NUMERAÇÃO", content=n_vol),
+            BaseFieldInfo(w=25, description="QUANTIDADE", content=vol.q_vol),
+            BaseFieldInfo(w=w_vol_esp, description="ESPÉCIE", content=esp),
+            BaseFieldInfo(w=w_vol_marca, description="MARCA", content=marca),
+            BaseFieldInfo(w=w_vol_n_vol, description="NUMERAÇÃO", content=n_vol),
             BaseFieldInfo(w=0, description="PESO BRUTO", content=peso_b),
             BaseFieldInfo(w=0, description="PESO LÍQUIDO", content=peso_l),
         ]
@@ -1606,7 +1616,7 @@ class DanfeNt2026010(xFPDF):
         lines = [fields_line1]
         if transporta is not None and len(transporta):
             lines.append(fields_line2)
-        if vol is not None and len(vol):
+        if any(vol):
             lines.append(fields_line3)
         block_transporte.rows_heights = (DEFAULT_FIELD_HEIGHT,) * len(lines)
         block_transporte.add_fields(lines)

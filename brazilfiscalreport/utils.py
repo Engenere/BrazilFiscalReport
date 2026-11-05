@@ -1,5 +1,7 @@
 import re
 import warnings
+from decimal import Decimal, InvalidOperation
+from typing import NamedTuple
 
 import phonenumbers
 from phonenumbers import PhoneNumberFormat
@@ -73,6 +75,55 @@ def to_float(value):
         return float(value)
     except (TypeError, ValueError):
         return 0.0
+
+
+class VolumesSummary(NamedTuple):
+    q_vol: str
+    esp: str
+    marca: str
+    n_vol: str
+    peso_b: str
+    peso_l: str
+
+
+def summarize_volumes(volumes, url=""):
+    """Reúne os grupos ``vol`` da NF-e na única linha de volumes do DANFE.
+
+    O leiaute permite vários ``vol`` em ``transp``, mas o DANFE tem uma linha
+    só (MOC 7.0, campos X27 a X32). ``qVol``, ``pesoB`` e ``pesoL`` são
+    somados; ``esp``, ``marca`` e ``nVol`` repetem o valor quando ele é o mesmo
+    em todos os volumes e listam os valores distintos, separados por vírgula,
+    quando diferem. Só o que consta do XML é impresso (MOC 7.0, item 3.1). Com
+    um único ``vol`` o resultado é o conteúdo dele, sem alteração.
+    """
+
+    def distinct(tag):
+        values = []
+        for volume in volumes:
+            text = get_tag_text(volume, url, tag)
+            if text and text not in values:
+                values.append(text)
+        return ", ".join(values)
+
+    def total(tag, precision):
+        amounts = []
+        for volume in volumes:
+            try:
+                amounts.append(Decimal(get_tag_text(volume, url, tag)))
+            except InvalidOperation:
+                continue
+        if not amounts:
+            return ""
+        return f"{sum(amounts):.{precision}f}"
+
+    return VolumesSummary(
+        q_vol=total("qVol", 0),
+        esp=distinct("esp"),
+        marca=distinct("marca"),
+        n_vol=distinct("nVol"),
+        peso_b=total("pesoB", 3),
+        peso_l=total("pesoL", 3),
+    )
 
 
 def format_number(cNumber, precision=0, group_sep=".", decimal_sep=","):

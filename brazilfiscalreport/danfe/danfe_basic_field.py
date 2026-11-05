@@ -50,16 +50,20 @@ class DanfeBasicField(Element):
         h_font_desc = pdf.get_font_size("H_FONT_DESC")
         font_size_cont = pdf.get_font_size("FONT_SIZE_CONT", True)
 
-        # Description Cell
-        pdf.set_font(pdf.default_font, "", font_size_desc)
-        pdf.cell(
-            w=self.w,
-            h=h_font_desc,
-            text=self.description,
-            new_x="LEFT",
-            new_y="NEXT",
-            align="L",
-        )
+        # Description Cell. A field without description (a row that continues
+        # a table, like the extra volume lines) starts at the content.
+        if self.description:
+            pdf.set_font(pdf.default_font, "", font_size_desc)
+            pdf.cell(
+                w=self.w,
+                h=h_font_desc,
+                text=self.description,
+                new_x="LEFT",
+                new_y="NEXT",
+                align="L",
+            )
+        else:
+            h_font_desc = 0
 
         if self.type in ["protocolo", "chave_acesso"]:
             pdf.set_font(pdf.default_font, "B", font_size_cont)

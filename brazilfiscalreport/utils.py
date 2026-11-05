@@ -75,6 +75,30 @@ def to_float(value):
         return 0.0
 
 
+def describe_volumes(volumes, url=""):
+    """Descreve grupos ``vol`` da NF-e em texto, para as informações
+    complementares do DANFE: "4 CAIXA, marca ACME, nº 001, peso bruto 12,000,
+    peso líquido 10,500; 10 PALETE, peso bruto 30,000, peso líquido 26,000".
+    """
+    descriptions = []
+    for volume in volumes:
+        q_vol = get_tag_text(volume, url, "qVol")
+        esp = get_tag_text(volume, url, "esp")
+        marca = get_tag_text(volume, url, "marca")
+        n_vol = get_tag_text(volume, url, "nVol")
+        peso_b = get_tag_text(volume, url, "pesoB")
+        peso_l = get_tag_text(volume, url, "pesoL")
+        parts = [
+            " ".join(text for text in (q_vol, esp) if text),
+            f"marca {marca}" if marca else "",
+            f"nº {n_vol}" if n_vol else "",
+            f"peso bruto {format_number(peso_b, precision=3)}" if peso_b else "",
+            f"peso líquido {format_number(peso_l, precision=3)}" if peso_l else "",
+        ]
+        descriptions.append(", ".join(part for part in parts if part))
+    return "; ".join(descriptions)
+
+
 def format_number(cNumber, precision=0, group_sep=".", decimal_sep=","):
     if not cNumber:
         cNumber = "0"

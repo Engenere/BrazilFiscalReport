@@ -2,6 +2,11 @@ URL = ".//{http://www.portalfiscal.inf.br/nfe}"
 DEFAULT_FIELD_HEIGHT = 6
 DEFAULT_HEIGHT_FONT_CONTENT = 3
 HEIGHT_FONT_BLOCK_DESC = 3
+# Carrier block: one volume line per vol group, the first one with the labels
+# and the next ones, shorter, with the values only. Beyond MAX_VOLUME_LINES the
+# volumes are listed in the additional data instead of growing the block.
+MAX_VOLUME_LINES = 5
+VOLUME_LINE_HEIGHT = 3.5
 # Product table: line height of the item rows (multiplied by the font size
 # factor), line height of the header row and inner padding of every cell.
 PRODUCT_LINE_HEIGHT = 2.5

@@ -469,3 +469,32 @@ def test_danfe_carrier_receipt_without_carrier(tmp_path, load_danfe):
     assert danfe.receipt_kinds == ["default"]
     pdf_path = get_pdf_output_path("danfe_moc_7_0", "danfe_default")
     assert_pdf_equal(danfe, pdf_path, tmp_path)
+
+
+def test_danfe_multiple_volumes(tmp_path, load_danfe):
+    """
+    With several vol groups, the volumes line sums quantity and weights and
+    lists the distinct species (issue #232).
+    """
+    danfe = load_danfe("nfe_multiple_volumes.xml")
+    pdf_path = get_pdf_output_path("danfe_moc_7_0", "danfe_multiple_volumes")
+    assert_pdf_equal(danfe, pdf_path, tmp_path)
+
+
+def test_danfe_many_volumes(tmp_path, load_xml):
+    """
+    Beyond MAX_VOLUME_LINES, the remaining volumes are listed in the
+    additional data instead of growing the carrier block.
+    """
+    xml = load_xml("danfe/nfe_multiple_volumes.xml")
+    extra = "".join(
+        f"<vol><qVol>{i}</qVol><esp>CAIXA</esp><marca>ACME</marca><nVol>{i:03d}"
+        f"</nVol><pesoL>1.000</pesoL><pesoB>1.500</pesoB></vol>"
+        for i in range(4, 12)
+    )
+    xml = xml.replace("</transp>", extra + "</transp>")
+    danfe = Danfe(xml=xml)
+    assert isinstance(danfe, DanfeMoc70)
+    assert len(danfe.volumes) == 11
+    pdf_path = get_pdf_output_path("danfe_moc_7_0", "danfe_many_volumes")
+    assert_pdf_equal(danfe, pdf_path, tmp_path)

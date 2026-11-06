@@ -53,6 +53,14 @@ def test_danfe_etiqueta_delivery_address(tmp_path, load_etiqueta):
     assert_pdf_equal(etiqueta, pdf_path, tmp_path)
 
 
+def test_danfe_etiqueta_logo(tmp_path, load_etiqueta, logo_path):
+    """The brand logo prints centered between the header and the issuer."""
+    config = DanfeEtiquetaConfig(logo=logo_path)
+    etiqueta = load_etiqueta("nfe_with_production_environment.xml", config=config)
+    pdf_path = get_pdf_output_path("danfe_etiqueta", "danfe_etiqueta_logo")
+    assert_pdf_equal(etiqueta, pdf_path, tmp_path)
+
+
 def test_danfe_etiqueta_items(tmp_path, load_etiqueta):
     """The items that do not fit on the label are counted in the last line."""
     config = DanfeEtiquetaConfig(display_items=True)

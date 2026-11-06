@@ -42,6 +42,7 @@ etiqueta = DanfeEtiqueta(xml=xml_content, config=config)
 | `paper_width`, `paper_height` | `100`, `150` | Tamanho da etiqueta em mm. A etiqueta térmica de 10 x 15 cm é a usual nos envios; a NT só exige largura mínima de **55 mm**. |
 | `margins` | `Margins(3, 3, 3, 3)` | Margens em mm. |
 | `font_type` | `FontType.TIMES` | `TIMES` ou `COURIER`. |
+| `logo`, `logo_height` | `None`, `12` | Logo da marca (caminho, bytes ou `BytesIO`), impresso centralizado entre o cabeçalho e os dados do emitente, com `logo_height` mm de altura, como nas etiquetas dos marketplaces. |
 | `display_total` | `True` | Imprime o valor total da NF-e (`vNF`), opcional desde a NT 2020.004 v1.10. |
 | `display_delivery_address` | `True` | Imprime o endereço do destinatário, ou o do grupo `entrega` (com o recebedor) quando a NF-e o tem. |
 | `display_items` | `False` | Lista os itens (código, descrição e quantidade). Os que não cabem são contados numa última linha, "E MAIS N ITEM(NS) NÃO LISTADO(S)". |

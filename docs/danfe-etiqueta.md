@@ -42,6 +42,7 @@ etiqueta = DanfeEtiqueta(xml=xml_content, config=config)
 | `paper_width`, `paper_height` | `100`, `150` | Label size in mm. The 10 x 15 cm thermal label is the usual shipping label; the NT only requires at least **55 mm** of width. |
 | `margins` | `Margins(3, 3, 3, 3)` | Margins in mm. |
 | `font_type` | `FontType.TIMES` | `TIMES` or `COURIER`. |
+| `logo`, `logo_height` | `None`, `12` | Brand logo (path, bytes or `BytesIO`), printed centered between the header and the issuer data, `logo_height` mm tall, as in the marketplace shipping labels. |
 | `display_total` | `True` | Prints the total value of the NF-e (`vNF`), optional since NT 2020.004 v1.10. |
 | `display_delivery_address` | `True` | Prints the recipient address, or the `entrega` group address (and receiver) when the NF-e has it. |
 | `display_items` | `False` | Lists the items (code, description and quantity). The items that don't fit are counted in a last line, "E MAIS N ITEM(NS) NÃO LISTADO(S)". |

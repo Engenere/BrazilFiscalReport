@@ -96,6 +96,7 @@ class DanfeEtiqueta(xFPDF):
 
         self.add_page()
         self._draw_watermark()
+        self._draw_logo()
         self._draw_header()
         self._draw_contingency()
         self._draw_emitter()
@@ -314,6 +315,25 @@ class DanfeEtiqueta(xFPDF):
             self.rotation(55, x + width / 2, y),
         ):
             self.text(x, y, text)
+
+    def _draw_logo(self):
+        """Brand logo in a box at the top of the label, above the header, as
+        in the marketplace shipping labels. The NT sets only the minimum
+        fields, so the logo is an optional extra."""
+        if not self.config.logo:
+            return
+        y = self.get_y()
+        height = self.config.logo_height + 2 * PADDING
+        self.rect(self.l_margin, y, self.epw, height)
+        self.image(
+            self.config.logo,
+            x=self.l_margin + PADDING,
+            y=y + PADDING,
+            w=self.epw - 2 * PADDING,
+            h=self.config.logo_height,
+            keep_aspect_ratio=True,
+        )
+        self.set_xy(self.l_margin, y + height)
 
     # Emitter, recipient, total and items
 

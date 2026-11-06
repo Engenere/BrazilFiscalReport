@@ -54,7 +54,7 @@ def test_danfe_etiqueta_delivery_address(tmp_path, load_etiqueta):
 
 
 def test_danfe_etiqueta_logo(tmp_path, load_etiqueta, logo_path):
-    """The brand logo prints centered between the header and the issuer."""
+    """The brand logo prints in a box at the top of the label, above the header."""
     config = DanfeEtiquetaConfig(logo=logo_path)
     etiqueta = load_etiqueta("nfe_with_production_environment.xml", config=config)
     pdf_path = get_pdf_output_path("danfe_etiqueta", "danfe_etiqueta_logo")

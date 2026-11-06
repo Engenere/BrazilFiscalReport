@@ -1,0 +1,3 @@
+# Sem comentário do Codecov nas PRs. O check de cobertura no status da PR
+# e o painel continuam.
+comment: false

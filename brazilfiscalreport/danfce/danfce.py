@@ -1,8 +1,6 @@
 import xml.etree.ElementTree as ET
 from xml.etree.ElementTree import Element
 
-from fpdf.enums import Align
-
 from ..generate_qrcode import draw_qr_code
 from ..utils import (
     chunks,
@@ -399,10 +397,13 @@ class Danfce(xFPDF):
     def _draw_logo(self):
         if not self.config.logo:
             return
+        # x numérico da caixa centralizada: com x=Align.C e keep_aspect_ratio o
+        # fpdf2 centraliza duas vezes e a logo estreita sai deslocada à direita.
+        box_w = self.epw * LOGO_MAX_WIDTH_RATIO
         self.image(
             self.config.logo,
-            x=Align.C,
-            w=self.epw * LOGO_MAX_WIDTH_RATIO,
+            x=(self.w - box_w) / 2,
+            w=box_w,
             h=LOGO_MAX_HEIGHT,
             keep_aspect_ratio=True,
         )

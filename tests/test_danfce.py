@@ -1,6 +1,8 @@
+import io
 import re
 
 import pytest
+from PIL import Image
 
 from brazilfiscalreport.danfce import Danfce, DanfceConfig, Margins
 from brazilfiscalreport.danfce.danfce import (
@@ -303,6 +305,21 @@ def test_danfce_with_logo(tmp_path, load_danfce, logo_path):
     danfce = load_danfce("danfce_default.xml", config=config)
     pdf_path = get_pdf_output_path("danfce", "danfce_logo")
     assert_pdf_equal(danfce, pdf_path, tmp_path)
+
+
+def test_danfce_narrow_logo_is_centered(load_danfce):
+    """
+    Logo mais estreita que a caixa (aqui, quadrada) também sai centralizada:
+    com x=Align.C e keep_aspect_ratio o fpdf2 centraliza duas vezes.
+    """
+    buf = io.BytesIO()
+    Image.new("RGB", (100, 100)).save(buf, "PNG")
+    danfce = load_danfce("danfce_default.xml", config=DanfceConfig(logo=buf))
+    danfce.set_compression(False)
+    content = bytes(danfce.output()).decode("latin-1")
+    # imagem é desenhada com "w 0 0 h x y cm"
+    w, _, _, _, x, _ = map(float, re.search(r"([\d.]+ ){6}cm", content)[0].split()[:6])
+    assert x + w / 2 == pytest.approx(danfce.w * danfce.k / 2, abs=0.01)
 
 
 def test_danfce_cancelled_watermark(tmp_path, load_danfce):

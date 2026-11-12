@@ -651,3 +651,13 @@ def test_danfe_carrier_receipt_without_carrier(tmp_path, load_danfe):
     assert danfe.receipt_kinds == ["default"]
     pdf_path = get_pdf_output_path("danfe", "danfe_default")
     assert_pdf_equal(danfe, pdf_path, tmp_path)
+
+
+def test_danfe_multiple_volumes(tmp_path, load_danfe):
+    """
+    With several vol groups, the volumes line sums quantity and weights and
+    lists the distinct species (issue #232).
+    """
+    danfe = load_danfe("nfe_multiple_volumes.xml")
+    pdf_path = get_pdf_output_path("danfe", "danfe_multiple_volumes")
+    assert_pdf_equal(danfe, pdf_path, tmp_path)

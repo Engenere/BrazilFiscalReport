@@ -53,3 +53,31 @@ class TestUtils(unittest.TestCase):
             with self.subTest(rate=rate):
                 self.assertEqual(expected, utils.format_rate(rate))
         self.assertEqual("8,665", utils.format_rate("8.665", suffix=""))
+
+
+class TestDescribeVolumes(unittest.TestCase):
+    URL = "{http://www.portalfiscal.inf.br/nfe}"
+
+    def volumes(self, xml):
+        from xml.etree import ElementTree
+
+        transp = ElementTree.fromstring(
+            f'<transp xmlns="http://www.portalfiscal.inf.br/nfe">{xml}</transp>'
+        )
+        return transp.findall(f"{self.URL}vol")
+
+    def test_describe_volumes(self):
+        vols = self.volumes(
+            "<vol><qVol>4</qVol><esp>CAIXA</esp><marca>ACME</marca>"
+            "<nVol>001</nVol><pesoL>10.500</pesoL><pesoB>12.000</pesoB></vol>"
+            "<vol><qVol>10</qVol><esp>PALETE</esp><pesoB>30.000</pesoB></vol>"
+            "<vol><esp>SACO</esp></vol>"
+        )
+        self.assertEqual(
+            utils.describe_volumes(vols, self.URL),
+            "4 CAIXA, marca ACME, nº 001, peso bruto 12,000, peso líquido 10,500; "
+            "10 PALETE, peso bruto 30,000; SACO",
+        )
+
+    def test_describe_no_volumes(self):
+        self.assertEqual(utils.describe_volumes([], self.URL), "")

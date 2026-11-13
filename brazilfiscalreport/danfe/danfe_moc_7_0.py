@@ -16,6 +16,7 @@ from fpdf.enums import Align, VAlign
 
 from ..utils import (
     chunks,
+    describe_volumes,
     format_cep,
     format_cpf_cnpj,
     format_number,
@@ -33,7 +34,9 @@ from .danfe_conf import (
     BASE_FONT_SIZES,
     DEFAULT_FIELD_HEIGHT,
     HEIGHT_FONT_BLOCK_DESC,
+    MAX_VOLUME_LINES,
     URL,
+    VOLUME_LINE_HEIGHT,
 )
 from .danfe_emit_info import DanfeEmitInfo
 from .danfe_ident_info import DanfeIdentInfo
@@ -118,6 +121,7 @@ class DanfeMoc70(xFPDF):
         self.entrega = root.find(f"{URL}entrega")
         self.totais = root.find(f"{URL}total")
         self.transp = root.find(f"{URL}transp")
+        self.volumes = [vol for vol in self.transp.findall(f"{URL}vol") if len(vol)]
         self.cobr = root.find(f"{URL}cobr")
         self.det = root.findall(f"{URL}det")
         self.inf_adic = root.find(f"{URL}infAdic")
@@ -484,6 +488,12 @@ class DanfeMoc70(xFPDF):
         dest_end, cpl, cpl_truncado = self._get_dest_end_text(self.dest)
         if cpl_truncado:
             obs += "Complemento do destinatário: " + cpl + "."
+        extra_volumes = self.volumes[MAX_VOLUME_LINES:]
+        if extra_volumes:
+            obs += (
+                f" Volumes {MAX_VOLUME_LINES + 1} a {len(self.volumes)}: "
+                f"{describe_volumes(extra_volumes, URL)}."
+            )
         if fisco:
             obs = f"{obs} {fisco}\n"
 
@@ -1368,11 +1378,6 @@ class DanfeMoc70(xFPDF):
 
     def _draw_shipping(self):
         block_transporte = DanfeBlock(
-            rows_heights=(
-                DEFAULT_FIELD_HEIGHT,
-                DEFAULT_FIELD_HEIGHT,
-                DEFAULT_FIELD_HEIGHT,
-            ),
             description="TRANSPORTADOR / VOLUMES TRANSPORTADOS",
             pdf=self,
         )
@@ -1397,13 +1402,6 @@ class DanfeMoc70(xFPDF):
         veic_placa = extract_text(veic_transp, "placa")
         veic_uf = extract_text(veic_transp, "UF")
         veic_rntc = extract_text(veic_transp, "RNTC")
-        vol = self.transp.find(f"{URL}vol")
-        q_vol = extract_text(vol, "qVol")
-        esp = extract_text(vol, "esp")
-        marca = extract_text(vol, "marca")
-        n_vol = extract_text(vol, "nVol")
-        peso_b = format_number(extract_text(vol, "pesoB"), precision=3)
-        peso_l = format_number(extract_text(vol, "pesoL"), precision=3)
 
         fields_line1 = [
             BaseFieldInfo(w=0, description="NOME / RAZÃO SOCIAL", content=name),
@@ -1434,17 +1432,42 @@ class DanfeMoc70(xFPDF):
             BaseFieldInfo(w=w_transp_ie, description="INSCRIÇÃO ESTADUAL", content=ie),
         ]
 
-        fields_line3 = [
-            BaseFieldInfo(w=25, description="QUANTIDADE", content=q_vol),
-            BaseFieldInfo(w=30, description="ESPÉCIE", content=esp),
-            BaseFieldInfo(w=30, description="MARCA", content=marca),
-            BaseFieldInfo(w=45, description="NUMERAÇÃO", content=n_vol),
-            BaseFieldInfo(w=0, description="PESO BRUTO", content=peso_b),
-            BaseFieldInfo(w=0, description="PESO LÍQUIDO", content=peso_l),
+        # Uma linha por grupo vol, como o ACBr: a primeira com os rótulos e as
+        # demais só com os valores. Além de MAX_VOLUME_LINES, os volumes vão
+        # para as informações complementares. Sem volume, a linha sai em branco.
+        shown = self.volumes[:MAX_VOLUME_LINES] or [None]
+        volume_lines = [
+            self._volume_fields(vol, labels=i == 0) for i, vol in enumerate(shown)
         ]
-
-        block_transporte.add_fields([fields_line1, fields_line2, fields_line3])
+        lines = [fields_line1, fields_line2, *volume_lines]
+        block_transporte.rows_heights = (DEFAULT_FIELD_HEIGHT,) * 3 + (
+            VOLUME_LINE_HEIGHT,
+        ) * (len(volume_lines) - 1)
+        block_transporte.add_fields(lines)
         block_transporte.render()
+
+    def _volume_fields(self, vol, labels=True):
+        def label(text):
+            return text if labels else ""
+
+        peso_b = format_number(extract_text(vol, "pesoB"), precision=3)
+        peso_l = format_number(extract_text(vol, "pesoL"), precision=3)
+        return [
+            BaseFieldInfo(
+                w=25, description=label("QUANTIDADE"), content=extract_text(vol, "qVol")
+            ),
+            BaseFieldInfo(
+                w=30, description=label("ESPÉCIE"), content=extract_text(vol, "esp")
+            ),
+            BaseFieldInfo(
+                w=30, description=label("MARCA"), content=extract_text(vol, "marca")
+            ),
+            BaseFieldInfo(
+                w=45, description=label("NUMERAÇÃO"), content=extract_text(vol, "nVol")
+            ),
+            BaseFieldInfo(w=0, description=label("PESO BRUTO"), content=peso_b),
+            BaseFieldInfo(w=0, description=label("PESO LÍQUIDO"), content=peso_l),
+        ]
 
     def _draw_products(self, height_product_table, products, additional_data=""):
         DanfeBlock(

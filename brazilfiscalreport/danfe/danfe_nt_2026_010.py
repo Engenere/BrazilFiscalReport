@@ -12,6 +12,7 @@ from qrcode.constants import ERROR_CORRECT_M
 from ..generate_qrcode import make_qr_code_image
 from ..utils import (
     chunks,
+    describe_volumes,
     format_cep,
     format_cpf_cnpj,
     format_number,
@@ -30,6 +31,7 @@ from .danfe_conf import (
     BASE_FONT_SIZES,
     DEFAULT_FIELD_HEIGHT,
     HEIGHT_FONT_BLOCK_DESC,
+    MAX_VOLUME_LINES,
     PRODUCT_CELL_PADDING,
     PRODUCT_HEADER_LINE_HEIGHT,
     PRODUCT_LINE_HEIGHT,
@@ -38,6 +40,7 @@ from .danfe_conf import (
     QR_CODE_BOX_SIZE,
     QR_CODE_SIZE,
     URL,
+    VOLUME_LINE_HEIGHT,
 )
 from .danfe_emit_info import DanfeEmitInfo
 from .danfe_ident_info import DanfeIdentInfo
@@ -146,6 +149,7 @@ class DanfeNt2026010(xFPDF):
         self.is_tot = root.find(f"{URL}ISTot")
         self.ibscbs_tot = root.find(f"{URL}IBSCBSTot")
         self.transp = root.find(f"{URL}transp")
+        self.volumes = [vol for vol in self.transp.findall(f"{URL}vol") if len(vol)]
         self.cobr = root.find(f"{URL}cobr")
         self.det = root.findall(f"{URL}det")
         self.inf_adic = root.find(f"{URL}infAdic")
@@ -608,6 +612,12 @@ class DanfeNt2026010(xFPDF):
         dest_end, cpl, cpl_truncado = self._get_dest_end_text(self.dest)
         if cpl_truncado:
             obs += "Complemento do destinatário: " + cpl + "."
+        extra_volumes = self.volumes[MAX_VOLUME_LINES:]
+        if extra_volumes:
+            obs += (
+                f" Volumes {MAX_VOLUME_LINES + 1} a {len(self.volumes)}: "
+                f"{describe_volumes(extra_volumes, URL)}."
+            )
         if fisco:
             obs = f"{obs} {fisco}\n"
 
@@ -1555,13 +1565,6 @@ class DanfeNt2026010(xFPDF):
         veic_placa = extract_text(veic_transp, "placa")
         veic_uf = extract_text(veic_transp, "UF")
         veic_rntc = extract_text(veic_transp, "RNTC")
-        vol = self.transp.find(f"{URL}vol")
-        q_vol = extract_text(vol, "qVol")
-        esp = extract_text(vol, "esp")
-        marca = extract_text(vol, "marca")
-        n_vol = extract_text(vol, "nVol")
-        peso_b = format_number(extract_text(vol, "pesoB"), precision=3)
-        peso_l = format_number(extract_text(vol, "pesoL"), precision=3)
 
         fields_line1 = [
             BaseFieldInfo(w=0, description="NOME / RAZÃO SOCIAL", content=name),
@@ -1592,25 +1595,47 @@ class DanfeNt2026010(xFPDF):
             BaseFieldInfo(w=w_transp_ie, description="INSCRIÇÃO ESTADUAL", content=ie),
         ]
 
-        fields_line3 = [
-            BaseFieldInfo(w=25, description="QUANTIDADE", content=q_vol),
-            BaseFieldInfo(w=30, description="ESPÉCIE", content=esp),
-            BaseFieldInfo(w=30, description="MARCA", content=marca),
-            BaseFieldInfo(w=45, description="NUMERAÇÃO", content=n_vol),
-            BaseFieldInfo(w=0, description="PESO BRUTO", content=peso_b),
-            BaseFieldInfo(w=0, description="PESO LÍQUIDO", content=peso_l),
-        ]
-
         # The carrier and volume details are printed only when the NF-e has
         # them (NT 2026.010, item 4.4); the freight mode is always printed.
+        # One line per vol group, as ACBr does: the first one with the labels
+        # and the next ones with the values only. Beyond MAX_VOLUME_LINES the
+        # volumes go to the additional data.
         lines = [fields_line1]
         if transporta is not None and len(transporta):
             lines.append(fields_line2)
-        if vol is not None and len(vol):
-            lines.append(fields_line3)
-        block_transporte.rows_heights = (DEFAULT_FIELD_HEIGHT,) * len(lines)
+        shown = self.volumes[:MAX_VOLUME_LINES]
+        lines.extend(
+            self._volume_fields(vol, labels=i == 0) for i, vol in enumerate(shown)
+        )
+        extra = max(len(shown) - 1, 0)
+        block_transporte.rows_heights = (DEFAULT_FIELD_HEIGHT,) * (
+            len(lines) - extra
+        ) + (VOLUME_LINE_HEIGHT,) * extra
         block_transporte.add_fields(lines)
         block_transporte.render()
+
+    def _volume_fields(self, vol, labels=True):
+        def label(text):
+            return text if labels else ""
+
+        peso_b = format_number(extract_text(vol, "pesoB"), precision=3)
+        peso_l = format_number(extract_text(vol, "pesoL"), precision=3)
+        return [
+            BaseFieldInfo(
+                w=25, description=label("QUANTIDADE"), content=extract_text(vol, "qVol")
+            ),
+            BaseFieldInfo(
+                w=30, description=label("ESPÉCIE"), content=extract_text(vol, "esp")
+            ),
+            BaseFieldInfo(
+                w=30, description=label("MARCA"), content=extract_text(vol, "marca")
+            ),
+            BaseFieldInfo(
+                w=45, description=label("NUMERAÇÃO"), content=extract_text(vol, "nVol")
+            ),
+            BaseFieldInfo(w=0, description=label("PESO BRUTO"), content=peso_b),
+            BaseFieldInfo(w=0, description=label("PESO LÍQUIDO"), content=peso_l),
+        ]
 
     def _draw_products(self, height_product_table, products, additional_data=""):
         DanfeBlock(

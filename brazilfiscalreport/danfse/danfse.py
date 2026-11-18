@@ -505,7 +505,8 @@ class Danfse(xFPDF):
         emit_uf = extract_text(emit, "UF") if emit is not None else ""
 
         c_stat = extract_text(inf_nfse, "cStat")
-        fin_nfse = extract_text(dps_ibscbs, "finNFSe") if dps_ibscbs is not None else ""
+        # infDPS no leiaute 1.04.01 (NT 009); dentro do IBSCBS no 1.01
+        fin_nfse = extract_text(inf_dps, "finNFSe")
 
         data = {
             "environment": extract_text(dps, "tpAmb"),
